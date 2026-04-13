@@ -150,3 +150,46 @@
 
   margin: auto;
 }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.user-academia {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.btn-logout {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-logout:hover {
+  color: #ef4444;
+}
+
+

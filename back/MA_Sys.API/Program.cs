@@ -50,6 +50,7 @@ builder.Services.AddScoped<IAcademiaRepository, AcademiaRepository>();
 builder.Services.AddScoped<IModalidadeRepository, ModalidadeRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IPlanosRepository, PlanosRepository>();
+builder.Services.AddScoped<IPagamentoRepository, PagamentosRepository>();
 
 // SERVICES
 builder.Services.AddScoped<AlunoService>();
@@ -61,6 +62,7 @@ builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<ProfessorService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<PlanosService>();
+builder.Services.AddScoped<PagamentoService>();
 
 
 builder.Services.AddHttpContextAccessor();

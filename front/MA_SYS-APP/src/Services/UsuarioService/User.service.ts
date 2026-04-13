@@ -10,6 +10,7 @@ export interface Usuarios {
   password: string;
   academiaId: number;
   role: string;
+  nomeAcademia: string;
 }
 
 @Injectable({

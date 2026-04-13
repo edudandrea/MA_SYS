@@ -46,6 +46,8 @@ export class AcademiasComponent implements OnInit {
     return nome ? nome.charAt(0).toUpperCase() : '?';
   }
 
+  
+
   @HostListener('document:click', ['$event'])
   fecharMenu(event: any) {
     const clicouMenu = event.target.closest('.card-menu');

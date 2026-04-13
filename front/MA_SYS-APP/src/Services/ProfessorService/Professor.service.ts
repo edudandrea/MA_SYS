@@ -14,6 +14,8 @@ export interface Professores {
   ativo: boolean;
   nomeAcademia: string;
   totalAlunos: number;
+  nomeModalidade: string;
+  menuAberto: boolean;
 }
 
 @Injectable({
@@ -31,6 +33,10 @@ export class ProfessorService {
   novoProfessor(professor: Partial<Professores>): Observable<Professores> {
     return this.http.post<Professores>(this.apiUrl, professor);
   }
+
+  atualizarProfessor(professor: Partial<Professores>): Observable<Professores> {
+      return this.http.put<Professores>(`${this.apiUrl}/${professor.id}`, professor);
+    }
 
   atualizarStatus(id: number, ativo: boolean): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/status`, ativo);

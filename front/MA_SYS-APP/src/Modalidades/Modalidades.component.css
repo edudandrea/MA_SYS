@@ -1,11 +1,20 @@
-.modalidade-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  margin-top: 25px;
+.modalidades-page {
+  max-width: 1200px;
 }
 
-.modalidade-card {
+/* =========================
+   GRID
+========================= */
+.modalidades-page .modalidade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* =========================
+   CARD
+========================= */
+.modalidades-page .modalidade-card {
   background: linear-gradient(145deg, #020617, #020617);
   border: 1px solid #1e293b;
   border-radius: 16px;
@@ -16,63 +25,113 @@
   z-index: 1;
 }
 
-.modalidade-card:hover {
- transform: translateY(-3px);
+/* Hover SaaS */
+.modalidades-page .modalidade-card:hover {
+  transform: translateY(-3px);
   border-color: #2563eb;
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
   z-index: 2;
 }
 
+/* Glow */
+.modalidades-page .modalidade-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(120deg, transparent, #2563eb, transparent);
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+}
 
+.modalidades-page .modalidade-card:hover::after {
+  opacity: 0.2;
+}
+
+/* =========================
+   HEADER CENTRAL
+========================= */
+.card-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* Avatar */
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+}
+
+/* Nome */
+.modalidades-page .modalidade-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f0;
+  text-align: center;
+  max-width: 180px;
+}
+
+/* =========================
+   MENU
+========================= */
+.card-menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+}
+
+/* =========================
+   BODY
+========================= */
+.card-body {
+  margin-top: 10px;
+}
+
+/* GRID DE INFORMAÇÕES */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* ITEM */
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* =========================
+   FOOTER
+========================= */
 .card-footer {
-  margin-top: 16px;
+  margin-top: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.edit-input {
-  background: #020617;
-  border: 1px solid #2563eb;
-
-  border-radius: 8px;
-
-  padding: 6px 10px;
-
-  color: white;
-
-  width: 160px;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.modalidade-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #2563eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.modalidade-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #f1f5f9;
-}
-
-
-
+/* STATUS */
 .status {
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 20px;
 }
 
@@ -86,20 +145,131 @@
   color: #ef4444;
 }
 
-.modalidade-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 1px;
-  background: linear-gradient(120deg, transparent, #2563eb, transparent);
-  opacity: 0;
-  transition: 0.3s;
-  pointer-events: none;
+.form-grid-modal {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
-.modalidade-card:hover::after {
-  opacity: 0.2;
+/* LINHA FULL */
+.form-row.full {
+  margin-bottom: 20px;
+}
+
+/* INPUT GROUP */
+.modal-content .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+/* INPUT MODERNO */
+.modal-content .input-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 10px;
+
+  padding: 10px 12px;
+}
+
+/* INPUT */
+.modal-content .input-modern input,
+.modal-content .input-modern select {
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+
+  font-size: 14px;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  color: #e2e8f0;
+  flex: 1; /* 🔥 usa espaço restante corretamente */
+  min-width: 0;
+}
+
+/* REMOVE seta padrão */
+.modal-content .input-modern select::-ms-expand {
+  display: none;
+}
+
+/* DROPDOWN */
+.modal-content select option {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+/* FOCUS */
+.modal-content .input-modern:focus-within {
+  border-color: #2563eb;
+}
+
+/* ICON (CORRIGIDO) */
+.modal-content .input-modern i {
+  flex-shrink: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* SETA CUSTOM (apenas para select) */
+.modal-content .input-modern::after {
+  content: '▾';
+  position: absolute;
+  right: 10px;
+  color: #64748b;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
 }
 
 .empty-state {

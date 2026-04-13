@@ -31,9 +31,12 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.login, this.password).subscribe({
       next: (response) => {
         this.toastr.success('Login realizado com sucesso', 'Sucesso');
+        
 
         const token = response.token;
         localStorage.setItem('token', token);
+        localStorage.setItem('role', response.role);
+        localStorage.setItem('usuario', JSON.stringify(response.usuario));
 
         const decodedToken = this.decodeToken(token);
 

@@ -12,16 +12,27 @@ namespace MA_Sys.API.Services
     public class PlanosService
     {
         private readonly IPlanosRepository _repo;
+        private readonly IAlunoRepository _alunoRepo;
 
-        public PlanosService(IPlanosRepository repo)
+        public PlanosService(IPlanosRepository repo, IAlunoRepository alunoRepo)
         {
             _repo = repo;
+            _alunoRepo = alunoRepo;
         }
 
-        public List<PlanosResponseDto> List()
-        {          
+        public List<PlanosResponseDto> List(string role, int? academiaId)
+        {
+            var query = _repo.Query().AsNoTracking();
 
-            return _repo.Query().Select(a => new PlanosResponseDto
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                if (academiaId == null)
+                    throw new UnauthorizedAccessException("Usuário sem vinculo com academia");
+
+                query = query.Where(a => a.Id == academiaId);
+            }
+
+            return query.Select(a => new PlanosResponseDto
             {
                 Id = a.Id,
                 Nome = a.Nome,
@@ -52,25 +63,26 @@ namespace MA_Sys.API.Services
                 Nome = pl.Nome,
                 Valor = pl.Valor,
                 DuracaoMeses = pl.DuracaoMeses,
-                AcademiaId = pl.AcademiaId
+                AcademiaId = pl.AcademiaId,
+                AcademiaNome = pl.Academia.Nome,
+                Ativo = pl.Ativo,
+                TotalAlunos = _alunoRepo.Query().Count(a => a.PlanoId == pl.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
+
+
 
             }).ToList();
         }
 
-        public void Add(PlanosCreateDto dto, int? academiaId, string role)
+        public void Add(PlanosCreateDto dto, int? academiaId)
         {
-            if (role != "Admin")
-            {
-                if (dto.AcademiaId != academiaId)
-                    throw new Exception("Não autorizado a criar plano para outra academia");
-            }
+
             var plano = new Plano
             {
                 Nome = dto.Nome,
                 Valor = dto.Valor,
                 DuracaoMeses = dto.DuracaoMeses,
                 AcademiaId = academiaId ?? 0,
-                Ativo = true 
+                Ativo = true
             };
 
             _repo.Add(plano);
@@ -104,6 +116,27 @@ namespace MA_Sys.API.Services
             _repo.Save();
         }
 
+        public PlanosDto GetTotalAlunos(int? academiaId, int? planoId, string? role)
+        {
+            var query = _alunoRepo.Query();
 
+            var isAdmin = role?.Trim().ToLower() == "admin";
+
+            // 🔥 filtrar pelo plano
+            query = query.Where(a => a.PlanoId == planoId);
+
+            // 🔥 se NÃO for admin → filtra pela academia
+            if (!isAdmin && academiaId.HasValue)
+            {
+                query = query.Where(a => a.AcademiaId == academiaId);
+            }
+
+            var totalAlunos = query.Count();
+
+            return new PlanosDto
+            {
+                TotalAlunos = totalAlunos
+            };
+        }
     }
 }

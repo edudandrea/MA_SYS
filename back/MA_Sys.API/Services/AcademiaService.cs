@@ -2,6 +2,7 @@ using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.AcademiasDto;
 using MA_SYS.Api.Dto;
 using MA_SYS.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MA_Sys.API.Services
 {
@@ -9,39 +10,51 @@ namespace MA_Sys.API.Services
     {
         private readonly IAcademiaRepository _repo;
 
-
-
         public AcademiaService(IAcademiaRepository repo)
-
         {
             _repo = repo;
-
         }
 
-        public List<AcademiaResponseDto> List()
+        public List<AcademiaResponseDto> List(string role, int? academiaId)
         {
-            return _repo.Query()
-                .Select(a => new AcademiaResponseDto
-                {
-                    Id = a.Id,
-                    Nome = a.Nome,
-                    Email = a.Email,
-                    Telefone = a.Telefone,
-                    Cidade = a.Cidade,
-                    RedeSocial = a.RedeSocial,
-                    Responsavel = a.Responsavel,
-                    Ativo = a.Ativo,
+            var query = _repo.Query().AsNoTracking();
 
-                    totalAlunos = a.Alunos.Count(),
-                    totalProfessores = a.Professores.Count()
-                    
-                }).ToList();
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                if (academiaId == null)
+                    throw new UnauthorizedAccessException("Usuário sem vinculo com academia");
+
+                query = query.Where(a => a.Id == academiaId);
+            }
+
+            return query.Select(a => new AcademiaResponseDto
+            {
+                Id = a.Id,
+                Nome = a.Nome,
+                Email = a.Email,
+                Telefone = a.Telefone,
+                Cidade = a.Cidade,
+                RedeSocial = a.RedeSocial,
+                Responsavel = a.Responsavel,
+                Ativo = a.Ativo,
+
+                totalAlunos = a.Alunos.Count(),
+                totalProfessores = a.Professores.Count()
+
+            }).ToList();
         }
 
-        public List<AcademiaResponseDto> Get(AcademiaFiltroDto filtro, int academiaId)
+        public List<AcademiaResponseDto> Get(string role, AcademiaFiltroDto filtro, int? academiaId)
         {
-            var query = _repo.Query()
-            .Where(a => a.Id == academiaId);
+            var query = _repo.Query().AsNoTracking();
+
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                if (academiaId == null)
+                    throw new UnauthorizedAccessException("Usuário sem vinculo com academia");
+
+                query = query.Where(a => a.Id == academiaId);
+            }
 
             if (filtro.Id.HasValue)
                 query = query.Where(a => a.Id == filtro.Id);
@@ -61,8 +74,6 @@ namespace MA_Sys.API.Services
 
                 totalAlunos = a.Alunos.Count(),
                 totalProfessores = a.Professores.Count()
-
-
 
             }).ToList();
         }
@@ -135,9 +146,9 @@ namespace MA_Sys.API.Services
             _repo.Save();
         }
 
-        public void UpdateStatus(int id, int academiaId, bool ativo)
+        public void UpdateStatus(int id, int? academiaId, bool ativo)
         {
-            var academia = _repo.GetById(id, academiaId);
+            var academia = _repo.GetById(id, academiaId ?? 0);
 
             if (academia == null)
                 throw new Exception("Academia não encontrado");

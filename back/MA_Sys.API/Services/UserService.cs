@@ -13,9 +13,14 @@ namespace MA_Sys.API.Services
             _repo = repo;
         }
 
-        public List<UserResponseDto> List()
+        public List<UserResponseDto> List(string role, int? academiaId)
         {
             var user = _repo.Query();
+
+            if (role != "Admin")
+            {
+                user = user.Where(u => u.AcademiaId == academiaId);
+            }
 
             return user.Select(u => new UserResponseDto
             {
@@ -25,15 +30,23 @@ namespace MA_Sys.API.Services
                 Email = u.Email,
                 Password = u.Password,
                 Role = u.Role,
-                
+
             }).ToList();
         }
 
-        public List<UserResponseDto> Get(UserFiltroDto filtro)
+        public List<UserResponseDto> Get(string role, int? academiaId, UserFiltroDto filtro)
         {
-            var query = _repo.Query();          
+            var query = _repo.Query();
 
-            
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                if (academiaId == null)
+                    throw new UnauthorizedAccessException("Usuário sem vinculo com academia não pode acessar modalidades");
+
+                query = query.Where(m => m.AcademiaId == academiaId);
+            }
+
+
             if (!string.IsNullOrEmpty(filtro.UserName))
                 query = query.Where(u => u.UserName.Contains(filtro.UserName));
 
@@ -41,15 +54,16 @@ namespace MA_Sys.API.Services
                 query = query.Where(u => u.Role.Contains(filtro.Role));
 
             return query.Select(u => new UserResponseDto
-            {                
+            {
                 UserName = u.UserName,
                 Email = u.Email,
-                Password = u.Password,
                 Role = u.Role,
-                AcademiaId = u.AcademiaId
+                AcademiaId = u.AcademiaId,
+                AcademiaNome = u.Academia.Nome
                 
+
             }).ToList();
-           
+
         }
 
         public void Add(UserCreateDto dto)
@@ -82,8 +96,8 @@ namespace MA_Sys.API.Services
             user.Role = dto.Role?.Trim();
             user.AcademiaId = dto.AcademiaId;
 
-             _repo.Update(user);
-        
+            _repo.Update(user);
+
             _repo.Save();
         }
 

@@ -74,7 +74,8 @@ namespace MA_Sys.API.Services
                 Graduacao = a.Graduacao,
                 Ativo = a.Ativo,
                 AcademiaId = a.AcademiaId,
-                Obs = a.Obs
+                PlanoId = a.PlanoId,
+                Obs = a.Obs,
 
             }).ToList();
         }

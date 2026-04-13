@@ -1,6 +1,7 @@
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_SYS.Api.Data;
 using MA_SYS.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MA_Sys.API.Data.Repository
 {
@@ -12,7 +13,9 @@ namespace MA_Sys.API.Data.Repository
         
         public Users GetByLogin(string login)
         {
-            return _context.User.FirstOrDefault(u => u.Login == login);
+            return _context.User
+                                .Include(u => u.Academia)
+                                .FirstOrDefault(u => u.Login == login);
         }
         
     }

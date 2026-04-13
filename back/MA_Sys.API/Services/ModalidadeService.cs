@@ -1,3 +1,4 @@
+using MA_Sys.API.Data.Repository;
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.ModalidadesDto;
 using MA_SYS.Api.Models;
@@ -9,10 +10,14 @@ namespace MA_Sys.API.Services
     public class ModalidadeService
     {
         private readonly IModalidadeRepository _repo;
+        private readonly IAlunoRepository _alunoRepo;
+        private readonly IProfessorRepository _profRepo;
 
-        public ModalidadeService(IModalidadeRepository repo)
+        public ModalidadeService(IModalidadeRepository repo,  IAlunoRepository alunoRepo, IProfessorRepository profRepo)
         {
             _repo = repo;
+            _alunoRepo = alunoRepo;
+            _profRepo = profRepo;
         }
 
         public List<ModalidadeResponseDto> List(int academiaId)
@@ -50,18 +55,25 @@ namespace MA_Sys.API.Services
                 Id = m.Id,
                 NomeModalidade = m.NomeModalidade,
                 Ativo = m.Ativo,
-                AcademiaId = m.AcademiaId
+                AcademiaId = m.AcademiaId,
+                TotalAlunos = _alunoRepo.Query().Count(a => a.ModalidadeId == m.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId)),
+                TotalProf = _profRepo.Query().Count(a => a.ModalidadeId == m.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
 
             }).ToList();
         }
 
         public void Add(ModalidadeCreateDto dto, int? academiaId, string role)
         {
-            if (role != "Admin")
+            var query = _repo.Query().AsNoTracking();
+
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
             {
-                if (dto.AcademiaId != academiaId)
-                    throw new Exception("Não autorizado a criar modalidade para outra academia");
+                if (academiaId == null)
+                    throw new UnauthorizedAccessException("Usuário sem vinculo com academia não pode criar modalidades");
+
+                query = query.Where(m => m.AcademiaId == academiaId);
             }
+            
             var modalidade = new Modalidade
             {
                 NomeModalidade = dto.NomeModalidade,

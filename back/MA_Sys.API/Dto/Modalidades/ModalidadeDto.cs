@@ -7,5 +7,6 @@ namespace MA_SYS.Api.Dto
         public string? NomeModalidade { get; set; }
         public bool Ativo { get; set; }
         public int TotalAlunos { get; set; }
+        public int TotalProf { get; set; }
     }
 }

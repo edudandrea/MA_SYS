@@ -146,32 +146,6 @@ namespace MA_SYS.Api.Migrations
                     b.ToTable("Aulas");
                 });
 
-            modelBuilder.Entity("MA_SYS.Api.Models.Mensalidade", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("AcademiaId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Pago")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("Valor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Vencimento")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Mensalidades");
-                });
-
             modelBuilder.Entity("MA_SYS.Api.Models.Modalidade", b =>
                 {
                     b.Property<int>("Id")
@@ -200,6 +174,45 @@ namespace MA_SYS.Api.Migrations
                     b.ToTable("Modalidades");
                 });
 
+            modelBuilder.Entity("MA_SYS.Api.Models.Pagamentos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AcademiaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DataPagamento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DataVencimento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FormaPagamento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PlanoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("PlanoId");
+
+                    b.ToTable("Pagamentos");
+                });
+
             modelBuilder.Entity("MA_SYS.Api.Models.Plano", b =>
                 {
                     b.Property<int>("Id")
@@ -218,10 +231,15 @@ namespace MA_SYS.Api.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TotalAlunos")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("Valor")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AcademiaId");
 
                     b.ToTable("Planos");
                 });
@@ -252,6 +270,9 @@ namespace MA_SYS.Api.Migrations
 
                     b.Property<string>("Telefone")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("TotalAlunos")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -302,6 +323,36 @@ namespace MA_SYS.Api.Migrations
                         .HasForeignKey("AcademiaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MA_SYS.Api.Models.Pagamentos", b =>
+                {
+                    b.HasOne("MA_SYS.Api.Models.Aluno", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MA_SYS.Api.Models.Plano", "Plano")
+                        .WithMany()
+                        .HasForeignKey("PlanoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Plano");
+                });
+
+            modelBuilder.Entity("MA_SYS.Api.Models.Plano", b =>
+                {
+                    b.HasOne("MA_SYS.Api.Models.Academia", "Academia")
+                        .WithMany()
+                        .HasForeignKey("AcademiaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Academia");
                 });
 
             modelBuilder.Entity("MA_SYS.Api.Models.Professor", b =>

@@ -17,7 +17,7 @@ namespace MA_SYS.Api.Data
         public DbSet<Aluno> Alunos { get; set; }
         public DbSet<Plano> Planos { get; set; }
         public DbSet<Aula> Aulas { get; set; }
-        public DbSet<Mensalidade> Mensalidades { get; set; }
+        public DbSet<Pagamentos> Pagamentos { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Academia> Academias { get; set; }
         public DbSet<Modalidade> Modalidades { get; internal set; }        

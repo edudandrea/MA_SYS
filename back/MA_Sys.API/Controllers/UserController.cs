@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace MA_Sys.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserRepository _userRepo;
         private readonly TokenService _tokenService;
@@ -22,20 +23,12 @@ namespace MA_Sys.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public IActionResult List()
-        {
-            var user = _service.List();
-            return Ok(user);
-        }
-
-
-
         [HttpGet("{id}")]
         public IActionResult Get([FromBody] UserFiltroDto filtro)
         {
+            var (role, academiaId) = GetUserInfo();
             
-            var user = _service.Get(filtro);
+            var user = _service.Get(role, academiaId, filtro);
 
             return Ok(user);
         }
@@ -61,9 +54,11 @@ namespace MA_Sys.API.Controllers
                 usuario = new
                 {
                     id = user.UserId,
+                    userName = user.UserName,                    
                     login = user.Login,
                     role = user.Role,
-                    academiaId = user.AcademiaId
+                    academiaId = user.AcademiaId,
+                    academiaNome = user.Academia != null ? user.Academia.Nome : null
                 }
                    
             });

@@ -20,7 +20,7 @@ import { Academias, AcademiasService } from '../Services/AcademiaService/Academi
 export class ModalidadesComponent implements OnInit {
   modalidadeId: number = 0;
   modalidades: (Modalidades & { menuAberto?: boolean; academiaNome?: string })[] = [];
-  academias: (Academias)[] = [];
+  academias: Academias[] = [];
   ativo: boolean = true;
   nomeModalidade: string = '';
   totalAlunos: number = 0;
@@ -48,10 +48,13 @@ export class ModalidadesComponent implements OnInit {
 
   ngOnInit() {
     console.log('Tela modalidades carregada');
-     this.carregarAcademias(() => {
-    this.carregarModalidades();
-  });
-      
+    this.carregarAcademias(() => {
+      this.carregarModalidades();
+    });
+  }
+
+  getInicial(nome: string): string {
+    return nome ? nome.charAt(0).toUpperCase() : '?';
   }
 
   trackByModalidade(index: number, item: Modalidades) {
@@ -109,7 +112,7 @@ export class ModalidadesComponent implements OnInit {
   cadastrarNovaModalidade() {
     this.spinner.show();
 
-    const modalidade = {      
+    const modalidade = {
       nomeModalidade: this.novaModalidade.nomeModalidade,
     };
 
@@ -167,42 +170,41 @@ export class ModalidadesComponent implements OnInit {
   }
 
   carregarModalidades() {
-  this.spinner.show();
+    this.spinner.show();
 
-  this.modalidadesService.getModalidades().subscribe({
-    next: (res) => {
-      console.log('Modalidades recebidas:', res);
+    this.modalidadesService.getModalidades().subscribe({
+      next: (res) => {
+        console.log('Modalidades recebidas:', res);
 
-      this.spinner.hide();
+        this.spinner.hide();
 
-      this.modalidades = res.map((m) => {
+        this.modalidades = res.map((m) => {
+          // 🔍 DEBUG
+          console.log('--------------------------------');
+          console.log('Modalidade:', m.nomeModalidade);
+          console.log('ID Academia:', m.academiaId);
+          console.log('Map completo:', this.academiaMap);
+          console.log('Nome encontrado:', this.academiaMap.get(m.academiaId));
 
-        // 🔍 DEBUG
-        console.log('--------------------------------');
-        console.log('Modalidade:', m.nomeModalidade);
-        console.log('ID Academia:', m.academiaId);
-        console.log('Map completo:', this.academiaMap);
-        console.log('Nome encontrado:', this.academiaMap.get(m.academiaId));
+          return {
+            ...m,
+            menuAberto: false,
 
-        return {
-          ...m,
-          menuAberto: false,
+            // ✅ CORRETO (sem erro de digitação)
+            academiaNome: this.academiaMap.get(m.academiaId) || 'Sem Academia',
+          };
+        });
 
-          // ✅ CORRETO (sem erro de digitação)
-          academiaNome: this.academiaMap.get(m.academiaId) || 'Sem Academia',
-        };
-      });
+        this.cd.markForCheck();
+      },
 
-      this.cd.markForCheck();
-    },
-
-    error: (err) => {
-      console.error(err);
-      this.toastr.error('Erro ao carregar modalidades');
-      this.spinner.hide();
-    },
-  });
-}
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Erro ao carregar modalidades');
+        this.spinner.hide();
+      },
+    });
+  }
 
   excluirModalidade(modalidadeId: number): void {
     if (confirm('Deseja realmente excluir essa modalidade?')) {
@@ -228,28 +230,27 @@ export class ModalidadesComponent implements OnInit {
     });
   }
 
-  carregarAcademias(callback?: () => void) {    
+  carregarAcademias(callback?: () => void) {
     this.acad.getAcademias().subscribe({
       next: (res) => {
         console.log('Academias recebidas:', res);
-       
+
         this.academias = res;
 
         this.academiaMap.clear();
-        this.academias.forEach(a => this.academiaMap.set(a.id, a.nome));
+        this.academias.forEach((a) => this.academiaMap.set(a.id, a.nome));
 
-        this.cd.markForCheck(); 
+        this.cd.markForCheck();
 
-        if(callback) callback();
-      },      
+        if (callback) callback();
+      },
 
       error: (err) => {
         console.error(err);
         this.toastr.error('Erro ao carregar Academias');
       },
     });
-  }  
- 
+  }
 
   getIconeModalidade(nome: string): string {
     const icones: any = {

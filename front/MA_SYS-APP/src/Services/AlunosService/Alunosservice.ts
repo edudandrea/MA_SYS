@@ -23,6 +23,7 @@ export interface Alunos {
   ativo: boolean;
   academiaId: number;
   academiaNome?: string;
+  planoId: number;
 }
 
 @Injectable({

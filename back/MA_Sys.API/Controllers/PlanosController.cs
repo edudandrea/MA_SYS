@@ -24,13 +24,6 @@ namespace MA_Sys.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult List()
-        {
-            var academias = _service.List();
-            return Ok(academias);
-        }
-
-        [HttpGet("{id}")]
         public IActionResult Get([FromQuery] PlanosFiltroDto filtro)
         {
             var (role, academiaId) = GetUserInfo();
@@ -42,13 +35,21 @@ namespace MA_Sys.API.Controllers
             return Ok(prof);
         }
 
+        [HttpGet("totalAlunos")]
+        public IActionResult GetTotalAlunos([FromQuery] int planoId)
+        {
+            var (role, academiaId) = GetUserInfo();
+            var totalAlunos = _service.GetTotalAlunos(academiaId, planoId, role);
+            return Ok(totalAlunos);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] PlanosCreateDto dto)
         {
             var (role, academiaId) = GetUserInfo();
             Console.WriteLine($"Academia ID: {academiaId}");
 
-            _service.Add(dto, academiaId, role);
+            _service.Add(dto, academiaId);
 
             return Ok();
         }

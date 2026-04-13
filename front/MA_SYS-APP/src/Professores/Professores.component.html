@@ -19,12 +19,12 @@
         </button>
 
         <div class="menu-dropdown" *ngIf="professor.menuAberto">
-          <button *ngIf="editarId !== professor.id" --(click)="editarProfessor(professor)">
+          <button *ngIf="editarId !== professor.id" (click)="editarProfessor(professor)">
             <i class="fa-solid fa-pen"></i>
             Editar
           </button>
 
-          <button *ngIf="editarId === professor.id" --(click)="salvarEdicao(professor)">
+          <button *ngIf="editarId === professor.id" (click)="salvarEdicao(professor)">
             <i class="fa-solid fa-check"></i>
             Salvar
           </button>
@@ -57,26 +57,30 @@
           <div class="info-item">
             <i class="fa-solid fa-building"></i>
             <span>{{ professor.academiaNome }}</span>
+            
           </div>
 
           <div class="info-item">
             <i class="fa-solid fa-building"></i>
-            <span>{{ professor.modalidadeId }}</span>
+            <span>{{ professor.nomeModalidade }}</span>
           </div>
 
           <div class="info-item">
             <i class="fa-solid fa-award"></i>
-            <span>{{ professor.graduacao }}</span>
+            <span *ngIf="editarId !== professor.id">{{ professor.graduacao }}</span>
+            <input *ngIf="editarId === professor.id" [(ngModel)]="graduacao" class="edit-input" />
           </div>
 
           <div class="info-item">
             <i class="fa-solid fa-phone"></i>
-            <span>{{ professor.telefone }}</span>
+            <span *ngIf="editarId !== professor.id">{{ professor.telefone }}</span>
+            <input *ngIf="editarId === professor.id" [(ngModel)]="telefone" class="edit-input" />
           </div>
 
           <div class="info-item">
             <i class="fa-solid fa-envelope"></i>
-            <span>{{ professor.email }}</span>
+            <span *ngIf="editarId !== professor.id">{{ professor.email }}</span>
+            <input *ngIf="editarId === professor.id" [(ngModel)]="email" class="edit-input" />
           </div>
         </div>
       </div>

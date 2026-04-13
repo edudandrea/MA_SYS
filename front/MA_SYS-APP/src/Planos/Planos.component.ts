@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Planos, PlanosService } from '../Services/Planos/Planos.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-Planos',
@@ -21,16 +22,21 @@ export class PlanosComponent implements OnInit {
   ativo: boolean = true;
   editarId: number | null = null;
   duracaoMeses: number = 0;
-  toitalAlunos: number = 0;
+  totalAlunos: number = 0;
+
+  planoMap = new Map<number, string>();
 
   constructor(
     private modalService: BsModalService,
     private planosService: PlanosService,
     private toastr: ToastrService,
     private cd: ChangeDetectorRef,
+    private spinner: NgxSpinnerService,
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.carregarPlanos();    
+  }
 
   getInicial(nome: string): string {
     return nome ? nome.charAt(0).toUpperCase() : '?';
@@ -52,6 +58,7 @@ export class PlanosComponent implements OnInit {
         this.planos = [...this.planos];
 
         this.cd.markForCheck();
+        this.carregarPlanos();
 
         this.toastr.success(`Plano ${novoStatus ? 'ativado' : 'desativado'}`);
       },
@@ -76,11 +83,74 @@ export class PlanosComponent implements OnInit {
     this.planos = [...this.planos];
   }
 
+  carregarPlanos() {
+    this.spinner.show();
+
+    this.planosService.getPlanos().subscribe({
+      next: (res) => {
+        this.spinner.hide();
+
+        if (!res || res.length === 0) {
+          this.toastr.warning('Nenhum plano cadastrado', 'Atenção');
+          this.planos = [];
+          console.log('RES COMPLETO:', res);
+          return;
+        }
+
+        console.log('Planos recebidos:', res);
+
+        this.planos = res.map((p) => {
+          return {
+            ...p,
+            menuAberto: false,
+            ativo: !!p.ativo,            
+          };
+        });
+        this.cd.detectChanges();
+      },
+
+      error: (err) => {
+        this.spinner.hide();
+        console.error(err);
+        this.toastr.error('Erro ao carregar plano', 'Erro');
+      },
+    });
+  }
+
   novoPlano() {
-   
-  }
+    this.spinner.show();
 
-  excluirPlano(plano: number): void{
+    const professor = {
+      nome: this.nome,
+      valor: this.valor,
+      duracaoMeses: this.duracaoMeses,
+      academiaId: this.academiaId,
+    };
 
-  }
+    console.group('📤 NOVO PROFESSOR');
+    console.log(JSON.stringify(professor, null, 2));
+    console.groupEnd();
+
+    this.planosService.novoPlano(professor).subscribe({
+      next: (res) => {
+        this.spinner.hide();
+        this.toastr.success('Plano cadastrado!', 'Sucesso');
+
+        setTimeout(() => {
+          this.nome = '';
+        }, 500);
+
+        this.modalRef?.hide();
+
+        this.carregarPlanos();
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error(err);
+        this.toastr.error('Erro ao salvar plano', 'Erro');
+      },
+    });
+  }  
+
+  excluirPlano(plano: number): void {}
 }

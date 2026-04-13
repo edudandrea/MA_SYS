@@ -124,6 +124,7 @@
 
         {{ selectedAluno?.ativo ? 'Aluno Ativo' : 'Aluno Inativo' }}
       </span>
+      
 
       <span class="alunos-count">
         <i class="fa-solid fa-building"></i>
@@ -265,6 +266,22 @@
       </div>
 
       <div class="input-group">
+        <label>Plano</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-money-bill"></i>
+
+          <select [(ngModel)]="planoId" name="planoId" [disabled]="!modoEdicao">
+            <option [ngValue]="0">Selecione</option>
+
+            <option *ngFor="let plano of planos" [ngValue]="plano.id">
+              {{ plano.nome }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
         <label>Graduação</label>
 
         <div class="input-modern">
@@ -288,15 +305,9 @@
           />
         </div>
       </div>
+    </div>
 
-      <div class="input-group">
-        <label>Data Cadastro</label>
-
-        <div class="input-modern">
-          <i class="fa-solid fa-calendar"></i>
-          <input type="date" [(ngModel)]="dataCadastro" name="dataCadastro" readonly />
-        </div>
-      </div>
+    <div class="form-row nome-cpf">
 
       <div class="input-group">
         <label>Observações</label>
@@ -310,6 +321,15 @@
             [disabled]="!modoEdicao"
             [class.input-editando]="modoEdicao"
           />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Data Cadastro</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-calendar"></i>
+          <input type="date" [(ngModel)]="dataCadastro" name="dataCadastro" readonly />
         </div>
       </div>
     </div>
@@ -370,7 +390,7 @@
 
           <div class="input-modern">
             <i class="fa-solid fa-user"></i>
-            <input [(ngModel)]="nome" />
+            <input [(ngModel)]="filtroAlunos.nome" />
           </div>
         </div>
       </div>
@@ -381,7 +401,7 @@
 
           <div class="input-modern">
             <i class="fa-solid fa-id-card"></i>
-            <input [(ngModel)]="cpf" />
+            <input [(ngModel)]="filtroAlunos.CPF" />
           </div>
         </div>
 
@@ -390,7 +410,7 @@
 
           <div class="input-modern">
             <i class="fa-solid fa-envelope"></i>
-            <input [(ngModel)]="email" />
+            <input [(ngModel)]="filtroAlunos.email" />
           </div>
         </div>
 
@@ -399,7 +419,7 @@
 
           <div class="input-modern">
             <i class="fa-solid fa-phone"></i>
-            <input [(ngModel)]="telefone" />
+            <input [(ngModel)]="filtroAlunos.telefone" />
           </div>
         </div>
 
@@ -409,7 +429,7 @@
           <div class="input-modern">
             <i class="fa-solid fa-hand-fist"></i>
 
-            <select [(ngModel)]="modalidadeId">
+            <select [(ngModel)]="filtroAlunos.modalidadeId">
               <option [ngValue]="0">Selecione</option>
 
               <option *ngFor="let modalidade of modalidades" [ngValue]="modalidade.id">
@@ -424,7 +444,7 @@
     <div class="actions-row">
       <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
 
-      <button class="btn-save" (click)="salvarNovoAluno()">Salvar Aluno</button>
+      <button class="btn-save" (click)="cadastroNovoAluno()">Salvar Aluno</button>
     </div>
   </div>
 </ng-template>

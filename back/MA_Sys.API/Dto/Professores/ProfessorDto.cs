@@ -10,5 +10,6 @@ namespace MA_SYS.Api.Dto
         public string? Email { get; set; }
         public int ModalidadeId { get; set; }
         public bool Ativo { get; set; }
+        public int TotalAlunos { get; set; }
     }
 }

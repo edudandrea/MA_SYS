@@ -20,12 +20,15 @@ export class ProfessoresComponent implements OnInit {
   nome: string = '';
   telefone: string = '';
   nomeAcademia: string = '';
+  nomeModalidade: string = '';
   ativo: boolean = true;
   email: string = '';
   graduacao: string = '';
   isAdmin = false;
 
   academiaMap = new Map<number, string>();
+
+  modalidadeMap = new Map<number, string>();
 
   modalidadeId: number = 0;
 
@@ -58,8 +61,7 @@ export class ProfessoresComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getUserRole();
-    this.carregarProfessores();
+    this.getUserRole();    
   }
 
   @HostListener('document:click', ['$event'])
@@ -83,6 +85,7 @@ export class ProfessoresComponent implements OnInit {
       this.filtrarModalidades();
     }
     this.carregarAcademias();
+    this.carregarModalidades();
   }
 
   getInicial(nome: string): string {
@@ -98,6 +101,9 @@ export class ProfessoresComponent implements OnInit {
         this.spinner.hide();
 
         this.totalModalidades = res;
+        this.modalidadeMap = new Map(
+          res.map(m => [m.id, m.nomeModalidade])
+        );
 
         this.filtrarModalidades();
 
@@ -119,7 +125,13 @@ export class ProfessoresComponent implements OnInit {
         this.spinner.hide();
         this.academias = res;
 
+        this.academiaMap = new Map(
+          res.map(a => [a.id, a.nome])
+        );       
+
         this.carregarModalidades();
+
+        this.carregarProfessores();
 
         this.cd.markForCheck();
       },
@@ -136,18 +148,16 @@ export class ProfessoresComponent implements OnInit {
 
     this.prof.getProfessores().subscribe({
       next: (res) => {
-        this.spinner.hide();
-
-        if (!res || res.length === 0) {
-          this.toastr.warning('Nenhum professor cadastrado', 'Atenção');
-          this.professores = [];
-          console.log('RES COMPLETO:', res);
-          return;
-        }
+        this.spinner.hide();        
 
         console.log('Professores recebidos:', res);
 
-        this.professores = res;
+        this.professores = res.map(p => ({
+          ...p,
+          menuAberto: false,
+          academiaNome: this.academiaMap.get(p.academiaId) || 'Sem Academia',
+          nomeModalidade: this.modalidadeMap.get(p.modalidadeId) || 'Sem Modalidade'
+        }));
         this.cd.markForCheck();
       },
 
@@ -247,6 +257,47 @@ export class ProfessoresComponent implements OnInit {
         this.spinner.hide();
         console.error(err);
         this.toastr.error('Erro ao salvar professor', 'Erro');
+      },
+    });
+  }
+
+  // ---------PUT ----------
+
+  editarProfessor(prof: Professores) {
+    this.editarId = prof.id;
+    this.nome= prof.nome;
+    this.graduacao = prof.graduacao;
+    this.email = prof.email;
+    this.telefone = prof.telefone
+    prof.menuAberto = false;
+  }
+
+  cancelarEdicao() {
+    this.editarId = null;
+  }
+
+  salvarEdicao(prof: Professores) {
+    const payload = {
+      id: prof.id,
+      nome: this.nome,
+      graduacao: this.graduacao,
+      telefone: this.telefone,
+      email: this.email,
+      ativo: prof.ativo,
+    };
+
+    this.prof.atualizarProfessor(payload).subscribe({
+      next: () => {
+        prof.nome = this.nome;
+        prof.graduacao = this.graduacao;
+        prof.telefone = this.telefone,
+        prof.email = this.email
+
+        this.editarId = null;
+
+        this.carregarProfessores();
+
+        this.toastr.success('Modalidade atualizada');
       },
     });
   }

@@ -9,6 +9,7 @@ namespace MA_Sys.API.Dto.ProfessoresDto
         public string? Telefone { get; set; }
         public string? Email { get; set; }
         public int ModalidadeId { get; set; }
+        public int TotalAlunos { get; set; }
         public bool Ativo { get; set; }
     }
 }

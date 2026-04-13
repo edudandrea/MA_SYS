@@ -1,3 +1,4 @@
+using MA_Sys.API.Controllers;
 using MA_Sys.API.Dto.AcademiasDto;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,29 +9,20 @@ namespace MA_SYS.Api.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class AcademiasController : Controller
+    public class AcademiasController : BaseController
     {
         private readonly AcademiaService _service;
 
         public AcademiasController(AcademiaService service)
         {
             _service = service;
-        }
-
-        private int GetAcademiaId()
-        {
-            var claim = User.FindFirst("AcademiaId");
-
-            if (claim == null || string.IsNullOrEmpty(claim.Value))
-                throw new Exception("Token inválido");
-
-            return int.Parse(claim.Value);
-        }
+        }        
 
         [HttpGet]
         public IActionResult List()
         {
-            var academias = _service.List();
+            var (role, academiaId) = GetUserInfo();
+            var academias = _service.List(role, academiaId);
             return Ok(academias);
         }
 
@@ -38,9 +30,9 @@ namespace MA_SYS.Api.Controllers
         [AllowAnonymous]
         public IActionResult Get([FromBody] AcademiaFiltroDto filtro)
         {
-            var academiaId = GetAcademiaId();
+             var (role, academiaId) = GetUserInfo();
 
-            var academia = _service.Get(filtro, academiaId);
+            var academia = _service.Get(role, filtro, academiaId);
 
             return Ok(academia);
         }

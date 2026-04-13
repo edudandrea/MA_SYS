@@ -13,10 +13,12 @@ namespace MA_Sys.API.Services
     public class ProfessorService
     {
         private readonly IProfessorRepository _repo;
+        private readonly IAlunoRepository _alunoRepo;
 
-        public ProfessorService(IProfessorRepository repo)
+        public ProfessorService(IProfessorRepository repo, IAlunoRepository alunoRepo)
         {
             _repo = repo;
+            _alunoRepo = alunoRepo;
         }
 
         public List<ProfessorResponseDto> List(int academiaId)
@@ -71,6 +73,8 @@ namespace MA_Sys.API.Services
                 Telefone = p.Telefone,
                 Graduacao = p.Graduacao,
                 Ativo = p.Ativo,
+                TotalAlunos = _alunoRepo.Query().Count(a => a.ModalidadeId == p.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
+                
             }).ToList();
         }
 

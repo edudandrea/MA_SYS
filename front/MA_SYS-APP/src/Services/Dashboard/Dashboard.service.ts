@@ -4,15 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class DashboardService{
+export class DashboardService {
   private apiUrl = `${environment.apiUrl}/Dashboard`;
 
-constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-getDashboard(): Observable<any> {
-  return this.http.get<any>(this.apiUrl);
-}
-
+  getDashboard(): Observable<any> {
+    return this.http.get<any>(this.apiUrl);
+  }
 }

@@ -14,6 +14,10 @@
 
   <!-- GRID -->
   <div class="usuario-grid">
+    <div class="empty-state" *ngIf="!usuarios || usuarios.length === 0">
+      <i class="fa-solid fa-user-slash"></i>
+      <p>Nenhum usuário cadastrado</p>
+    </div>
     <div class="usuario-card" *ngFor="let user of usuarios">
       <!-- HEADER -->
       <div class="card-header">

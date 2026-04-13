@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { Modalidades, ModalidadesService } from '../Services/ModalidadeService/Modalidades.service';
 import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
+import { Planos, PlanosService } from '../Services/Planos/Planos.service';
 
 export enum TabsCadastroAluno {
   Pesquisa = 'PESQUISA',
@@ -36,28 +37,23 @@ export class AlunosComponent implements OnInit {
   estado: string = '';
   graduacao: string = '';
   modalidadeId: number = 0;
+  planoId: number = 0;
   telefone: string = '';
   email: string = '';
   modoEdicao = false;
   dataNascimento: string = '';
   dataCadastro: string = '';
   modalidades: Modalidades[] = [];
+  planos: Planos[] = [];
   redeSocial: string = '';
   ativo: boolean = true;
   obs: string = '';
-  
 
   totalAlunos: number = 0;
 
   TabsCadastroAluno = TabsCadastroAluno;
 
-  filtroAlunos = {
-    id: '',
-    nome: '',
-    CPF: '',
-    graduacao: '',
-    modalidadeId: 0,
-  };
+  filtroAlunos = { }as any;
 
   tabs = [
     {
@@ -76,13 +72,15 @@ export class AlunosComponent implements OnInit {
 
   alunosFiltrados: Alunos[] = [];
 
-  selectedAluno?: Alunos & {academiaNome?: string};
+  selectedAluno?: Alunos & { academiaNome?: string };
 
   animacaoStatus: 'pulse' | 'shake' | null = null;
 
   academias: Academias[] = [];
 
   academiaMap = new Map<number, string>();
+
+  private debounceTimer: any;
 
   constructor(
     private toastr: ToastrService,
@@ -92,17 +90,20 @@ export class AlunosComponent implements OnInit {
     private modalidadesService: ModalidadesService,
     private cd: ChangeDetectorRef,
     private acad: AcademiasService,
+    private planosService: PlanosService,
   ) {}
 
   ngOnInit() {
+    this.carregarPlanos();
     this.carregarAcademias();
     this.carregarModalidades();
   }
 
-  private debounceTimer: any;
-
   setActiveTab(tab: TabsCadastroAluno) {
     this.activeTab = tab;
+    if (tab === TabsCadastroAluno.Pesquisa) {
+      this.resetFiltro();
+    }
   }
 
   // Métodos para pesquisar alunos
@@ -131,7 +132,7 @@ export class AlunosComponent implements OnInit {
           this.mostrarListaAlunos = false;
         },
       });
-    }, 300); // debounce
+    }, 300);
   }
 
   onPesquisarClick(): void {
@@ -140,7 +141,6 @@ export class AlunosComponent implements OnInit {
     if (this.filtroAlunos.nome) filtro.nome = this.filtroAlunos.nome;
     if (this.filtroAlunos.CPF) filtro.CPF = this.filtroAlunos.CPF;
     if (this.filtroAlunos.graduacao) filtro.graduacao = this.filtroAlunos.graduacao;
-    if (this.filtroAlunos.modalidadeId > 0) filtro.modalidadeId = this.filtroAlunos.modalidadeId;
 
     this.pesquisarAlunos(filtro);
   }
@@ -149,27 +149,6 @@ export class AlunosComponent implements OnInit {
     setTimeout(() => {
       this.mostrarListaAlunos = false;
     }, 0);
-  }
-
-  carregarAcademias() {
-    this.spinner.show();
-    this.acad.getAcademias().subscribe({
-      next: (res) => {
-        console.log('Academias recebidas:', res);
-        this.spinner.hide();
-        this.academias = res;
-
-        this.academiaMap.clear();
-        this.academias.forEach((a) => this.academiaMap.set(a.id, a.nome));
-
-        this.cd.markForCheck(); // força Angular atualizar
-      },
-
-      error: (err) => {
-        console.error(err);
-        this.toastr.error('Erro ao carregar Academias');
-      },
-    });
   }
 
   selecionarAlunoDaLista(aluno: Alunos) {
@@ -208,30 +187,32 @@ export class AlunosComponent implements OnInit {
   }
 
   setAlunoAtual(aluno: Alunos) {
-  if (!aluno) return;
+    console.log('🔍 Pesquisando alunos com filtro:', aluno);
+    if (!aluno) return;
 
-  this.selectedAluno = {
-    ...aluno,
-    academiaNome: this.academiaMap.get(aluno.academiaId) || 'Sem Academia'
-  };
+    this.selectedAluno = {
+      ...aluno,
+      academiaNome: this.academiaMap.get(aluno.academiaId) || 'Sem Academia',
+    };
 
-  this.idAluno = aluno.id;
-  this.nome = aluno.nome;
-  this.cpf = aluno.cpf;
-  this.endereco = aluno.endereco ?? '';
-  this.graduacao = aluno.graduacao;
-  this.modalidadeId = aluno.modalidadeId;
-  this.telefone = aluno.telefone;
-  this.email = aluno.email;
-  this.redeSocial = aluno.redeSocial ?? '';
-  this.dataNascimento = aluno.dataNascimento?.split('T')[0] ?? '';
-  this.bairro = aluno.bairro ?? '';
-  this.cidade = aluno.cidade ?? '';
-  this.cep = aluno.cep ?? '';
-  this.estado = aluno.estado ?? '';
-  this.dataCadastro = aluno.dataCadastro?.substring(0, 10);
-  this.ativo = aluno.ativo;
-}
+    this.idAluno = aluno.id;
+    this.nome = aluno.nome;
+    this.cpf = aluno.cpf;
+    this.endereco = aluno.endereco ?? '';
+    this.graduacao = aluno.graduacao;
+    this.modalidadeId = aluno.modalidadeId;
+    this.telefone = aluno.telefone;
+    this.email = aluno.email;
+    this.redeSocial = aluno.redeSocial ?? '';
+    this.dataNascimento = aluno.dataNascimento?.split('T')[0] ?? '';
+    this.bairro = aluno.bairro ?? '';
+    this.cidade = aluno.cidade ?? '';
+    this.cep = aluno.cep ?? '';
+    this.estado = aluno.estado ?? '';
+    this.dataCadastro = aluno.dataCadastro?.substring(0, 10);
+    this.ativo = aluno.ativo;
+    this.planoId = Number(aluno.planoId);
+  }
 
   pesquisarAlunos(filtro: any): void {
     this.spinner.show();
@@ -253,7 +234,72 @@ export class AlunosComponent implements OnInit {
     });
   }
 
-  salvarNovoAluno() {
+  resetFiltro() {
+    this.filtroAlunos = {
+      id: '',
+      nome: '',
+      CPF: '',
+      graduacao: '',
+      modalidadeId: 0,
+      planoId: 0,
+    };
+  }
+
+  // Métodos para carregar dados de apoio (modalidades, academias, planos)
+
+  carregarModalidades() {
+    this.modalidadesService.getModalidades().subscribe({
+      next: (res) => {
+        this.modalidades = res;
+        if (this.selectedAluno) {
+          this.modalidadeId = this.selectedAluno.modalidadeId;
+        }
+      },
+
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  carregarPlanos() {
+    this.planosService.getPlanos().subscribe({
+      next: (res) => {
+        console.log('Planos recebidos:', res);
+        this.planos = res;
+        if (this.selectedAluno) {
+          this.planoId = this.selectedAluno.planoId;
+        }
+      },
+
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  carregarAcademias() {
+    this.spinner.show();
+    this.acad.getAcademias().subscribe({
+      next: (res) => {
+        console.log('Academias recebidas:', res);
+        this.spinner.hide();
+        this.academias = res;
+
+        this.academiaMap.clear();
+        this.academias.forEach((a) => this.academiaMap.set(a.id, a.nome));
+
+        this.cd.markForCheck(); // força Angular atualizar
+      },
+
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Erro ao carregar Academias');
+      },
+    });
+  }
+
+  cadastroNovoAluno() {
     this.spinner.show();
 
     const aluno = {
@@ -284,60 +330,14 @@ export class AlunosComponent implements OnInit {
         this.setAlunoAtual(res);
 
         this.activeTab = TabsCadastroAluno.Cadastro;
+        this.resetFiltro();
         this.fecharModal();
+        
       },
       error: (err) => {
         this.spinner.hide();
         console.error(err);
         this.toastr.error('Erro ao salvar aluno', 'Erro');
-      },
-    });
-  }
-
-  atualizarAluno() {
-    if (!this.idAluno) {
-      this.toastr.warning('Aluno não selecionado.', 'Atenção');
-      return;
-    }
-
-    if (!this.modoEdicao) return;
-
-    const payload: Partial<Alunos> = {
-      nome: String(this.nome ?? '').trim(),
-      cpf: this.cpf ?? undefined,
-      graduacao: this.graduacao ?? undefined,
-      modalidadeId: this.modalidadeId ?? undefined,
-      telefone: String(this.telefone ?? '').replace(/\D/g, ''),
-      email: this.email ?? undefined,
-      endereco: this.endereco ?? undefined,
-      bairro: this.bairro ?? undefined,
-      cidade: this.cidade ?? undefined,
-      estado: this.estado ?? undefined,
-      cep: this.cep ?? undefined,
-      redeSocial: this.redeSocial ?? undefined,
-      dataNascimento: this.dataNascimento,
-      ativo: this.ativo,
-    };
-
-    console.group('📤 ATUALIZAR ALUNO');
-    console.log(JSON.stringify(payload, null, 2));
-    console.groupEnd();
-
-    this.spinner.show();
-
-    this.alunoService.atualizarAluno(this.idAluno, payload).subscribe({
-      next: (res) => {
-        this.spinner.hide();
-        this.toastr.success('Aluno atualizado com sucesso!', 'Sucesso');
-
-        // 🔥 mantém estado atualizado
-        this.modoEdicao = false;
-        this.setAlunoAtual(res);
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.error(err);
-        this.toastr.error('Erro ao atualizar aluno', 'Erro');
       },
     });
   }
@@ -375,27 +375,60 @@ export class AlunosComponent implements OnInit {
   }
 
   openModalNovoAluno(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template, {
+     this.modalRef = this.modalService.show(template, {
       class: 'modal-lg modal-dialog-centered',
     });
-
+    
     setTimeout(() => {
       this.inputNomeModal?.nativeElement.focus();
     }, 200);
   }
 
-  carregarModalidades() {
-    this.modalidadesService.getModalidades().subscribe({
-      next: (res) => {
-        this.modalidades = res;
-        if (this.selectedAluno) {
-          this.modalidadeId = this.selectedAluno.modalidadeId;
-        }
-      },
+  atualizarAluno() {
+    if (!this.idAluno) {
+      this.toastr.warning('Aluno não selecionado.', 'Atenção');
+      return;
+    }
 
+    if (!this.modoEdicao) return;
+
+    const payload: Partial<Alunos> = {
+      nome: String(this.nome ?? '').trim(),
+      cpf: this.cpf ?? undefined,
+      graduacao: this.graduacao ?? undefined,
+      modalidadeId: this.modalidadeId ?? undefined,
+      telefone: String(this.telefone ?? '').replace(/\D/g, ''),
+      email: this.email ?? undefined,
+      endereco: this.endereco ?? undefined,
+      bairro: this.bairro ?? undefined,
+      cidade: this.cidade ?? undefined,
+      estado: this.estado ?? undefined,
+      cep: this.cep ?? undefined,
+      redeSocial: this.redeSocial ?? undefined,
+      dataNascimento: this.dataNascimento,
+      ativo: this.ativo,
+      planoId: this.planoId ?? undefined,
+    };
+
+    console.group('📤 ATUALIZAR ALUNO');
+    console.log(JSON.stringify(payload, null, 2));
+    console.groupEnd();
+
+    this.spinner.show();
+
+    this.alunoService.atualizarAluno(this.idAluno, payload).subscribe({
+      next: (res) => {
+        this.spinner.hide();
+        this.toastr.success('Aluno atualizado com sucesso!', 'Sucesso');
+
+        // 🔥 mantém estado atualizado
+        this.modoEdicao = false;
+        this.setAlunoAtual(res);
+      },
       error: (err) => {
+        this.spinner.hide();
         console.error(err);
-        this.toastr.error('Erro ao carregar modalidades');
+        this.toastr.error('Erro ao atualizar aluno', 'Erro');
       },
     });
   }

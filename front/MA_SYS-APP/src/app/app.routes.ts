@@ -10,19 +10,20 @@ import { LayoutComponent } from '../Layout/Layout.component';
 import { UsuariosComponent } from '../Usuarios/Usuarios.component';
 import { PlanosComponent } from '../Planos/Planos.component';
 import { DashboardAdminComponent } from '../DashboardAdmin/DashboardAdmin.component';
+import { DashboardAcademiaComponent } from '../DashboardAcademia/DashboardAcademia.component';
 
 export const routes: Routes = [
 
     
-    { path: 'login', component: LoginComponent}, 
-    
+    { path: 'login', component: LoginComponent},     
     
     {
         path: '',
         component: LayoutComponent,
         canActivate: [AuthGuard],
         children: [
-            { path: 'dashboard', component: DashboardAdminComponent },            
+            { path: 'dashboard', component: DashboardAdminComponent },  
+            { path: 'dash-acad', component: DashboardAcademiaComponent }, 
             { path: 'academias', component: AcademiasComponent },            
             { path: 'alunos', component: AlunosComponent },
             { path: 'modalidades', component: ModalidadesComponent },

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MA_SYS.Api.Models;
 
 namespace MA_Sys.API.Dto.Planos
 {
@@ -13,5 +14,7 @@ namespace MA_Sys.API.Dto.Planos
         public decimal Valor { get; set; }
         public int DuracaoMeses { get; set; }
         public bool Ativo { get; set; }
+        public int TotalAlunos { get; set; }
+        public Academia? Academia { get; set; }
     }
 }
