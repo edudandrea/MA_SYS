@@ -1,12 +1,8 @@
 using MA_Sys.API.Controllers;
 using MA_Sys.API.Dto.ProfessoresDto;
 using MA_Sys.API.Services;
-using MA_SYS.Api.Data;
-using MA_SYS.Api.Dto;
-using MA_SYS.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MA_SYS.Api.Controllers
 {

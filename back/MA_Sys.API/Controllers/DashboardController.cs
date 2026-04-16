@@ -1,17 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace MA_Sys.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DashboardController : ControllerBase
+    public class DashboardController : BaseController
     {
         private readonly DashboardService _service;
 
@@ -23,7 +17,8 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var dashboard = _service.GetDashboard();
+            var (role, academiaId) = GetUserInfo();
+            var dashboard = _service.GetDashboard(role, academiaId);
             return Ok(dashboard);
         }
     }

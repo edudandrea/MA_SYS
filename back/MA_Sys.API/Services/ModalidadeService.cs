@@ -1,8 +1,6 @@
-using MA_Sys.API.Data.Repository;
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.ModalidadesDto;
 using MA_SYS.Api.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MA_Sys.API.Services

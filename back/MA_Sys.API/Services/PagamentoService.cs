@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.Pagamentos;
 using MA_SYS.Api.Models;
@@ -44,7 +40,6 @@ namespace MA_Sys.API.Services
                 DataPagamento = dataPagamento,
                 DataVencimento = dataVencimento,
                 Status = "Pg",
-                FormaPagamento = dto.FormaPagamento,
                 AcademiaId = dto.AcademiaId
             };
             _pagRepo.Add(pagamento);

@@ -44,16 +44,7 @@ export class LoginComponent implements OnInit {
 
         localStorage.setItem('role', role);
 
-        if (role === 'Admin') {
-          console.log('Redirecionando para /dashboard');
-          this.router.navigate(['/dashboard']);
-        } else if (role === 'Academia') {
-          console.log('Redirecionando para /alunos');
-          this.router.navigate(['/alunos']);
-        } else {
-          console.log('Role não encontrado, redirecionando para /login');
-          this.router.navigate(['/login']);
-        }
+        this.router.navigate(['/dashboard'])
       },
       error: () => {
         this.toastr.error('Usuário ou senha inválidos', 'Erro');
@@ -62,8 +53,8 @@ export class LoginComponent implements OnInit {
   }
 
   decodeToken(token: string): any {
-    const payload = token.split('.')[1]; // Pega o payload do token
-    const decodedPayload = atob(payload); // Decodifica o payload
-    return JSON.parse(decodedPayload); // Retorna o payload decodificado
+    const payload = token.split('.')[1]; 
+    const decodedPayload = atob(payload); 
+    return JSON.parse(decodedPayload); 
   }
 }

@@ -7,13 +7,14 @@ import { ToastrModule } from 'ngx-toastr';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { routes } from './app.routes';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { Authinterceptor } from '../Services/Auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
 
-    provideHttpClient(withInterceptorsFromDi()),
+    
+    provideHttpClient(withInterceptorsFromDi(), withFetch()),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: Authinterceptor,

@@ -2,7 +2,6 @@ using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.Alunos;
 using MA_SYS.Api.Dto;
 using MA_SYS.Api.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace MA_Sys.API.Services
 {

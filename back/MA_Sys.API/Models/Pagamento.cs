@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MA_Sys.API.Models;
 
 namespace MA_SYS.Api.Models
 {
@@ -14,9 +15,10 @@ namespace MA_SYS.Api.Models
         public decimal Valor { get; set; }
         public DateTime DataPagamento { get; set; }
         public DateTime DataVencimento { get; set; }
-        public string? Status { get; set; }
-        public string? FormaPagamento { get; set; }
+        public string Status { get; set; } = "Pendente";        
         public Aluno? Aluno { get; set; }
         public Plano? Plano { get; set; }
+        public int FormaPagamentoId { get; set; }
+        public FormaPagamento? FormaPagamento { get; set; }
     }
 }

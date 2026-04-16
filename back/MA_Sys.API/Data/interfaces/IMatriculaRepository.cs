@@ -6,8 +6,8 @@ using MA_SYS.Api.Models;
 
 namespace MA_Sys.API.Data.Repository.interfaces
 {
-    public interface IProfessorRepository : IBaseRepository<Professor>
+    public interface IMatriculaRepository : IBaseRepository<Matricula>
     {
-        List<Professor> GetByAcademia(int academiaId);
+        List<Matricula> GetByAcademia(int academiaId);
     }
 }

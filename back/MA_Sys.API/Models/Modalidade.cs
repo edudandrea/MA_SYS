@@ -9,7 +9,7 @@ namespace MA_SYS.Api.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int AcademiaId { get; set; }
-        public string? NomeModalidade { get; set; }
+        public string NomeModalidade { get; set; } = string.Empty;
         public bool Ativo { get; set; }
         public int TotalAlunos { get; set; }
         public int TotalProf { get; set; }

@@ -159,6 +159,7 @@ namespace MA_SYS.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("NomeModalidade")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TotalAlunos")
@@ -192,13 +193,14 @@ namespace MA_SYS.Api.Migrations
                     b.Property<DateTime>("DataVencimento")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("FormaPagamento")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("FormaPagamentoId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("PlanoId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Valor")
@@ -207,6 +209,8 @@ namespace MA_SYS.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlunoId");
+
+                    b.HasIndex("FormaPagamentoId");
 
                     b.HasIndex("PlanoId");
 
@@ -316,6 +320,36 @@ namespace MA_SYS.Api.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("MA_Sys.API.Models.FormaPagamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AcademiaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Dias")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Parcelas")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Taxa")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FormaPagamentos");
+                });
+
             modelBuilder.Entity("MA_SYS.Api.Models.Modalidade", b =>
                 {
                     b.HasOne("MA_SYS.Api.Models.Academia", null)
@@ -333,6 +367,12 @@ namespace MA_SYS.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MA_Sys.API.Models.FormaPagamento", "FormaPagamento")
+                        .WithMany()
+                        .HasForeignKey("FormaPagamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MA_SYS.Api.Models.Plano", "Plano")
                         .WithMany()
                         .HasForeignKey("PlanoId")
@@ -340,6 +380,8 @@ namespace MA_SYS.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Aluno");
+
+                    b.Navigation("FormaPagamento");
 
                     b.Navigation("Plano");
                 });

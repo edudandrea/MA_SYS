@@ -1,0 +1,144 @@
+.dashboard-page {
+  padding: 20px;
+}
+
+/* KPIs */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.stat-card.success { border-color: #16a34a; }
+.stat-card.danger { border-color: #dc2626; }
+
+/* GRID */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.dashboard-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.dashboard-card.full {
+  grid-column: span 2;
+}
+
+/* ALERTAS */
+.alert {
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.alert.danger {
+  background: #dc262633;
+  color: #ef4444;
+}
+
+.alert.warning {
+  background: #f59e0b33;
+  color: #facc15;
+}
+
+/* LIST */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+/* TABLE */
+.table-header,
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.filter {
+  position: relative;
+  display: inline-block;
+}
+
+/* SELECT */
+.filter select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: linear-gradient(145deg, #020617, #020617);
+  color: #e2e8f0;
+
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+
+  backdrop-filter: blur(6px);
+
+  padding: 10px 40px 10px 14px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+
+  outline: none;
+}
+
+/* HOVER */
+.filter select:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+}
+
+/* FOCUS */
+.filter select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
+}
+
+/* SETA CUSTOM */
+.filter::after {
+  content: "\f078";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  
+  font-size: 10px;
+  color: #94a3b8;
+
+  pointer-events: none;
+}
+
+/* OPTION (limitado pelos browsers) */
+.filter select option {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+.filter select:hover {
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}

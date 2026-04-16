@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MA_Sys.API.Data.Repository.interfaces;
 
 namespace MA_Sys.API.Services

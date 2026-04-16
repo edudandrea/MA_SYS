@@ -10,45 +10,88 @@
     </div>
 
     <nav>
-      <a *ngIf="isAdmin()" routerLink="/dashboard">
+      <a routerLink="/dashboard">
         <i class="fa-solid fa-chart-line"></i>
         <span *ngIf="!sidebarCollapsed">Dashboard</span>
       </a>
 
-      <a routerLink="/dash-acad">
-        <i class="fa-solid fa-chart-line"></i>
-        <span *ngIf="!sidebarCollapsed">Dashboard</span>
-      </a>
+      <div class="menu-item" (click)="toggleCadastro()">
+        <div class="menu-link">
+          <div class="menu-left">
+            <i class="fa-solid fa-user-gear"></i>
+            <span *ngIf="!sidebarCollapsed">Cadastros</span>
+          </div>
 
-      <a *ngIf="isAdmin()" routerLink="/academias">
-        <i class="fa-solid fa-user"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Academias</span>
-      </a>
+          <!-- seta -->
+          <i
+            *ngIf="!sidebarCollapsed"
+            class="fa-solid fa-chevron-down arrow"
+            [class.open]="cadastroOpen"
+          >
+          </i>
+        </div>
+      </div>
 
-      <a routerLink="/alunos">
-        <i class="fa-solid fa-user"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Alunos</span>
-      </a>
+      <!-- SUBMENU -->
+      <div class="submenu" *ngIf="cadastroOpen && !sidebarCollapsed">
+        <a *ngIf="isAdmin()" routerLink="/academias">
+          <i class="fa-solid fa-user"></i>
+          <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Academias</span>
+        </a>
 
-      <a routerLink="/professores">
-        <i class="fa-solid fa-user-tie"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Professores</span>
-      </a>
+        <a routerLink="/alunos">
+          <i class="fa-solid fa-circle-user"></i>
+          <span>Alunos</span>
+        </a>
 
-      <a routerLink="/modalidades">
-        <i class="fa-solid fa-hand-fist"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Modalidades</span>
-      </a>
+        <a routerLink="/matriculas">
+          <i class="fa-solid fa-money-bills"></i>
+          <span>Matriculas</span>
+        </a>
 
-      <a routerLink="/planos">
-        <i class="fa-solid fa-money-bill"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Planos</span>
-      </a>
+        <a routerLink="/professores">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>Professores</span>
+        </a>
 
-      <a routerLink="/planos">
-        <i class="fa-solid fa-money-bill"></i>
-        <span *ngIf="!sidebarCollapsed" routerLinkActive="active">Gestão Financeira</span>
-      </a>
+        <a routerLink="/modalidades">
+          <i class="fa-solid fa-dumbbell"></i>
+          <span>Modalidades</span>
+        </a>
+      </div>
+
+      <div class="menu-item" (click)="toggleFinanceiro()">
+        <div class="menu-link">
+          <i class="fa-solid fa-money-bill"></i>
+          <span *ngIf="!sidebarCollapsed">Gestão Financeira</span>
+
+          <!-- seta -->
+          <i
+            *ngIf="!sidebarCollapsed"
+            class="fa-solid fa-chevron-down arrow"
+            [class.open]="financeiroOpen"
+          >
+          </i>
+        </div>
+      </div>
+
+      <!-- SUBMENU -->
+      <div class="submenu" *ngIf="financeiroOpen && !sidebarCollapsed">
+        <a routerLink="/planos">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Planos</span>
+        </a>
+
+        <a routerLink="/pagamentos">
+          <i class="fa-solid fa-credit-card"></i>
+          <span>Pagamentos</span>
+        </a>
+
+        <a routerLink="/financeiro">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Fluxo de Caixa</span>
+        </a>
+      </div>
 
       <a *ngIf="isAdmin()" routerLink="/usuarios">
         <i class="fa-solid fa-users"></i>

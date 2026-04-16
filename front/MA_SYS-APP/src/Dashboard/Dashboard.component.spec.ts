@@ -3,21 +3,20 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { DashboardAcademiaComponent } from './DashboardAcademia.component';
+import { DashboardComponent } from './Dashboard.component';
 
-describe('DashboardAcademiaComponent', () => {
-  let component: DashboardAcademiaComponent;
-  let fixture: ComponentFixture<DashboardAcademiaComponent>;
+describe('DashboardAdminComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DashboardAcademiaComponent ]
-    })
-    .compileComponents();
+      declarations: [DashboardComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DashboardAcademiaComponent);
+    fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

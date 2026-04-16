@@ -1,3 +1,4 @@
+using MA_Sys.API.Models;
 using MA_SYS.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,9 @@ namespace MA_SYS.Api.Data
         public DbSet<Pagamentos> Pagamentos { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Academia> Academias { get; set; }
-        public DbSet<Modalidade> Modalidades { get; internal set; }        
+        public DbSet<Modalidade> Modalidades { get; internal set; }
+        public DbSet <FormaPagamento> FormaPagamentos { get; set; }   
+        public DbSet<Matricula> Matriculas { get; set; }     
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

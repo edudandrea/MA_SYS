@@ -8,15 +8,20 @@ import { AuthService } from "./Auth.service";
 
 export class AuthGuard implements CanActivate{
 
-    constructor(private auth: AuthService, private router: Router){}
+    constructor(private auth: AuthService, 
+                private router: Router){}
 
     canActivate(): boolean{
-        if(this.auth.isLogged()){
+        if (typeof window === 'undefined')
             return true;
-        }
+        
+        const role = localStorage.getItem('role');
 
-        this.router.navigate(['/login']);
-        return false;
+        if(!role){
+            this.router.navigate(['/login']);
+            return false;
+        }
+        return true;
     }        
     
 }

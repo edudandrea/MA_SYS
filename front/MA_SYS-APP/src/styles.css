@@ -864,6 +864,7 @@ select:disabled {
   overflow: hidden;
 
   z-index: 900;
+  white-space: nowrap;
 }
 
 .floating-edit {
@@ -884,6 +885,8 @@ select:disabled {
   white-space: nowrap;
 
   transition: all 0.25s ease;
+
+  display: inline-block;
 }
 
 /* expansão */

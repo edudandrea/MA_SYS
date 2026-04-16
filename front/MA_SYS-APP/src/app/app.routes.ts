@@ -9,8 +9,10 @@ import { AuthGuard } from '../Services/Auth/auth.guard';
 import { LayoutComponent } from '../Layout/Layout.component';
 import { UsuariosComponent } from '../Usuarios/Usuarios.component';
 import { PlanosComponent } from '../Planos/Planos.component';
-import { DashboardAdminComponent } from '../DashboardAdmin/DashboardAdmin.component';
-import { DashboardAcademiaComponent } from '../DashboardAcademia/DashboardAcademia.component';
+import { DashboardComponent } from '../Dashboard/Dashboard.component';
+import { PagamentosComponent } from '../Pagamentos/Pagamentos.component';
+import { MatriculasComponent } from '../Matriculas/Matriculas.component';
+
 
 export const routes: Routes = [
 
@@ -22,18 +24,21 @@ export const routes: Routes = [
         component: LayoutComponent,
         canActivate: [AuthGuard],
         children: [
-            { path: 'dashboard', component: DashboardAdminComponent },  
-            { path: 'dash-acad', component: DashboardAcademiaComponent }, 
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            
+            { path: 'dashboard', component: DashboardComponent },  
             { path: 'academias', component: AcademiasComponent },            
             { path: 'alunos', component: AlunosComponent },
             { path: 'modalidades', component: ModalidadesComponent },
             { path: 'professores', component: ProfessoresComponent },
             { path: 'planos', component: PlanosComponent },
+            { path: 'pagamentos', component: PagamentosComponent },
             { path: 'usuarios', component: UsuariosComponent },
+            { path: 'matriculas', component: MatriculasComponent },
         ]
     },    
 
-    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    
     { path: '**', redirectTo: 'login'}
 ];
 

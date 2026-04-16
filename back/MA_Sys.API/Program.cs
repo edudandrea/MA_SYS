@@ -51,6 +51,8 @@ builder.Services.AddScoped<IModalidadeRepository, ModalidadeRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IPlanosRepository, PlanosRepository>();
 builder.Services.AddScoped<IPagamentoRepository, PagamentosRepository>();
+builder.Services.AddScoped<IFormaPagamentoRepository, FormaPagamentoRepository>();
+builder.Services.AddScoped<IMatriculaRepository, MatriculaRepository>();
 
 // SERVICES
 builder.Services.AddScoped<AlunoService>();
@@ -63,6 +65,9 @@ builder.Services.AddScoped<ProfessorService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<PlanosService>();
 builder.Services.AddScoped<PagamentoService>();
+builder.Services.AddScoped<FormaPagamentoService>();
+builder.Services.AddScoped<MatriculaService>();
+builder.Services.AddScoped<PixService>();
 
 
 builder.Services.AddHttpContextAccessor();
