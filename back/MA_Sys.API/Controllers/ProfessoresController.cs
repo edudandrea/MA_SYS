@@ -41,6 +41,17 @@ namespace MA_SYS.Api.Controllers
             return Ok();
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromBody] ProfessorUpdateDto dto, int id)
+        {
+            var (role, academiaId) = GetUserInfo();
+            Console.WriteLine($"Academia ID: {academiaId}");
+
+            _service.Update(id, dto);
+
+            return Ok();
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

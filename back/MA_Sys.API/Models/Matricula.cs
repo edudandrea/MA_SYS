@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.ConstrainedExecution;
 
 namespace MA_SYS.Api.Models
 {
@@ -14,7 +15,7 @@ namespace MA_SYS.Api.Models
         public int AlunoId { get; set; }
 
         public int PlanoId { get; set; }
-
+        public int FormaPagamentoId { get; set; }
         public DateTime DataInicio { get; set; }
 
         public DateTime DataFim { get; set; }

@@ -94,14 +94,38 @@ namespace MA_Sys.API.Services
             {
                 Id = m.Id,
                 AlunoId = m.AlunoId,
+                AcademiaId = m.AcademiaId,
 
                 AlunoNome = _alunoRepo.Query()
                     .Where(a => a.Id == m.AlunoId)
                     .Select(a => a.Nome)
                     .FirstOrDefault(),
 
-                AcademiaId = m.AcademiaId,
+                
+                Email = _alunoRepo.Query()
+                    .Where(a => a.Id == m.AlunoId)
+                    .Select(a => a.Email)
+                    .FirstOrDefault(),
+
+                Telefone = _alunoRepo.Query()
+                    .Where(a => a.Id == m.AlunoId)
+                    .Select(a => a.Telefone)
+                    .FirstOrDefault(),
+
                 PlanoId = m.PlanoId,
+                PlanoNome = _planoRepo.Query()
+                    .Where(p => p.Id == m.PlanoId)
+                    .Select(p => p.Nome)
+                    .FirstOrDefault(),
+
+                    PlanoValor = _planoRepo.Query()
+                    .Where(p => p.Id == m.PlanoId)
+                    .Select(p => p.Valor)
+                    .FirstOrDefault(),
+                FormaPagamentoNome = _formaPgtoRepo.Query()
+                    .Where(f => f.Id == m.FormaPagamentoId)
+                    .Select(f => f.Nome)
+                    .FirstOrDefault(),
                 DataInicio = m.DataInicio,
                 DataFim = m.DataFim,
                 Status = m.Status

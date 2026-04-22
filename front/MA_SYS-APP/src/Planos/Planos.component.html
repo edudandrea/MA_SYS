@@ -19,12 +19,12 @@
         </button>
 
         <div class="menu-dropdown" *ngIf="plano.menuAberto">
-          <button *ngIf="editarId !== plano.id" --(click)="editarPlano(plano)">
+          <button *ngIf="editarId !== plano.id" (click)="editarPlano(plano)">
             <i class="fa-solid fa-pen"></i>
             Editar
           </button>
 
-          <button *ngIf="editarId === plano.id" --(click)="salvarEdicao(plano)">
+          <button *ngIf="editarId === plano.id" (click)="salvarEdicao(plano)">
             <i class="fa-solid fa-check"></i>
             Salvar
           </button>
@@ -61,15 +61,27 @@
 
           <div class="info-item">
             <i class="fa-solid fa-money-bill"></i>
+
             <label>Valor</label>
-            <span>{{ plano.valor }}</span>
+
+            <span *ngIf="editarId !== plano.id">
+              {{ plano.valor }}
+            </span>
+
+            <input *ngIf="editarId === plano.id" [(ngModel)]="valor" class="edit-input" />
           </div>
 
           <div class="info-item">
             <i class="fa-solid fa-calendar"></i>
+
             <label>Duração (meses)</label>
-            <span>{{ plano.duracaoMeses }}</span>
-          </div>          
+
+            <span *ngIf="editarId !== plano.id">
+              {{ plano.duracaoMeses }}
+            </span>
+
+            <input *ngIf="editarId === plano.id" [(ngModel)]="duracaoMeses" class="edit-input" />
+          </div>
         </div>
       </div>
 
@@ -127,7 +139,7 @@
         <div class="form-group">
           <label>Duração (meses)</label>
           <input [(ngModel)]="duracaoMeses" name="duracaoMeses" />
-        </div>                  
+        </div>
       </form>
     </div>
 

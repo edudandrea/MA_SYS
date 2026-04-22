@@ -152,5 +152,38 @@ export class PlanosComponent implements OnInit {
     });
   }  
 
+   editarPlano(plano: Planos) {
+      this.editarId = plano.id;
+      this.nome= plano.nome;
+      this.valor = plano.valor;
+      plano.menuAberto = false;
+    }
+
+    salvarEdicao(plano: Planos) {
+        const payload = {
+          id: plano.id,
+          nome: this.nome,
+          valor: this.valor,
+          duracaoMeses: this.duracaoMeses,
+         
+        };
+    
+        this.planosService.atualizarPlano(payload).subscribe({
+          next: () => {
+            plano.nome = this.nome;
+            plano.valor = this.valor;
+            plano.duracaoMeses = this.duracaoMeses;
+
+            this.editarId = null;
+    
+            this.carregarPlanos();
+    
+            this.toastr.success('Plano atualizado');
+          },
+        });
+      }
+
+
+
   excluirPlano(plano: number): void {}
 }

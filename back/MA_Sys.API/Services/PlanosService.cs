@@ -50,8 +50,14 @@ namespace MA_Sys.API.Services
             }
 
 
-            if (filtro != null && !string.IsNullOrEmpty(filtro.Nome))
-                query = query.Where(pl => pl.Nome.Contains(filtro.Nome));
+            if (filtro != null)
+            {
+                if (!string.IsNullOrEmpty(filtro.Nome))
+                    query = query.Where(pl => pl.Nome.Contains(filtro.Nome));                
+
+                if (filtro.Ativo.HasValue)
+                    query = query.Where(pl => pl.Ativo == filtro.Ativo.Value);
+            }
 
             return query.Select(pl => new PlanosResponseDto
             {
@@ -62,8 +68,9 @@ namespace MA_Sys.API.Services
                 AcademiaId = pl.AcademiaId,
                 AcademiaNome = pl.Academia.Nome,
                 Ativo = pl.Ativo,
-                TotalAlunos = _alunoRepo.Query().Count(a => a.PlanoId == pl.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
-
+                TotalAlunos = _alunoRepo.Query().Count(a => 
+                                                a.PlanoId == pl.Id && 
+                                                (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
 
 
             }).ToList();

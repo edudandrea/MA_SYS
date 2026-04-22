@@ -16,17 +16,28 @@ import { Matriculas, MatriculasService } from '../Services/MatriculasService/Mat
 import { AlunosService } from '../Services/AlunosService/Alunosservice';
 import { PlanosService } from '../Services/Planos/Planos.service';
 import { PagamentosService } from '../Services/PagamentosService/Pagamentos.service';
+import { url } from 'node:inspector';
+import * as QRCode from 'qrcode';
+import { NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-Matriculas',
   templateUrl: './Matriculas.component.html',
   styleUrls: ['./Matriculas.component.css'],
   imports: [CommonModule, FormsModule],
-  
 })
 export class MatriculasComponent implements OnInit {
   modalRef?: BsModalRef;
-  matriculas: (Matriculas & { menuAberto?: boolean , aluno?: any })[] = [];
+  matriculas: (Matriculas & {
+    menuAberto?: boolean;
+    aluno?: any;
+    email?: string;
+    telefone?: string;
+    planoNome?: string;
+    planoValor?: number;
+    formaPagamentoNome?: string;
+  })[] = [];
+
   matriculaId: number = 0;
   alunoId: number = 0;
   modalidadeId: number = 0;
@@ -47,6 +58,7 @@ export class MatriculasComponent implements OnInit {
 
   formasPagamento: any[] = [];
   formaPagamentoId: number = 0;
+  formaPagamentoSelecionada: any = null;
 
   novaMatricula = {
     alunoId: 0,
@@ -57,6 +69,9 @@ export class MatriculasComponent implements OnInit {
     planiId: 0,
     nome: '',
   };
+
+  qrCodePix: string = '';
+  showQrCode: boolean = false;
 
   constructor(
     private modalService: BsModalService,
@@ -69,13 +84,13 @@ export class MatriculasComponent implements OnInit {
     private alunoService: AlunosService,
     private planoService: PlanosService,
     private pgService: PagamentosService,
+    private zone: NgZone,
   ) {}
 
   ngOnInit() {
     const hoje = new Date();
     this.dataMatricula = hoje.toISOString().split('T')[0];
     this.carregarMatriculas();
-    
   }
 
   resetForm() {
@@ -98,12 +113,15 @@ export class MatriculasComponent implements OnInit {
 
   // ----------MODAL ----------
   modalNovaMatricula(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template, {
-      class: 'modal-md modal-dialog-centered',
-    });
     this.carregarAlunos();
     this.carregarPlanos();
     this.carregarFormaPagamento();
+
+    setTimeout(() => {
+      this.modalRef = this.modalService.show(template, {
+        class: 'modal-md modal-dialog-centered',
+      });
+    }, 0);
   }
 
   // ------SEARCHS -----------
@@ -118,8 +136,45 @@ export class MatriculasComponent implements OnInit {
   }
 
   onPlanoChange() {
-    this.planoSelecionado = this.planos.find((p) => p.id === this.planoId);
-    console.log('Plano selecionado:', this.planoSelecionado);
+    console.log('ANTES FIND:', this.planoId, typeof this.planoId);
+
+    const plano = this.planos.find((p) => p.id == this.planoId);
+
+    console.log('RESULTADO FIND:', plano);
+
+    this.planoSelecionado = plano;
+
+    console.log('DEPOIS:', this.planoSelecionado);
+
+    this.showQrCode = false; // 🔥 OCULTA O QR CODE AO MUDAR DE PLANO
+    this.qrCodePix = ''; // 🔥 LIMPA O QR CODE ANTERIOR
+  }
+
+  onFormaPagamentoChange() {
+    console.log('Forma de pagamento selecionada:', this.formaPagamentoId);
+    this.formaPagamentoSelecionada = this.formasPagamento.find(
+      (f) => f.id == this.formaPagamentoId,
+    );
+
+    this.showQrCode = false; // 🔥 OCULTA O QR CODE AO MUDAR DE FORMA DE PAGAMENTO
+    this.qrCodePix = ''; // 🔥 LIMPA O QR CODE ANTERIOR
+  }
+
+  gerarPix() {
+    const valor = this.planoSelecionado?.valor || 0;
+
+    this.pgService.gerarPix(valor).subscribe((res) => {
+      this.gerarCodePix(res.payload);
+    });
+  }
+
+  gerarCodePix(payload: string) {
+    QRCode.toDataURL(payload).then((url) => {
+      setTimeout(() => {
+        this.qrCodePix = url;
+        this.showQrCode = true;
+      }, 0);
+    });
   }
 
   // ---------- GETS ---------
@@ -130,7 +185,6 @@ export class MatriculasComponent implements OnInit {
         console.log('Matriculas:', res);
         this.matriculas = [...res];
         this.cd.detectChanges();
-        
       },
       error: (err) => {
         console.error(err);
