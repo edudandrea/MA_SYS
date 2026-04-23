@@ -1,0 +1,78 @@
+<div class="cadastro-container">
+  <div class="cadastro-card">
+    <h2>Identificação</h2>
+    <p class="subtitle">Informe seus dados para continuar</p>
+
+    <!-- 🔍 BUSCA -->
+    <div class="form-group">
+      <label>CPF</label>
+      <input type="text" [(ngModel)]="cpfBusca" placeholder="000.000.000-00" />
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="emailBusca" placeholder="seu@email.com" />
+    </div>
+
+    <button class="btn-buscar" (click)="pesquisarAlunos()">Buscar</button>
+
+    <!-- ❌ NÃO ENCONTRADO -->
+    <div *ngIf="mostrarCadastro" class="cadastro-section">
+      <h3>Complete seu cadastro</h3>
+
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" [(ngModel)]="nome" />
+      </div>
+
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="text" [(ngModel)]="telefone" />
+      </div>
+
+      <div class="form-group">
+        <label>Plano</label>
+        <select [(ngModel)]="planoId" (change)="onPlanoChange()">
+          <option *ngFor="let plano of planos" [value]="plano.id">
+            {{ plano.nome }} - R$ {{ plano.valor }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ✅ ENCONTRADO -->
+    <div *ngIf="alunoEncontrado" class="aluno-section">
+      <h3>Bem-vindo, {{ aluno?.nome }}</h3>
+
+      <div class="info-box">
+        <span>📋 Plano: {{ aluno?.plano }}</span>
+        <span>💰 Valor: R$ {{ aluno?.valor }}</span>
+      </div>
+
+      <!-- 💳 PAGAMENTO -->
+      <div class="form-group">
+        <label>Forma de pagamento</label>
+
+        <select [(ngModel)]="formaPagamentoId" (change)="onFormaPagamentoChange()">
+          <option value="" disabled>Selecione</option>
+          <option *ngFor="let f of formasPagamento" [value]="f.id">
+            {{ f.nome }}
+          </option>
+        </select>
+      </div>
+
+      <!-- PIX -->
+      <div *ngIf="isPix && !showQrCode" class="pix-action">
+        <button class="btn-pix" (click)="gerarPix()">Gerar QR Code PIX</button>
+      </div>
+
+      <div *ngIf="showQrCode" class="pix-qrcode">
+        <h5>Escaneie ou clique para copiar</h5>
+
+        <img [src]="qrCodePix" (click)="copiarPix()" class="qr-clickable" />
+
+        <span class="pix-valor"> Valor: R$ {{ aluno?.valor | number: '1.2-2' }} </span>
+      </div>
+    </div>
+  </div>
+</div>

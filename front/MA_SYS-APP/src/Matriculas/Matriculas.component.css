@@ -434,3 +434,31 @@ input[type="date"] {
    margin-top: 8px;
   color: #ccc;
 }
+
+.card-payment {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  grid-column: 1 / -1; /* ocupa toda largura */
+  margin-top: 10px;
+}
+
+.card-payment input {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.card-flag {
+  width: 40px;
+  display: block;
+}

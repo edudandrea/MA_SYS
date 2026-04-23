@@ -12,7 +12,9 @@ namespace MA_SYS.Api.Models
         public int AcademiaId { get; set; }
         public int PlanoId { get; set; }
         public int AlunoId { get; set; }
+        public int MatriculaId { get; set; }
         public decimal Valor { get; set; }
+        public string? ExternalId { get; set; }
         public DateTime DataPagamento { get; set; }
         public DateTime DataVencimento { get; set; }
         public string Status { get; set; } = "Pendente";        

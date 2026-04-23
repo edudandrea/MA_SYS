@@ -17,7 +17,8 @@ namespace MA_SYS.Api.Models
         public int PlanoId { get; set; }
         public int FormaPagamentoId { get; set; }
         public DateTime DataInicio { get; set; }
-
+        public bool MensalidadePaga { get; set; }
+        public DateTime? DataPagamento { get; set; }
         public DateTime DataFim { get; set; }
         public string Status { get; set; } = string.Empty;
         public Aluno Aluno { get; set; } = null!;

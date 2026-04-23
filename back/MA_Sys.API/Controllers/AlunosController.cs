@@ -1,5 +1,7 @@
 using MA_Sys.API.Dto.Alunos;
 using MA_Sys.API.Services;
+using MA_SYS.Api.Dto;
+using MA_SYS.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +14,10 @@ namespace MA_Sys.API.Controllers
     {
         private readonly AlunoService _service;
 
-         public AlunosController(AlunoService service)
+        public AlunosController(AlunoService service)
         {
             _service = service;
-        }         
+        }
 
         [HttpGet]
         public IActionResult Get([FromQuery] AlunoFiltroDto filtro)
@@ -27,17 +29,51 @@ namespace MA_Sys.API.Controllers
             return Ok(alunos);
         }
 
-        [HttpPost]        
+        [HttpGet("{slug}")]
+        public IActionResult BuscarAluno(string slug, [FromQuery] string cpf, [FromQuery] string email)
+        {
+            var academiaId = ObterAcademiaIdPeloSlug(slug);
+
+            var matricula = _service.BuscarMatriculaPorCpfEmail(cpf, email, academiaId);
+
+            if (matricula == null)
+                return NotFound();
+
+            return Ok(new
+            {
+                nome = matricula.Aluno.Nome,
+                plano = matricula.Plano.Nome,
+                valor = matricula.Plano.Valor
+            });
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Add([FromBody] AlunosCreateDto dto)
         {
-            
+
             var academiaId = GetAcademiaId();
             Console.WriteLine($"Academia ID: {academiaId}");
 
             _service.Add(dto, academiaId);
 
             return Ok();
-        } 
+        }
+
+        [HttpPost("{slug}")]
+        public IActionResult Cadastrar(string slug, [FromBody] AlunosCreateDto dto)
+        {
+            var academiaId = ObterAcademiaIdPeloSlug(slug);
+
+            _service.Add(dto, academiaId);
+
+            return Ok(new
+            {
+                sucesso = true,
+                mensagem = "Aluno cadastrado com sucesso"
+            }
+
+            );
+        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] AlunoUpdateDto dto, int id)
@@ -49,16 +85,16 @@ namespace MA_Sys.API.Controllers
             _service.Update(id, dto);
 
             return Ok();
-        } 
+        }
 
         [HttpPatch("{id}/status")]
-        public IActionResult AtualizarStatus(int id, [FromBody]bool ativo)
+        public IActionResult AtualizarStatus(int id, [FromBody] bool ativo)
         {
             var (role, academiaId) = GetUserInfo();
             _service.UpdateStatus(id, academiaId, ativo);
 
             return NoContent();
         }
-        
+
     }
 }

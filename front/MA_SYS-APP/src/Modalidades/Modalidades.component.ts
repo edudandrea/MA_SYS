@@ -147,6 +147,7 @@ export class ModalidadesComponent implements OnInit {
 
   cancelarEdicao() {
     this.editarId = null;
+    this.modalidades.forEach(m => m.menuAberto = false);
   }
 
   salvarEdicao(modalidade: Modalidades) {

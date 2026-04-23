@@ -178,7 +178,7 @@
           <div class="input-modern">
             <i class="fa-solid fa-credit-card"></i>
 
-            <select [(ngModel)]="formaPagamentoId" (change)="onFormaPagamentoChange()">
+            <select [(ngModel)]="formaPagamentoId" (ngModelChange)="onFormaPagamentoChange()">
               <option value="" disabled>Selecione</option>
               <option *ngFor="let f of formasPagamento" [value]="f.id">
                 {{ f.nome }}
@@ -188,7 +188,7 @@
         </div>
 
         <div
-          *ngIf="formaPagamentoSelecionada?.nome.toLowerCase() === 'pix'"
+          *ngIf="formaPagamentoSelecionada?.nome?.toLowerCase() === 'pix'"
           class="pix-container full"
         >
           <!-- 🔥 BOTÃO -->
@@ -206,6 +206,35 @@
             <span class="pix-valor">
               Valor: R$ {{ planoSelecionado?.valor | number: '1.2-2' }}
             </span>
+          </div>
+        </div>
+
+        <div *ngIf="isCartao" class="card-payment">
+          <div class="form-group">
+            <label>Número do cartão</label>
+            <input
+              type="text"
+              [(ngModel)]="numeroCartao"
+              (input)="onCartaoInput($event)"
+              placeholder="0000 0000 0000 0000"
+            />
+            <img
+              *ngIf="bandeiraCartao"
+              [src]="'assets/cards/' + bandeiraCartao.toLowerCase() + '.png'"
+              class="card-flag"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Validade</label>
+              <input type="text" [(ngModel)]="validadeCartao" placeholder="MM/AA" />
+            </div>
+
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="text" [(ngModel)]="cvvCartao" placeholder="123" />
+            </div>
           </div>
         </div>
 

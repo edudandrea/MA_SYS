@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Pagamentos, PagamentosService } from '../Services/PagamentosService/Pagamentos.service';
 import { ToastrService } from 'ngx-toastr';
@@ -16,6 +16,7 @@ import { PixResponse } from '../Model/pix-response.model';
 })
 export class PagamentosComponent implements OnInit {
   modalRef?: BsModalRef;
+  menuAberto: boolean = false;
   pagamentos: any[] = [];
   nome: string = '';
   ativo: boolean = true;
@@ -46,6 +47,15 @@ export class PagamentosComponent implements OnInit {
 
   ngOnInit() {
     this.carregarFormaPgtos();
+  }
+
+  @HostListener('document:click', ['$event'])
+  fecharMenu(event: any) {
+    const clicouMenu = event.target.closest('.card-menu');
+
+    if (!clicouMenu) {
+      this.pagamentos.forEach((m: any) => (m.menuAberto = false));
+    }
   }
 
   gerarQrCodePix(payload: string) {
@@ -85,13 +95,6 @@ export class PagamentosComponent implements OnInit {
         this.toastr.error('Erro ao gerar Pix');
       },
     });
-  }
-
-  testarPix() {
-    // valor fixo só pra teste
-    this.valor = 50;
-
-    this.gerarPix();
   }
 
   getInicial(nome: string): string {
@@ -197,6 +200,41 @@ export class PagamentosComponent implements OnInit {
         this.spinner.hide();
         console.error(err);
         this.toastr.error('Erro ao salvar Forma de Pagamento', 'Erro');
+      },
+    });
+  }
+
+  // ---------- PUT ----------
+
+  editarFormaPagamento(pg: Pagamentos) {
+    this.editarId = pg.id;
+    this.nome = pg.nome;
+    pg.menuAberto = false;
+  }
+
+  cancelarEdicao() {
+    this.editarId = null;
+    this.pagamentos.forEach(p => p.menuAberto = false);
+  }
+
+  salvarEdicao(pg: Pagamentos) {
+    const payload = {
+     id: pg.id,
+     nome: this.nome,
+     taxa: this.taxa,
+     parcelas: this.parcelas,
+     dias: this.dias,
+    };
+
+    this.pgService.atualizarFormaPagamento(payload).subscribe({
+      next: () => {
+        pg.nome = this.nome;
+
+        this.editarId = null;
+
+        this.carregarFormaPgtos();
+
+        this.toastr.success('Forma de pagamento atualizada');
       },
     });
   }

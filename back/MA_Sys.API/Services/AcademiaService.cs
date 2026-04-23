@@ -15,6 +15,29 @@ namespace MA_Sys.API.Services
             _repo = repo;
         }
 
+        public string GerarSlug(string nome)
+        {
+           var slug = nome.ToLower()
+                .Replace(" ", "-")
+                .Replace(".", "")
+                .Replace(",", "")
+                .Replace(";", "")
+                .Replace(":", "")
+                .Replace("!", "")
+                .Replace("?", "")
+                .Replace("@", "")
+                .Replace("#", "")
+                .Replace("$", "")
+                .Replace("%", "")
+                .Replace("^", "")
+                .Replace("&", "")
+                .Replace("*", "")
+                .Replace("(", "")
+                .Replace(")", "");
+
+            return slug;
+        }
+
         public List<AcademiaResponseDto> List(string role, int? academiaId)
         {
             var query = _repo.Query().AsNoTracking();
@@ -39,7 +62,9 @@ namespace MA_Sys.API.Services
                 Ativo = a.Ativo,
 
                 totalAlunos = a.Alunos.Count(),
-                totalProfessores = a.Professores.Count()
+                totalProfessores = a.Professores.Count(),
+
+                Slug = a.Slug
 
             }).ToList();
         }
@@ -73,12 +98,14 @@ namespace MA_Sys.API.Services
                 Ativo = a.Ativo,
 
                 totalAlunos = a.Alunos.Count(),
-                totalProfessores = a.Professores.Count()
+                totalProfessores = a.Professores.Count(),
+
+                Slug = a.Slug
 
             }).ToList();
         }
 
-        public AcademiaDto GetById(int id, int academiaId)
+        public AcademiaDto? GetById(int id, int academiaId)
         {
             return _repo.Query()
                 .Where(a => a.Id == id && a.Id == academiaId)
@@ -94,6 +121,8 @@ namespace MA_Sys.API.Services
 
                     DataCadastro = a.DataCadastro,
 
+                    Slug = a.Slug,
+
                     Ativo = a.Ativo
                 })
                 .FirstOrDefault();
@@ -101,9 +130,21 @@ namespace MA_Sys.API.Services
 
         public void Add(AcademiaCreateDto dto)
         {
+
+            var slugBase = GerarSlug(dto.Nome);
+            var slug = slugBase;
+            int count = 1;
+
+            while (_repo.Query().Any(a => a.Slug == slug))
+            {
+                slug = $"{slugBase}-{count}";
+                count++;
+            }
+             
             var academia = new Academia
             {
                 Nome = dto.Nome,
+                Slug = slug,
                 Telefone = dto.Telefone,
                 Email = dto.Email,
                 DataCadastro = DateTime.UtcNow,
@@ -131,13 +172,14 @@ namespace MA_Sys.API.Services
             academia.RedeSocial = dto.RedeSocial;
             academia.Email = dto.Email;
             academia.Responsavel = dto.Responsavel;
+            
 
             _repo.Save();
         }
 
-        public void Delete(int id, int academiaId)
+        public void Delete(int id, int? academiaId)
         {
-            var academia = _repo.GetById(id, academiaId);
+            var academia = _repo.GetById(id, academiaId ?? 0);
 
             if (academia == null)
                 throw new Exception("Academia não encontrado");

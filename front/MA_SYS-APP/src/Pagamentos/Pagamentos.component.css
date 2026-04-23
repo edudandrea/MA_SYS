@@ -306,3 +306,26 @@
 .btn-test-pix:hover {
   background: #16a34a;
 }
+
+.edit-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05); /* 🔥 fundo escuro */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* foco */
+.edit-input:focus {
+  border-color: #00ffcc;
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+}
+
+/* remove fundo branco no autofill (Chrome) */
+.edit-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset;
+  -webkit-text-fill-color: #fff;
+}

@@ -8,10 +8,13 @@ namespace MA_Sys.API.Services
     {
         private readonly IPlanosRepository _planoRepo;
         private readonly IPagamentoRepository _pagRepo;
-        public PagamentoService(IPlanosRepository planoRepo, IPagamentoRepository pagRepo)
+        private readonly IMatriculaRepository _matriculaRepo;
+
+        public PagamentoService(IPlanosRepository planoRepo, IPagamentoRepository pagRepo, IMatriculaRepository matriculaRepo)
         {
             _planoRepo = planoRepo;
             _pagRepo = pagRepo;
+            _matriculaRepo = matriculaRepo;
         }
 
         public List<Pagamentos> GetPagamentosAlunos(int alunoId)
@@ -21,7 +24,7 @@ namespace MA_Sys.API.Services
                 .OrderByDescending(p => p.DataPagamento)
                 .ToList();
         }
-        
+
 
         public async Task<Pagamentos> RegistraPagamento(PagamentoRegistroDto dto)
         {
@@ -45,6 +48,37 @@ namespace MA_Sys.API.Services
             _pagRepo.Add(pagamento);
 
             return pagamento;
+        }
+
+        public void ProcessarWebhook(dynamic payload)
+        {
+            string externalId = payload?.data?.id?.ToString();
+            string status = payload?.data?.status?.ToString();
+
+            if (string.IsNullOrEmpty(externalId))
+                throw new Exception("ExternalId inválido");
+
+            var pagamento = _pagRepo.Query()
+                .FirstOrDefault(p => p.ExternalId == externalId);
+
+            if (pagamento == null)
+                throw new Exception("Pagamento não encontrado");
+
+            if (status == "approved")
+            {
+                pagamento.Status = "Pago";
+
+                var matricula = _matriculaRepo.Query()
+                    .FirstOrDefault(m => m.Id == pagamento.MatriculaId);
+
+                if (matricula != null)
+                {
+                    matricula.MensalidadePaga = true;
+                    matricula.DataPagamento = DateTime.Now;
+                }
+
+                _pagRepo.Save();
+            }
         }
 
 

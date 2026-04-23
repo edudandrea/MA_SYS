@@ -274,6 +274,7 @@ export class ProfessoresComponent implements OnInit {
 
   cancelarEdicao() {
     this.editarId = null;
+    this.professores.forEach(p => p.menuAberto = false);
   }
 
   salvarEdicao(prof: Professores) {
@@ -297,7 +298,7 @@ export class ProfessoresComponent implements OnInit {
 
         this.carregarProfessores();
 
-        this.toastr.success('Modalidade atualizada');
+        this.toastr.success('Professor atualizado');
       },
     });
   }

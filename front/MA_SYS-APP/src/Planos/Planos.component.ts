@@ -35,7 +35,7 @@ export class PlanosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.carregarPlanos();    
+    this.carregarPlanos();
   }
 
   getInicial(nome: string): string {
@@ -103,7 +103,7 @@ export class PlanosComponent implements OnInit {
           return {
             ...p,
             menuAberto: false,
-            ativo: !!p.ativo,            
+            ativo: !!p.ativo,
           };
         });
         this.cd.detectChanges();
@@ -150,40 +150,42 @@ export class PlanosComponent implements OnInit {
         this.toastr.error('Erro ao salvar plano', 'Erro');
       },
     });
-  }  
+  }
 
-   editarPlano(plano: Planos) {
-      this.editarId = plano.id;
-      this.nome= plano.nome;
-      this.valor = plano.valor;
-      plano.menuAberto = false;
-    }
+  editarPlano(plano: Planos) {
+    this.editarId = plano.id;
+    this.nome = plano.nome;
+    this.valor = plano.valor;
+    plano.menuAberto = false;
+  }
 
-    salvarEdicao(plano: Planos) {
-        const payload = {
-          id: plano.id,
-          nome: this.nome,
-          valor: this.valor,
-          duracaoMeses: this.duracaoMeses,
-         
-        };
-    
-        this.planosService.atualizarPlano(payload).subscribe({
-          next: () => {
-            plano.nome = this.nome;
-            plano.valor = this.valor;
-            plano.duracaoMeses = this.duracaoMeses;
+  salvarEdicao(plano: Planos) {
+    const payload = {
+      id: plano.id,
+      nome: this.nome,
+      valor: this.valor,
+      duracaoMeses: this.duracaoMeses,
+    };
 
-            this.editarId = null;
-    
-            this.carregarPlanos();
-    
-            this.toastr.success('Plano atualizado');
-          },
-        });
-      }
+    this.planosService.atualizarPlano(payload).subscribe({
+      next: () => {
+        plano.nome = this.nome;
+        plano.valor = this.valor;
+        plano.duracaoMeses = this.duracaoMeses;
 
+        this.editarId = null;
 
+        this.carregarPlanos();
+
+        this.toastr.success('Plano atualizado');
+      },
+    });
+  }
+
+  cancelarEdicao() {
+    this.editarId = null;
+    this.planos.forEach((p) => (p.menuAberto = false));
+  }
 
   excluirPlano(plano: number): void {}
 }

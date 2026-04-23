@@ -15,9 +15,7 @@ namespace MA_Sys.API.Controllers
         public PagamentosController(PagamentoService service)
         {
             _service = service;
-        }      
-
-        
+        }
 
         [HttpPost]
         public async Task<IActionResult> RegistraPagamento([FromBody] PagamentoRegistroDto dto)
@@ -25,14 +23,25 @@ namespace MA_Sys.API.Controllers
             try
             {
                 var pagamento = await _service.RegistraPagamento(dto);
-                return Ok(pagamento);
+
+                // 🔥 retorno importante
+                return Ok(new
+                {
+                    pagamentoId = pagamento.Id,
+                    status = pagamento.Status
+                });
             }
             catch (Exception ex)
             {
-                // Log do erro
-                Console.WriteLine($"Erro ao registrar pagamento: {ex.Message}");
-                return BadRequest(new { message = ex.Message });    
-            }          
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("webhook")]
+        public IActionResult WebhookPix([FromBody] dynamic payload)
+        {
+            _service.ProcessarWebhook(payload);
+            return Ok();
         }
     }
 }

@@ -3,6 +3,7 @@ namespace MA_SYS.Api.Dto
     public class AcademiaDto
     {
         public int Id { get; set; }
+        public string? Slug { get; set; }
         public string? Nome { get; set; }
         public string? Cidade { get; set; }
         public string? Estado { get; set; }

@@ -179,3 +179,27 @@
 .menu-btn:hover {
   color: #e2e8f0;
 }
+
+.link-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link-box input {
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.link-box button {
+  background: #2563eb;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+}

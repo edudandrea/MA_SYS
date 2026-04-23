@@ -19,19 +19,19 @@
         </button>
 
         <div class="menu-dropdown" *ngIf="pagamento.menuAberto">
-          <button *ngIf="editarId !== pagamento.id" --(click)="editarPagamento(pagamento)">
+          <button *ngIf="editarId !== pagamento.id" (click)="editarFormaPagamento(pagamento)">
             <i class="fa-solid fa-pen"></i>
             Editar
           </button>
 
-          <button *ngIf="editarId === pagamento.id" --(click)="salvarEdicao(pagamento)">
+          <button *ngIf="editarId === pagamento.id" (click)="salvarEdicao(pagamento)">
             <i class="fa-solid fa-check"></i>
             Salvar
           </button>
 
-          <button class="danger" --(click)="excluirPagamento(pagamento.id)">
-            <i class="fa-solid fa-trash"></i>
-            Excluir
+          <button *ngIf="editarId === pagamento.id" class="danger" (click)="cancelarEdicao()">
+            <i class="fa-solid fa-ban"></i>
+            Cancelar
           </button>
         </div>
       </div>

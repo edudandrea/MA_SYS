@@ -23,6 +23,14 @@ namespace MA_Sys.API.Controllers
             _service = service;
         }
 
+        [HttpGet]
+        public IActionResult List()
+        {
+            var (role, academiaId) = GetUserInfo();
+            var user = _service.List(role, academiaId);
+            return Ok(user);
+        }
+
         [HttpGet("{id}")]
         public IActionResult Get([FromBody] UserFiltroDto filtro)
         {

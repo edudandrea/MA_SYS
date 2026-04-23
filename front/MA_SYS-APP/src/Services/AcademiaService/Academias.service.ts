@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../app/environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { Modalidades } from '../ModalidadeService/Modalidades.service';
 
 export interface Academias {
   id: number;
@@ -16,6 +17,8 @@ export interface Academias {
   responsavel: string;
   totalProf: number;
   diasAtraso: number;
+  slug: string;
+  menuAberto?: boolean;
 }
 
 @Injectable({
@@ -36,6 +39,10 @@ export class AcademiasService {
   excluirAcademia(id: number): Observable<Academias> {
     return this.http.delete<Academias>(`${this.apiUrl}/${id}`);
   }
+
+  atualizarAcademia(academia: Partial<Academias>): Observable<Academias> {
+      return this.http.put<Academias>(`${this.apiUrl}/${academia.id}`, academia);
+    }
 
   atualizarStatus(id: number, ativo: boolean): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/status`, ativo);

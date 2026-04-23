@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { ElementRef, ViewChild } from '@angular/core';
 import { Modalidades, ModalidadesService } from '../Services/ModalidadeService/Modalidades.service';
 import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
 import { Planos, PlanosService } from '../Services/Planos/Planos.service';

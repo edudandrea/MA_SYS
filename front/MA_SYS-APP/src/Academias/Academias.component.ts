@@ -5,6 +5,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
+import { Modalidades } from '../Services/ModalidadeService/Modalidades.service';
 
 @Component({
   selector: 'app-Academias',
@@ -26,6 +27,8 @@ export class AcademiasComponent implements OnInit {
   editarId: number | null = null;
   responsavel: string = '';
   totalProf: number = 0
+  linkCadastro: string = '';
+  slug: string = '';
 
   academias: (Academias & { menuAberto?: boolean })[] = [];
 
@@ -130,7 +133,8 @@ export class AcademiasComponent implements OnInit {
     console.groupEnd();
 
     this.academiaService.novaAcademia(academia).subscribe({
-      next: () => {
+      next: (res) => {
+        this.linkCadastro = `https://seusistema.com/${res.slug}/cadastro`;
         this.spinner.hide();
         this.toastr.success('Academia cadastrado!', 'Sucesso');
 
@@ -184,5 +188,55 @@ export class AcademiasComponent implements OnInit {
 
   fecharModal() {
     this.modalRef?.hide();
+  }
+
+  editarAcademia(academia: Academias) {
+      this.editarId = academia.id;
+      this.nome = academia.nome;
+      this.cidade = academia.cidade;
+      this.telefone = academia.telefone;
+      this.email = academia.email;
+      this.redeSocial = academia.redeSocial;
+      this.responsavel = academia.responsavel;
+      academia.menuAberto = false;
+    }
+
+  salvarEdicao(academia: Academias) {
+      const payload = {
+        id: academia.id,
+        nome: this.nome,
+        cidade: this.cidade,
+        telefone: this.telefone,
+        email: this.email,
+        redeSocial: this.redeSocial,
+        responsavel: this.responsavel,
+        ativo: academia.ativo,
+      };
+  
+      this.academiaService.atualizarAcademia(payload).subscribe({
+        next: () => {
+          academia.nome = this.nome;
+          academia.cidade = this.cidade;
+          academia.telefone = this.telefone;
+          academia.email = this.email;
+          academia.redeSocial = this.redeSocial;
+          academia.responsavel = this.responsavel;
+
+          this.editarId = null;
+
+          this.carregarAcademias();
+
+          this.toastr.success('Academia atualizada');
+        },
+      });
+    }
+
+    copiarLink(slug: string) {
+    const link = `http://localhost:4200/${slug}/cadastro`;
+    navigator.clipboard.writeText(link).then(() => {
+      this.toastr.success('Link copiado para a área de transferência!');
+    }, () => {
+      this.toastr.error('Erro ao copiar o link.');
+    });
   }
 }

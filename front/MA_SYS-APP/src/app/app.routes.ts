@@ -12,12 +12,14 @@ import { PlanosComponent } from '../Planos/Planos.component';
 import { DashboardComponent } from '../Dashboard/Dashboard.component';
 import { PagamentosComponent } from '../Pagamentos/Pagamentos.component';
 import { MatriculasComponent } from '../Matriculas/Matriculas.component';
+import { CadastroAlunosComponent } from '../CadastroAlunos/CadastroAlunos.component';
 
 
 export const routes: Routes = [
 
     
-    { path: 'login', component: LoginComponent},     
+    { path: 'login', component: LoginComponent}, 
+    { path: ':academia/cadastro', component: CadastroAlunosComponent},    
     
     {
         path: '',

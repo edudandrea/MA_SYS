@@ -16,7 +16,7 @@ namespace MA_SYS.Api.Controllers
         public AcademiasController(AcademiaService service)
         {
             _service = service;
-        }        
+        }
 
         [HttpGet]
         public IActionResult List()
@@ -30,7 +30,7 @@ namespace MA_SYS.Api.Controllers
         [AllowAnonymous]
         public IActionResult Get([FromBody] AcademiaFiltroDto filtro)
         {
-             var (role, academiaId) = GetUserInfo();
+            var (role, academiaId) = GetUserInfo();
 
             var academia = _service.Get(role, filtro, academiaId);
 
@@ -44,7 +44,13 @@ namespace MA_SYS.Api.Controllers
         {
             _service.Add(dto);
 
-            return Ok("Academia criada om sucesso");
+            return Ok(new
+            {
+                sucesso = true,
+                mensagem = "Academia cadastrada com sucesso"
+            }
+
+            );
         }
 
         [HttpPut("{id}")]
@@ -56,13 +62,22 @@ namespace MA_SYS.Api.Controllers
             _service.Update(id, dto);
 
             return Ok();
-        } 
+        }
 
         [HttpPatch("{id}/status")]
-        public IActionResult AtualizarStatus(int id, [FromBody]bool ativo)
+        public IActionResult AtualizarStatus(int id, [FromBody] bool ativo)
         {
             var academiaId = GetAcademiaId();
             _service.UpdateStatus(id, academiaId, ativo);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var (role, academiaId) = GetUserInfo();
+            _service.Delete(id, academiaId);
 
             return NoContent();
         }

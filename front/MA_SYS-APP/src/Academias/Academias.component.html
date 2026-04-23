@@ -20,12 +20,12 @@
         </button>
 
         <div class="menu-dropdown" *ngIf="academia.menuAberto">
-          <button *ngIf="editarId !== academia.id" --(click)="editarAcademia(academia)">
+          <button *ngIf="editarId !== academia.id" (click)="editarAcademia(academia)">
             <i class="fa-solid fa-pen"></i>
             Editar
           </button>
 
-          <button *ngIf="editarId === academia.id" --(click)="salvarEdicao(academia)">
+          <button *ngIf="editarId === academia.id" (click)="salvarEdicao(academia)">
             <i class="fa-solid fa-check"></i>
             Salvar
           </button>
@@ -58,7 +58,7 @@
           <div class="info-item">
             <i class="fa-solid fa-building"></i>
             <span>{{ academia.nome }}</span>
-          </div>          
+          </div>
 
           <div class="info-item">
             <i class="fa-solid fa-phone"></i>
@@ -88,173 +88,179 @@
           {{ academia.ativo ? 'Ativo' : 'Inativo' }}
         </span>
       </div>
+      <div class="info-item link-box">
+        <i class="fa-solid fa-link"></i>
+
+        <input [value]="'http://localhost:4200/' + academia.slug + '/cadastro'" readonly />
+
+        <button (click)="copiarLink(academia.slug)">Copiar</button>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- BOTÃO FLUTUANTE -->
+
+<button class="floating-add" (click)="openModalNovaAcademia(templateNovaAcademia)">
+  <i class="fa-solid fa-plus"></i>
+  <span class="fab-text"> Novo Academia </span>
+</button>
+
+<ng-template #templateNovaAcademia>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Nova Academia</h4>
+
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Nome da Academia</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-user"></i>
+          <input [(ngModel)]="nome" />
+        </div>
+      </div>
+
+      <div class="form-row contato">
+        <div class="input-group">
+          <label>Cidade</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-city"></i>
+            <input [(ngModel)]="cidade" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-envelope"></i>
+            <input [(ngModel)]="email" name="email" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Rede Social</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-globe"></i>
+            <input [(ngModel)]="redeSocial" name="redeSocial" />
+          </div>
+        </div>
+      </div>
+
+      <!-- TELEFONE + RESPONSÁVEL -->
+
+      <div class="form-row telefone-responsavel">
+        <div class="input-group telefone">
+          <label>Telefone</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-phone"></i>
+            <input [(ngModel)]="telefone" name="telefone" />
+          </div>
+        </div>
+
+        <div class="input-group responsavel">
+          <label>Responsável</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-user"></i>
+            <input [(ngModel)]="responsavel" name="responsavel" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- BOTÃO FLUTUANTE -->
+  <div class="modal-footer">
+    <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
 
-  <button class="floating-add" (click)="openModalNovaAcademia(templateNovaAcademia)">
-    <i class="fa-solid fa-plus"></i>
-    <span class="fab-text"> Novo Academia </span>
-  </button>
+    <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
+  </div>
+</ng-template>
 
-  <ng-template #templateNovaAcademia>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4>Nova Academia</h4>
+<ng-template #templateEditarAcademia>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Editar Academia</h4>
 
-        <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Nome da Academia</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-user"></i>
+          <input [(ngModel)]="nome" />
+        </div>
       </div>
 
-      <div class="modal-body">
+      <div class="form-row contato">
         <div class="input-group">
-          <label>Nome da Academia</label>
+          <label>Cidade</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-city"></i>
+            <input [(ngModel)]="cidade" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-envelope"></i>
+            <input [(ngModel)]="email" name="email" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Rede Social</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-globe"></i>
+            <input [(ngModel)]="redeSocial" name="redeSocial" />
+          </div>
+        </div>
+      </div>
+
+      <!-- TELEFONE + RESPONSÁVEL -->
+
+      <div class="form-row telefone-responsavel">
+        <div class="input-group telefone">
+          <label>Telefone</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-phone"></i>
+            <input [(ngModel)]="telefone" name="telefone" />
+          </div>
+        </div>
+
+        <div class="input-group responsavel">
+          <label>Responsável</label>
 
           <div class="input-modern">
             <i class="fa-solid fa-user"></i>
-            <input [(ngModel)]="nome" />
-          </div>
-        </div>
-
-        <div class="form-row contato">
-          <div class="input-group">
-            <label>Cidade</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-city"></i>
-              <input [(ngModel)]="cidade" />
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label>Email</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-envelope"></i>
-              <input [(ngModel)]="email" name="email" />
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label>Rede Social</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-globe"></i>
-              <input [(ngModel)]="redeSocial" name="redeSocial" />
-            </div>
-          </div>
-        </div>
-
-        <!-- TELEFONE + RESPONSÁVEL -->
-
-        <div class="form-row telefone-responsavel">
-          <div class="input-group telefone">
-            <label>Telefone</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-phone"></i>
-              <input [(ngModel)]="telefone" name="telefone" />
-            </div>
-          </div>
-
-          <div class="input-group responsavel">
-            <label>Responsável</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-user"></i>
-              <input [(ngModel)]="responsavel" name="responsavel" />
-            </div>
+            <input [(ngModel)]="responsavel" name="responsavel" />
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+  <div class="modal-footer">
+    <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
 
-      <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
-    </div>
-  </ng-template>
-
-  <ng-template #templateEditarAcademia>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4>Editar Academia</h4>
-
-        <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="input-group">
-          <label>Nome da Academia</label>
-
-          <div class="input-modern">
-            <i class="fa-solid fa-user"></i>
-            <input [(ngModel)]="nome" />
-          </div>
-        </div>
-
-        <div class="form-row contato">
-          <div class="input-group">
-            <label>Cidade</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-city"></i>
-              <input [(ngModel)]="cidade" />
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label>Email</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-envelope"></i>
-              <input [(ngModel)]="email" name="email" />
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label>Rede Social</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-globe"></i>
-              <input [(ngModel)]="redeSocial" name="redeSocial" />
-            </div>
-          </div>
-        </div>
-
-        <!-- TELEFONE + RESPONSÁVEL -->
-
-        <div class="form-row telefone-responsavel">
-          <div class="input-group telefone">
-            <label>Telefone</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-phone"></i>
-              <input [(ngModel)]="telefone" name="telefone" />
-            </div>
-          </div>
-
-          <div class="input-group responsavel">
-            <label>Responsável</label>
-
-            <div class="input-modern">
-              <i class="fa-solid fa-user"></i>
-              <input [(ngModel)]="responsavel" name="responsavel" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-
-      <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
-    </div>
-  </ng-template>
-
+    <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
+  </div>
+</ng-template>
 
 <ng-template #templateExcluirAcademia>
   <div class="modal-content modal-surface">
@@ -271,12 +277,10 @@
     </div>
 
     <div class="modal-footer modal-actions">
-      <button type="button" class="btn-cancel" (click)="modalRef?.hide()">
-        Sim Excluir
-      </button>
+      <button type="button" class="btn-cancel" (click)="modalRef?.hide()">Sim Excluir</button>
 
       <button type="button" class="btn-save" (click)="confirmarCancelarEdicao()">
-       Não Quero Excluir
+        Não Quero Excluir
       </button>
     </div>
   </div>

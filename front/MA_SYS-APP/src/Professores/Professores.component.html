@@ -29,7 +29,12 @@
             Salvar
           </button>
 
-          <button class="danger" (click)="excluirProfessor(professor.id)">
+          <button *ngIf="editarId === professor.id" class="danger" (click)="cancelarEdicao()">
+            <i class="fa-solid fa-ban"></i>
+            Cancelar
+          </button>
+
+          <button  *ngIf="!editarId"class="danger" (click)="excluirProfessor(professor.id)">
             <i class="fa-solid fa-trash"></i>
             Excluir
           </button>

@@ -12,6 +12,7 @@ export interface Pagamentos {
   taxa: number;
   parcelas: number;
   dias: number;
+  menuAberto?: boolean;
 }
 
 @Injectable({
@@ -35,6 +36,10 @@ export class PagamentosService {
    atualizarStatus(id: number, ativo: boolean): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/status`, ativo);
   }
+
+  atualizarFormaPagamento(formaPg: Partial<Pagamentos>): Observable<Pagamentos> {
+      return this.http.put<Pagamentos>(`${this.apiUrlFormaPagamento}/${formaPg.id}`, formaPg);
+    }
 
   gerarPix(valor: number): Observable<PixResponse> {
     return this.http.post<PixResponse>(`${this.apiUrlPix}/pix`, { valor });

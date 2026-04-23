@@ -9,6 +9,7 @@ namespace MA_SYS.Api.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public string? Slug { get; set; }
         public string? Nome { get; set; }
         public string? Cidade { get; set; }
         public string? Estado { get; set; }

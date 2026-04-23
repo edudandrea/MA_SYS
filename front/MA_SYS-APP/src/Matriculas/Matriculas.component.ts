@@ -73,6 +73,13 @@ export class MatriculasComponent implements OnInit {
   qrCodePix: string = '';
   showQrCode: boolean = false;
 
+  numeroCartao: string = '';
+  validadeCartao: string = '';
+  cvvCartao: string = '';
+
+  isCartao: boolean = false;
+  bandeiraCartao: string = '';
+
   constructor(
     private modalService: BsModalService,
     private cd: ChangeDetectorRef,
@@ -150,14 +157,22 @@ export class MatriculasComponent implements OnInit {
     this.qrCodePix = ''; // 🔥 LIMPA O QR CODE ANTERIOR
   }
 
+  //------ PAGAMENTO -----------
+
   onFormaPagamentoChange() {
     console.log('Forma de pagamento selecionada:', this.formaPagamentoId);
     this.formaPagamentoSelecionada = this.formasPagamento.find(
       (f) => f.id == this.formaPagamentoId,
     );
+    const nome = this.formaPagamentoSelecionada?.nome?.toLowerCase() || '';
+
+    this.isCartao = nome.includes('crédito') || nome.includes('debito');  
 
     this.showQrCode = false; // 🔥 OCULTA O QR CODE AO MUDAR DE FORMA DE PAGAMENTO
     this.qrCodePix = ''; // 🔥 LIMPA O QR CODE ANTERIOR
+    this.numeroCartao = ''; // 🔥 LIMPA O NÚMERO DO CARTÃO ANTERIOR
+    this.validadeCartao = ''; // 🔥 LIMPA A VALIDADE DO CARTÃO ANTERIOR
+    this.cvvCartao = ''; // 🔥 LIMPA O CVV DO CARTÃO ANTERIOR
   }
 
   gerarPix() {
@@ -175,6 +190,33 @@ export class MatriculasComponent implements OnInit {
         this.showQrCode = true;
       }, 0);
     });
+  }
+
+  onCartaoInput(event: any) {
+    let valor = event.target.value.replace(/\D/g, '');
+
+    valor = valor.substring(0, 16);
+
+    valor = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+    this.numeroCartao = valor;
+
+    this.detectarBandeira(valor.replace(/\s/g, ''));
+  }
+
+  detectarBandeira(numero: string) {
+    console.log(this.bandeiraCartao);
+    if(/^4/.test(numero)) {
+      this.bandeiraCartao = 'visa';
+    } else if (/^5[1-5]/.test(numero)) {
+      this.bandeiraCartao = 'mastercard';
+    } else if (/^3[47]/.test(numero)) {
+      this.bandeiraCartao = 'amex';
+    } else if (/^6(?:011|5)/.test(numero)) {
+      this.bandeiraCartao = 'discover';
+    } else {
+      this.bandeiraCartao = '';
+    }
   }
 
   // ---------- GETS ---------
