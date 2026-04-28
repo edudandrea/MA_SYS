@@ -32,7 +32,7 @@ body[data-theme='system'] {
   --bg-app: #09111f;
   --bg-panel: rgba(10, 18, 32, 0.9);
   --bg-panel-strong: rgba(5, 10, 20, 0.92);
-  --bg-input: rgba(9, 16, 29, 0.95);
+  --bg-input: rgba(20, 33, 54, 0.96);
   --border-color: rgba(148, 163, 184, 0.14);
   --text-primary: #edf2f7;
   --text-secondary: #cbd5e1;
@@ -70,6 +70,50 @@ body[data-theme='blue-light'] {
   --accent-glow: rgba(29, 78, 216, 0.16);
   --accent-secondary-glow: rgba(15, 23, 42, 0.1);
   --shadow-soft: 0 18px 40px rgba(30, 64, 175, 0.12);
+}
+
+body[data-theme='yellow-white'] {
+  --bg-app: #fffdf5;
+  --bg-panel: rgba(255, 255, 255, 0.95);
+  --bg-panel-strong: rgba(255, 251, 235, 0.98);
+  --bg-input: #ffffff;
+  --border-color: rgba(202, 138, 4, 0.25);
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --accent-primary: #d97706;
+  --accent-primary-strong: #b45309;
+  --accent-secondary: #f59e0b;
+  --accent-text: #92400e;
+  --accent-surface: rgba(245, 158, 11, 0.14);
+  --accent-border-soft: rgba(217, 119, 6, 0.28);
+  --accent-focus: rgba(217, 119, 6, 0.14);
+  --accent-shadow: rgba(217, 119, 6, 0.2);
+  --accent-glow: rgba(245, 158, 11, 0.16);
+  --accent-secondary-glow: rgba(234, 179, 8, 0.12);
+  --shadow-soft: 0 16px 38px rgba(217, 119, 6, 0.12);
+}
+
+body[data-theme='purple-white'] {
+  --bg-app: #fcfbff;
+  --bg-panel: rgba(255, 255, 255, 0.95);
+  --bg-panel-strong: rgba(245, 243, 255, 0.98);
+  --bg-input: #ffffff;
+  --border-color: rgba(109, 40, 217, 0.2);
+  --text-primary: #1f1b2d;
+  --text-secondary: #4c3f66;
+  --text-muted: #6d5c8f;
+  --accent-primary: #7c3aed;
+  --accent-primary-strong: #6d28d9;
+  --accent-secondary: #8b5cf6;
+  --accent-text: #5b21b6;
+  --accent-surface: rgba(124, 58, 237, 0.12);
+  --accent-border-soft: rgba(109, 40, 217, 0.26);
+  --accent-focus: rgba(109, 40, 217, 0.14);
+  --accent-shadow: rgba(109, 40, 217, 0.18);
+  --accent-glow: rgba(124, 58, 237, 0.14);
+  --accent-secondary-glow: rgba(139, 92, 246, 0.1);
+  --shadow-soft: 0 16px 38px rgba(109, 40, 217, 0.12);
 }
 
 body[data-theme='green-gold'] {
@@ -153,6 +197,8 @@ body[data-theme='red-black'] {
 }
 
 body[data-theme='blue-light'],
+body[data-theme='yellow-white'],
+body[data-theme='purple-white'],
 body[data-theme='windows'] {
   color-scheme: light;
 }
@@ -246,6 +292,15 @@ textarea::placeholder {
   background: rgba(34, 197, 94, 0.12);
   color: #86efac;
   border-color: rgba(34, 197, 94, 0.35);
+}
+
+body[data-theme='blue-light'] .badge-ativo,
+body[data-theme='yellow-white'] .badge-ativo,
+body[data-theme='purple-white'] .badge-ativo,
+body[data-theme='windows'] .badge-ativo {
+  background: rgba(22, 163, 74, 0.2);
+  color: #166534;
+  border-color: rgba(22, 163, 74, 0.42);
 }
 
 .badge-inativo {
@@ -561,7 +616,7 @@ select:disabled {
   padding: 6px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  background: rgba(8, 15, 27, 0.96);
+  background: color-mix(in srgb, var(--bg-panel-strong) 96%, transparent);
   z-index: 500;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
@@ -570,6 +625,7 @@ select:disabled {
   padding: 10px 12px;
   border-radius: 10px;
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 .autocomplete li:hover {
@@ -588,22 +644,60 @@ select:disabled {
   color: var(--text-muted);
 }
 
+.autocomplete-nome {
+  color: var(--text-primary);
+}
+
 .modal-backdrop {
   background: rgba(2, 6, 23, 0.75) !important;
   backdrop-filter: blur(6px);
 }
 
 .modal-dialog {
-  margin-top: 8vh;
+  margin: 8vh auto 1rem;
+  width: min(960px, 94vw);
+}
+
+.modal-sm {
+  width: min(360px, 94vw);
+}
+
+.modal-md {
+  width: min(560px, 94vw);
+}
+
+.modal-lg {
+  width: min(760px, 94vw);
+}
+
+.modal-xl {
+  width: min(980px, 94vw);
 }
 
 .modal-content {
+  width: 100%;
+  overflow: hidden;
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg-panel-strong) 92%, transparent), color-mix(in srgb, var(--bg-panel) 96%, transparent)) !important;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   color: var(--text-primary);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
   animation: modalEnter 0.25s ease;
+}
+
+.modal-content .modal-title,
+.modal-content h4,
+.modal-content h5,
+.modal-content p,
+.modal-content small,
+.modal-content label,
+.modal-content span,
+.modal-content strong {
+  color: var(--text-primary);
+}
+
+.modal-content .modal-subtext {
+  color: var(--text-secondary);
 }
 
 .modal-header,
@@ -617,6 +711,9 @@ select:disabled {
 
 .modal-body {
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .modal-footer {
@@ -627,8 +724,14 @@ select:disabled {
 }
 
 .btn-close {
-  filter: invert(1);
+  filter: none;
   opacity: 0.7;
+}
+
+body[data-theme='system'] .btn-close,
+body[data-theme='green-gold'] .btn-close,
+body[data-theme='red-black'] .btn-close {
+  filter: invert(1);
 }
 
 .toast-container {
@@ -661,6 +764,49 @@ select:disabled {
 .toast-info {
   background: #0f172a !important;
   border-left: 4px solid #3b82f6;
+}
+
+body[data-theme='blue-light'] .toast-success,
+body[data-theme='yellow-white'] .toast-success,
+body[data-theme='purple-white'] .toast-success,
+body[data-theme='windows'] .toast-success {
+  background: #ecfdf3 !important;
+  color: #14532d !important;
+  border-left: 4px solid #16a34a;
+}
+
+body[data-theme='blue-light'] .toast-error,
+body[data-theme='yellow-white'] .toast-error,
+body[data-theme='purple-white'] .toast-error,
+body[data-theme='windows'] .toast-error {
+  background: #fef2f2 !important;
+  color: #7f1d1d !important;
+  border-left: 4px solid #dc2626;
+}
+
+body[data-theme='blue-light'] .toast-warning,
+body[data-theme='yellow-white'] .toast-warning,
+body[data-theme='purple-white'] .toast-warning,
+body[data-theme='windows'] .toast-warning {
+  background: #fffbeb !important;
+  color: #78350f !important;
+  border-left: 4px solid #d97706;
+}
+
+body[data-theme='blue-light'] .toast-info,
+body[data-theme='yellow-white'] .toast-info,
+body[data-theme='purple-white'] .toast-info,
+body[data-theme='windows'] .toast-info {
+  background: #eff6ff !important;
+  color: #1e3a8a !important;
+  border-left: 4px solid #2563eb;
+}
+
+body[data-theme='blue-light'] .toast-container .ngx-toastr,
+body[data-theme='yellow-white'] .toast-container .ngx-toastr,
+body[data-theme='purple-white'] .toast-container .ngx-toastr,
+body[data-theme='windows'] .toast-container .ngx-toastr {
+  border-color: rgba(30, 64, 175, 0.18);
 }
 
 .card-info {
@@ -759,6 +905,89 @@ select:disabled {
 
 .floating-edit:hover i {
   transform: rotate(-20deg);
+}
+
+body[data-theme='system'] .btn-save,
+body[data-theme='system'] .btn-edit,
+body[data-theme='system'] .floating-save,
+body[data-theme='system'] .floating-add,
+body[data-theme='system'] .floating-edit,
+body[data-theme='green-gold'] .btn-save,
+body[data-theme='green-gold'] .btn-edit,
+body[data-theme='green-gold'] .floating-save,
+body[data-theme='green-gold'] .floating-add,
+body[data-theme='green-gold'] .floating-edit,
+body[data-theme='red-black'] .btn-save,
+body[data-theme='red-black'] .btn-edit,
+body[data-theme='red-black'] .floating-save,
+body[data-theme='red-black'] .floating-add,
+body[data-theme='red-black'] .floating-edit {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.08) 18%, rgba(255, 255, 255, 0.02) 34%, rgba(0, 0, 0, 0.34) 100%),
+    linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 58%, #ffffff 42%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.46),
+    inset 0 -12px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 16px 30px var(--accent-shadow);
+}
+
+body[data-theme='system'] .btn-cancel,
+body[data-theme='system'] .floating-cancel,
+body[data-theme='green-gold'] .btn-cancel,
+body[data-theme='green-gold'] .floating-cancel,
+body[data-theme='red-black'] .btn-cancel,
+body[data-theme='red-black'] .floating-cancel {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.08) 22%, rgba(255, 255, 255, 0.02) 36%, rgba(0, 0, 0, 0.28) 100%),
+    rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(203, 213, 225, 0.4);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.26);
+}
+
+body[data-theme='system'] .surface-card,
+body[data-theme='green-gold'] .surface-card,
+body[data-theme='red-black'] .surface-card,
+body[data-theme='system'] .modal-content,
+body[data-theme='green-gold'] .modal-content,
+body[data-theme='red-black'] .modal-content {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 18%, rgba(255, 255, 255, 0.01) 36%, rgba(0, 0, 0, 0.34) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-panel-strong) 92%, transparent), color-mix(in srgb, var(--bg-panel) 96%, transparent)) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -14px 28px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    var(--shadow-soft);
+}
+
+body[data-theme='system'] .page-tabs,
+body[data-theme='green-gold'] .page-tabs,
+body[data-theme='red-black'] .page-tabs {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 20%, rgba(255, 255, 255, 0.01) 38%, rgba(0, 0, 0, 0.28) 100%),
+    color-mix(in srgb, var(--bg-panel-strong) 92%, transparent);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme='system'] .page-tab.active,
+body[data-theme='green-gold'] .page-tab.active,
+body[data-theme='red-black'] .page-tab.active {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.12) 18%, rgba(255, 255, 255, 0.02) 38%, rgba(0, 0, 0, 0.3) 100%),
+    linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
+  color: #f8fafc;
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 56%, #ffffff 44%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.48),
+    inset 0 -12px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 10px 22px var(--accent-shadow);
 }
 
 @keyframes fadeTab {

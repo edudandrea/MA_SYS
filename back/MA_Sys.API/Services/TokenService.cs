@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MA_SYS.Api.Models;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,12 +14,19 @@ namespace MA_Sys.API.Services
         private readonly string? _issuer;
         private readonly string? _audience;
 
-        public TokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration, IHostEnvironment environment)
         {
             var jwtKey = configuration["Jwt:Key"];
-            if (string.IsNullOrWhiteSpace(jwtKey))
+            var jwtPlaceholder = string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("__CONFIGURE_VIA_", StringComparison.Ordinal);
+
+            if (jwtPlaceholder && environment.IsDevelopment())
             {
-                throw new InvalidOperationException("Jwt:Key nao configurada.");
+                jwtKey = "dev-only-jwt-key-marcia-prox-local-2026";
+            }
+
+            if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("__CONFIGURE_VIA_", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Jwt:Key nao configurada. Defina a chave real via variavel de ambiente Jwt__Key.");
             }
 
             _key = Encoding.ASCII.GetBytes(jwtKey);

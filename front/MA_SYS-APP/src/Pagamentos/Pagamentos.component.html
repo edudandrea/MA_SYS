@@ -116,6 +116,15 @@
           <label>Qtd. de dias</label>
           <input [(ngModel)]="dias" name="dias" />
         </div>
+
+        <div class="form-group full" *ngIf="!isAcademia">
+          <label>Academia</label>
+          <select [(ngModel)]="academiaId" name="academiaId">
+            <option *ngFor="let academia of academias" [ngValue]="academia.id">
+              {{ academia.nome }}
+            </option>
+          </select>
+        </div>
       </form>
     </div>
 

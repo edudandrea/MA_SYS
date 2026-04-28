@@ -12,9 +12,17 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtKey = builder.Configuration["Jwt:Key"];
-if (string.IsNullOrWhiteSpace(jwtKey))
+var jwtPlaceholder = string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("__CONFIGURE_VIA_", StringComparison.Ordinal);
+
+if (jwtPlaceholder && builder.Environment.IsDevelopment())
 {
-    throw new InvalidOperationException("Jwt:Key nao configurada.");
+    jwtKey = "dev-only-jwt-key-marcia-prox-local-2026";
+    Console.WriteLine("Jwt:Key ausente em Development. Usando chave temporaria apenas para ambiente local.");
+}
+
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Contains("__CONFIGURE_VIA_", StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("Jwt:Key nao configurada. Defina a chave real via variavel de ambiente Jwt__Key.");
 }
 
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -63,6 +71,8 @@ builder.Services.AddScoped<IModalidadeRepository, ModalidadeRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IPlanosRepository, PlanosRepository>();
 builder.Services.AddScoped<IPagamentoRepository, PagamentosRepository>();
+builder.Services.AddScoped<IPagamentoAcademiaRepository, PagamentoAcademiaRepository>();
+builder.Services.AddScoped<IFinanceiroRepository, FinanceiroRepository>();
 builder.Services.AddScoped<IFormaPagamentoRepository, FormaPagamentoRepository>();
 builder.Services.AddScoped<IMatriculaRepository, MatriculaRepository>();
 
@@ -77,9 +87,12 @@ builder.Services.AddScoped<ProfessorService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<PlanosService>();
 builder.Services.AddScoped<PagamentoService>();
+builder.Services.AddScoped<PagamentoAcademiaService>();
 builder.Services.AddScoped<FormaPagamentoService>();
 builder.Services.AddScoped<MatriculaService>();
+builder.Services.AddScoped<FluxoCaixaService>();
 builder.Services.AddScoped<PixService>();
+builder.Services.AddHttpClient<MercadoPagoGatewayService>();
 
 
 builder.Services.AddHttpContextAccessor();
@@ -134,6 +147,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("frontend");
+app.UseStaticFiles();
 
 app.UseSwagger();
 
@@ -143,7 +157,10 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.MapControllers();
 

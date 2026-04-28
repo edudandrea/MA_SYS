@@ -1,7 +1,8 @@
 using MA_Sys.API.Dto.Alunos;
+using MA_Sys.API.Data.Repository.interfaces;
+using MA_Sys.API.Security;
 using MA_Sys.API.Services;
 using MA_SYS.Api.Dto;
-using MA_SYS.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,45 +14,65 @@ namespace MA_Sys.API.Controllers
     public class AlunosController : BaseController
     {
         private readonly AlunoService _service;
+        private readonly IPagamentoRepository _pagamentoRepository;
 
-        public AlunosController(AlunoService service)
+        public AlunosController(AlunoService service, IPagamentoRepository pagamentoRepository)
         {
             _service = service;
+            _pagamentoRepository = pagamentoRepository;
         }
 
         [HttpGet]
         public IActionResult Get([FromQuery] AlunoFiltroDto filtro)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"ACADEMIA LOGADA: {academiaId}");
+            var (role, academiaId, _) = GetUserInfo();
+            if (RoleScope.IsAdmin(role))
+                return Forbid();
+
             var alunos = _service.Get(role, filtro, academiaId);
 
             return Ok(alunos);
         }
 
-        [HttpGet("{slug}")]
-        public IActionResult BuscarAluno(string slug, [FromQuery] string cpf, [FromQuery] string email)
+        [AllowAnonymous]
+        [HttpPost("public/{slug}/buscar")]
+        public IActionResult BuscarAlunoPublico(string slug, [FromBody] AlunoBuscaPublicaDto busca)
         {
             var academiaId = ObterAcademiaIdPeloSlug(slug);
-
-            var matricula = _service.BuscarMatriculaPorCpfEmail(cpf, email, academiaId);
+            var matricula = _service.BuscarMatriculaPorCpfEmail(busca.Cpf, busca.Email, academiaId);
 
             if (matricula == null)
                 return NotFound();
+
+            var pagamentoAtual = _pagamentoRepository.Query()
+                .Where(p => p.MatriculaId == matricula.Id)
+                .OrderByDescending(p => p.DataVencimento)
+                .FirstOrDefault();
+
+            var hoje = DateTime.UtcNow.Date;
+            var diaBase = matricula.DataInicio.Day;
+            var diaVencimentoMesAtual = Math.Min(diaBase, DateTime.DaysInMonth(hoje.Year, hoje.Month));
+            var vencimentoAtual = new DateTime(hoje.Year, hoje.Month, diaVencimentoMesAtual);
+
+            var dataReferencia = pagamentoAtual?.Status == "Pago" && pagamentoAtual.DataVencimento.Date > vencimentoAtual
+                ? pagamentoAtual.DataVencimento
+                : vencimentoAtual;
+
+            var diasParaVencimento = (dataReferencia.Date - hoje).Days;
+            var mensalidadeStatus = diasParaVencimento < 0 ? "Vencida" : "Em dia";
+            var alertaVencimento = diasParaVencimento <= 10;
 
             return Ok(new
             {
                 alunoId = matricula.Aluno.Id,
                 matriculaId = matricula.Id,
                 planoId = matricula.PlanoId,
-                academiaId = matricula.AcademiaId,
-                formaPagamentoId = matricula.FormaPagamentoId,
                 nome = matricula.Aluno.Nome,
-                cpf = matricula.Aluno.CPF,
-                email = matricula.Aluno.Email,
                 endereco = matricula.Aluno.Endereco,
                 bairro = matricula.Aluno.Bairro,
                 cidade = matricula.Aluno.Cidade,
+                estado = matricula.Aluno.Estado,
+                cep = matricula.Aluno.CEP,
                 redeSocial = matricula.Aluno.RedeSocial,
                 telefone = matricula.Aluno.Telefone,
                 graduacao = matricula.Aluno.Graduacao,
@@ -59,17 +80,21 @@ namespace MA_Sys.API.Controllers
                 dataCadastro = matricula.Aluno.DataCadastro.ToString("yyyy-MM-dd"),
                 obs = matricula.Aluno.Obs,
                 plano = matricula.Plano.Nome,
-                valor = matricula.Plano.Valor
+                valor = matricula.Plano.Valor,
+                mensalidadeStatus,
+                dataVencimentoMensalidade = dataReferencia.ToString("yyyy-MM-dd"),
+                diasParaVencimento,
+                alertaVencimento
             });
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] AlunosCreateDto dto)
         {
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
 
             var academiaId = GetAcademiaId();
-            Console.WriteLine($"Academia ID: {academiaId}");
-
             _service.Add(dto, academiaId);
 
             return Ok();
@@ -86,19 +111,19 @@ namespace MA_Sys.API.Controllers
             {
                 sucesso = true,
                 mensagem = "Aluno cadastrado com sucesso"
-            }
-
-            );
+            });
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] AlunoUpdateDto dto, int id)
         {
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
+
             var role = GetUserRole();
             var academiaId = GetAcademiaId();
-            Console.WriteLine($"Academia ID: {academiaId}");
 
-            _service.Update(id, dto);
+            _service.Update(id, dto, role, academiaId);
 
             return Ok();
         }
@@ -106,11 +131,13 @@ namespace MA_Sys.API.Controllers
         [HttpPatch("{id}/status")]
         public IActionResult AtualizarStatus(int id, [FromBody] bool ativo)
         {
-            var (role, academiaId) = GetUserInfo();
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
+
+            var (_, academiaId, _) = GetUserInfo();
             _service.UpdateStatus(id, academiaId, ativo);
 
             return NoContent();
         }
-
     }
 }

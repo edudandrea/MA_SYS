@@ -7,7 +7,11 @@ namespace MA_Sys.API.Dto.AcademiasDto
         public string? Email { get; set; }
         public string? Cidade { get; set; }
         public string? Estado  { get; set; }
+        public string? LogoUrl { get; set; }
         public string? RedeSocial { get; set; }
         public string? Responsavel { get; set; }
+        public string? ChavePix { get; set; }
+        public string? MercadoPagoPublicKey { get; set; }
+        public string? MercadoPagoAccessToken { get; set; }
     }
 }

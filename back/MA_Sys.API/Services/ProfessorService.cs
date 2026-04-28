@@ -17,8 +17,7 @@ namespace MA_Sys.API.Services
 
         public List<ProfessorResponseDto> List(int academiaId)
         {
-            var prof = _repo.Query();
-            prof = prof.Where(p => p.AcademiaId == academiaId);
+            var prof = _repo.Query().Where(p => p.AcademiaId == academiaId);
 
             return prof.Select(p => new ProfessorResponseDto
             {
@@ -30,18 +29,13 @@ namespace MA_Sys.API.Services
                 Graduacao = p.Graduacao,
                 ModalidadeId = p.ModalidadeId,
                 Ativo = p.Ativo
-
             }).ToList();
         }
 
         public List<ProfessorResponseDto> Get(string role, ProfessorFiltroDto filtro, int? academiaId)
         {
             var query = _repo.Query();
-
-            Console.WriteLine($"ROLE RAW: '{role}'");
-            Console.WriteLine("ROLE NO SERVICE: '" + role + "'");
-
-            var isAdmin = role?.Trim().ToLower() == "admin";
+            var isAdmin = string.Equals(role?.Trim(), "Admin", StringComparison.OrdinalIgnoreCase);
 
             if (!isAdmin && academiaId.HasValue)
             {
@@ -67,8 +61,9 @@ namespace MA_Sys.API.Services
                 Telefone = p.Telefone,
                 Graduacao = p.Graduacao,
                 Ativo = p.Ativo,
-                TotalAlunos = _alunoRepo.Query().Count(a => a.ModalidadeId == p.Id && (role.Trim().ToLower() == "admin" || a.AcademiaId == academiaId))
-                
+                TotalAlunos = _alunoRepo.Query().Count(a =>
+                    a.ModalidadeId == p.Id &&
+                    (isAdmin || a.AcademiaId == academiaId))
             }).ToList();
         }
 
@@ -76,7 +71,7 @@ namespace MA_Sys.API.Services
         {
             int academiaFinal;
 
-            if (role == "Admin")
+            if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
             {
                 if (dto.AcademiaId <= 0)
                     throw new Exception("Admin deve informar a academia");
@@ -86,7 +81,7 @@ namespace MA_Sys.API.Services
             else
             {
                 if (!academiaId.HasValue || academiaId <= 0)
-                    throw new Exception("Usuário sem academia válida");
+                    throw new Exception("Usuario sem academia valida");
 
                 academiaFinal = academiaId.Value;
             }
@@ -106,31 +101,35 @@ namespace MA_Sys.API.Services
             _repo.Save();
         }
 
-        public void Update(int id, ProfessorUpdateDto dto)
+        public void Update(int id, ProfessorUpdateDto dto, string role, int? academiaId)
         {
-            var prof = _repo.Query()
-                        .FirstOrDefault(a => a.Id == id);
+            var query = _repo.Query().Where(a => a.Id == id);
+
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(a => a.AcademiaId == academiaId);
+            }
+
+            var prof = query.FirstOrDefault();
 
             if (prof == null)
-                throw new Exception("Professor não encontrado");
+                throw new Exception("Professor nao encontrado");
 
             prof.Nome = dto.Nome?.Trim();
             prof.Email = dto.Email?.Trim();
             prof.Telefone = dto.Telefone;
-            prof.Email = dto.Email;
             prof.ModalidadeId = dto.ModalidadeId;
             prof.Graduacao = dto.Graduacao;
 
             _repo.Save();
         }
 
-
         public void Delete(int id, int academiaId)
         {
             var prof = _repo.GetById(id, academiaId);
 
             if (prof == null)
-                throw new Exception("Professor não encontrado");
+                throw new Exception("Professor nao encontrado");
 
             _repo.Delete(prof);
             _repo.Save();
@@ -141,13 +140,12 @@ namespace MA_Sys.API.Services
             var prof = _repo.GetById(id, academiaId);
 
             if (prof == null)
-                throw new Exception("Professor não encontrado");
+                throw new Exception("Professor nao encontrado");
 
             prof.Ativo = ativo;
 
             _repo.Update(prof);
             _repo.Save();
         }
-
     }
 }

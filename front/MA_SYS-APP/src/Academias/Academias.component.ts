@@ -5,6 +5,11 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
+import { PagamentosAcademiasService } from '../Services/PagamentosAcademias/PagamentosAcademias.service';
+import { PagamentoAcademia } from '../Services/PagamentosAcademias/PagamentosAcademias.service';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { environment } from '../app/environments/environment';
 
 @Component({
   selector: 'app-Academias',
@@ -20,6 +25,9 @@ export class AcademiasComponent implements OnInit {
   cidade = '';
   email = '';
   telefone = '';
+  logoUrl = '';
+  logoPreviewUrl = '';
+  logoArquivo: File | null = null;
   redeSocial = '';
   dataCadastro = '';
   ativo = true;
@@ -28,7 +36,15 @@ export class AcademiasComponent implements OnInit {
   totalProf = 0;
   linkCadastro = '';
   slug = '';
+  chavePix = '';
+  mercadoPagoPublicKey = '';
+  mercadoPagoAccessToken = '';
   publicOrigin = '';
+  academiaCobrancaSelecionada: Academias | null = null;
+  cobrancasAcademia: PagamentoAcademia[] = [];
+  cobrancaValor = 199.9;
+  cobrancaDataVencimento = new Date().toISOString().slice(0, 10);
+  cobrancaDescricao = '';
 
   academias: (Academias & { menuAberto?: boolean })[] = [];
 
@@ -39,6 +55,7 @@ export class AcademiasComponent implements OnInit {
     private acad: AcademiasService,
     private cd: ChangeDetectorRef,
     private academiaService: AcademiasService,
+    private pagamentosAcademiasService: PagamentosAcademiasService,
   ) {}
 
   ngOnInit() {
@@ -82,14 +99,27 @@ export class AcademiasComponent implements OnInit {
   }
 
   openModalNovaAcademia(template: TemplateRef<any>) {
+    this.resetForm();
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-md modal-dialog-centered',
+      class: 'modal-xl modal-dialog-centered',
     });
   }
 
   openModalExcluir(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
+    });
+  }
+
+  openModalCobrancas(template: TemplateRef<any>, academia: Academias & { menuAberto?: boolean }) {
+    academia.menuAberto = false;
+    this.academiaCobrancaSelecionada = academia;
+    this.cobrancaDescricao = `Mensalidade do sistema - ${academia.nome}`;
+    this.cobrancaDataVencimento = new Date().toISOString().slice(0, 10);
+    this.cobrancaValor = 199.9;
+    this.carregarCobrancasAcademia();
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-xl modal-dialog-centered',
     });
   }
 
@@ -104,6 +134,7 @@ export class AcademiasComponent implements OnInit {
         this.spinner.hide();
         this.academias = res.map((m) => ({
           ...m,
+          logoUrl: this.resolveLogoUrl(m.logoUrl),
           menuAberto: false,
         }));
 
@@ -119,20 +150,22 @@ export class AcademiasComponent implements OnInit {
 
   salvarNovaAcademia() {
     this.spinner.show();
-
-    const academia = {
-      nome: this.nome,
-      cidade: this.cidade,
-      telefone: this.telefone,
-      email: this.email,
-      redeSocial: this.redeSocial,
-      responsavel: this.responsavel,
-      dataCadastro: this.dataCadastro || new Date().toISOString(),
-    };
-
-    this.academiaService.novaAcademia(academia).subscribe({
-      next: (res) => {
-        this.linkCadastro = this.getCadastroLink(res.slug);
+    this.uploadLogoSeNecessario().pipe(
+      switchMap((logoUrl) => this.academiaService.novaAcademia({
+        nome: this.nome,
+        cidade: this.cidade,
+        telefone: this.telefone,
+        logoUrl,
+        email: this.email,
+        redeSocial: this.redeSocial,
+        responsavel: this.responsavel,
+        chavePix: this.chavePix,
+        mercadoPagoPublicKey: this.mercadoPagoPublicKey,
+        mercadoPagoAccessToken: this.mercadoPagoAccessToken,
+        dataCadastro: this.dataCadastro || new Date().toISOString(),
+      })),
+    ).subscribe({
+      next: () => {
         this.spinner.hide();
         this.toastr.success('Academia cadastrada!', 'Sucesso');
         this.carregarAcademias();
@@ -181,9 +214,11 @@ export class AcademiasComponent implements OnInit {
 
   fecharModal() {
     this.modalRef?.hide();
+    this.resetForm();
   }
 
   editarAcademia(academia: Academias & { menuAberto?: boolean }) {
+    this.resetForm();
     this.editarId = academia.id;
     this.nome = academia.nome;
     this.cidade = academia.cidade;
@@ -191,32 +226,61 @@ export class AcademiasComponent implements OnInit {
     this.email = academia.email;
     this.redeSocial = academia.redeSocial;
     this.responsavel = academia.responsavel;
+    this.chavePix = academia.chavePix || '';
+    this.logoUrl = this.resolveLogoUrl(academia.logoUrl);
+    this.logoPreviewUrl = this.resolveLogoUrl(academia.logoUrl);
+    this.mercadoPagoPublicKey = academia.mercadoPagoPublicKey || '';
+    this.mercadoPagoAccessToken = academia.mercadoPagoAccessToken || '';
     academia.menuAberto = false;
   }
 
   salvarEdicao(academia: Academias) {
-    const payload = {
-      id: academia.id,
-      nome: this.nome,
-      cidade: this.cidade,
-      telefone: this.telefone,
-      email: this.email,
-      redeSocial: this.redeSocial,
-      responsavel: this.responsavel,
-      ativo: academia.ativo,
-    };
-
-    this.academiaService.atualizarAcademia(payload).subscribe({
+    this.spinner.show();
+    this.uploadLogoSeNecessario().pipe(
+      switchMap((logoUrl) => this.academiaService.atualizarAcademia({
+        id: academia.id,
+        nome: this.nome,
+        cidade: this.cidade,
+        telefone: this.telefone,
+        logoUrl,
+        email: this.email,
+        redeSocial: this.redeSocial,
+        responsavel: this.responsavel,
+        chavePix: this.chavePix,
+        mercadoPagoPublicKey: this.mercadoPagoPublicKey,
+        mercadoPagoAccessToken: this.mercadoPagoAccessToken,
+        ativo: academia.ativo,
+      })),
+    ).subscribe({
       next: () => {
+        this.spinner.hide();
         academia.nome = this.nome;
         academia.cidade = this.cidade;
         academia.telefone = this.telefone;
+        academia.logoUrl = this.resolveLogoUrl(this.logoUrl);
         academia.email = this.email;
         academia.redeSocial = this.redeSocial;
         academia.responsavel = this.responsavel;
+        academia.chavePix = this.chavePix;
+        academia.mercadoPagoPublicKey = this.mercadoPagoPublicKey;
+        academia.mercadoPagoAccessToken = this.mercadoPagoAccessToken;
+
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        if (usuario?.academiaId === academia.id) {
+          localStorage.setItem('usuario', JSON.stringify({
+            ...usuario,
+            academiaNome: this.nome,
+            academiaLogoUrl: this.resolveLogoUrl(this.logoUrl),
+          }));
+        }
+
         this.editarId = null;
         this.carregarAcademias();
         this.toastr.success('Academia atualizada');
+      },
+      error: () => {
+        this.spinner.hide();
+        this.toastr.error('Erro ao atualizar academia');
       },
     });
   }
@@ -231,5 +295,145 @@ export class AcademiasComponent implements OnInit {
         this.toastr.error('Erro ao copiar o link.');
       },
     );
+  }
+
+  criarCobrancaSistema(academia: Academias & { menuAberto?: boolean }) {
+    if (!academia || academia.id <= 0) return;
+    const valor = Number(this.cobrancaValor);
+    if (!Number.isFinite(valor) || valor <= 0) {
+      this.toastr.error('Valor invalido para cobranca.');
+      return;
+    }
+
+    this.pagamentosAcademiasService.criarCobranca({
+      academiaId: academia.id,
+      valor,
+      dataVencimento: this.cobrancaDataVencimento,
+      descricao: this.cobrancaDescricao || `Mensalidade do sistema - ${academia.nome}`,
+    }).subscribe({
+      next: () => {
+        this.toastr.success('Cobranca criada com sucesso.');
+        this.carregarCobrancasAcademia();
+      },
+      error: () => this.toastr.error('Nao foi possivel criar a cobranca.'),
+    });
+  }
+
+  carregarCobrancasAcademia() {
+    if (!this.academiaCobrancaSelecionada) return;
+    this.pagamentosAcademiasService.listarPorAcademia(this.academiaCobrancaSelecionada.id).subscribe({
+      next: (res) => {
+        this.cobrancasAcademia = res;
+      },
+      error: () => {
+        this.cobrancasAcademia = [];
+        this.toastr.error('Nao foi possivel carregar historico de cobrancas.');
+      },
+    });
+  }
+
+  baixarCobranca(cobrancaId: number) {
+    this.pagamentosAcademiasService.baixar(cobrancaId).subscribe({
+      next: () => {
+        this.toastr.success('Cobranca baixada como paga.');
+        this.carregarCobrancasAcademia();
+      },
+      error: () => this.toastr.error('Nao foi possivel baixar a cobranca.'),
+    });
+  }
+
+  onLogoSelecionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.toastr.error('Selecione um arquivo de imagem valido.');
+      input.value = '';
+      return;
+    }
+
+    if (this.logoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.logoPreviewUrl);
+    }
+
+    this.logoArquivo = file;
+    this.logoPreviewUrl = URL.createObjectURL(file);
+  }
+
+  removerLogoSelecionada() {
+    if (this.logoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.logoPreviewUrl);
+    }
+
+    this.logoArquivo = null;
+    this.logoPreviewUrl = '';
+    this.logoUrl = '';
+  }
+
+  private uploadLogoSeNecessario(): Observable<string> {
+    if (!this.logoArquivo) {
+      return of(this.logoUrl);
+    }
+
+    return this.academiaService.uploadLogo(this.logoArquivo).pipe(
+      switchMap((response) => {
+        this.logoUrl = response.logoUrl;
+        this.logoPreviewUrl = this.resolveLogoUrl(response.logoUrl);
+        this.logoArquivo = null;
+        return of(this.resolveLogoUrl(response.logoUrl));
+      }),
+    );
+  }
+
+  private resolveLogoUrl(logoUrl?: string | null): string {
+    if (!logoUrl) {
+      return '';
+    }
+
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://') || logoUrl.startsWith('blob:')) {
+      return logoUrl;
+    }
+
+    if (logoUrl.startsWith('/api/')) {
+      return logoUrl;
+    }
+
+    if (logoUrl.startsWith('/uploads/academias/')) {
+      const fileName = logoUrl.split('/').pop();
+      return fileName ? `${environment.apiUrl}/Academias/logo/${fileName}` : logoUrl;
+    }
+
+    return logoUrl;
+  }
+
+  private resetForm() {
+    if (this.logoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.logoPreviewUrl);
+    }
+
+    this.id = 0;
+    this.nome = '';
+    this.totalAlunos = 0;
+    this.cidade = '';
+    this.email = '';
+    this.telefone = '';
+    this.logoUrl = '';
+    this.logoPreviewUrl = '';
+    this.logoArquivo = null;
+    this.redeSocial = '';
+    this.dataCadastro = '';
+    this.ativo = true;
+    this.editarId = null;
+    this.responsavel = '';
+    this.totalProf = 0;
+    this.linkCadastro = '';
+    this.slug = '';
+    this.chavePix = '';
+    this.mercadoPagoPublicKey = '';
+    this.mercadoPagoAccessToken = '';
   }
 }

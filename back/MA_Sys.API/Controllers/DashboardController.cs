@@ -17,8 +17,8 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var (role, academiaId) = GetUserInfo();
-            var dashboard = _service.GetDashboard(role, academiaId);
+            var (role, academiaId, userId) = GetUserInfo();
+            var dashboard = _service.GetDashboard(role, academiaId, userId);
             return Ok(dashboard);
         }
     }

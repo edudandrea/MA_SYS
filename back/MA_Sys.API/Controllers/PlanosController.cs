@@ -20,30 +20,25 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] PlanosFiltroDto filtro)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"ROLE: {role}");
-            Console.WriteLine($"ACADEMIA ID: {academiaId}");
+            var (role, academiaId, userId) = GetUserInfo();
+            var planos = _service.Get(role, filtro, academiaId, userId);
 
-            var prof = _service.Get(role, filtro, academiaId);
-
-            return Ok(prof);
+            return Ok(planos);
         }
 
         [HttpGet("totalAlunos")]
         public IActionResult GetTotalAlunos([FromQuery] int planoId)
         {
-            var (role, academiaId) = GetUserInfo();
-            var totalAlunos = _service.GetTotalAlunos(academiaId, planoId, role);
+            var (role, academiaId, userId) = GetUserInfo();
+            var totalAlunos = _service.GetTotalAlunos(academiaId, planoId, role, userId);
             return Ok(totalAlunos);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] PlanosCreateDto dto)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
-
-            _service.Add(dto, academiaId);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Add(dto, role, academiaId, userId);
 
             return Ok();
         }
@@ -51,10 +46,8 @@ namespace MA_Sys.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] PlanosUpdateDto dto, int id)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
-
-            _service.Update(id, dto);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Update(id, dto, role, academiaId, userId);
 
             return Ok();
         }
@@ -62,13 +55,10 @@ namespace MA_Sys.API.Controllers
         [HttpPatch("{id}/status")]
         public IActionResult AtualizarStatus(int id, [FromBody] bool ativo)
         {
-            var (role, academiaId) = GetUserInfo();
-            _service.UpdateStatus(id, academiaId, ativo);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.UpdateStatus(id, role, academiaId, userId, ativo);
 
             return NoContent();
         }
-
-        
-        
     }
 }

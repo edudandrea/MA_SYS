@@ -7,16 +7,18 @@ namespace MA_Sys.API.Data.Repository
 {
     public class UserRepository : BaseRepository<Users>, IUserRepository
     {
-        
-        public UserRepository(AppDbContext context) : base (context){}
-       
-        
-        public Users GetByLogin(string login)
+        public UserRepository(AppDbContext context) : base(context) {}
+
+        public Users? GetByLogin(string login)
         {
             return _context.User
                                 .Include(u => u.Academia)
                                 .FirstOrDefault(u => u.Login == login);
         }
-        
+
+        public bool HasAnyUser()
+        {
+            return _context.User.Any();
+        }
     }
 }

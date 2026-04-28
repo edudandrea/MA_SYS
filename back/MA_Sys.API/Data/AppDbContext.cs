@@ -24,10 +24,25 @@ namespace MA_SYS.Api.Data
         public DbSet<Modalidade> Modalidades { get; internal set; }
         public DbSet <FormaPagamento> FormaPagamentos { get; set; }   
         public DbSet<Matricula> Matriculas { get; set; }     
+        public DbSet<PagamentoAcademia> PagamentosAcademias { get; set; }
+        public DbSet<Financeiro> Financeiros { get; set; }
+        public DbSet<CategoriaTransacao> CategoriasTransacao { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);                                 
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Users>()
+                .HasOne(u => u.CreatedByUser)
+                .WithMany(u => u.CreatedUsers)
+                .HasForeignKey(u => u.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Academia>()
+                .HasOne(a => a.OwnerUser)
+                .WithMany()
+                .HasForeignKey(a => a.OwnerUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

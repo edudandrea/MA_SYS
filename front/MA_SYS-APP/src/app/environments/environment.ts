@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: '/api'
+  apiUrl: '/api',
+  mercadoPagoPublicKey: 'TEST-__CONFIGURE_VIA_MERCADOPAGO_PUBLIC_KEY__',
 };
 
 /*

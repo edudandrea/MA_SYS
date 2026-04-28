@@ -16,16 +16,18 @@ import { AcademiasService } from '../Services/AcademiaService/Academias.service'
 export class UsuariosComponent implements OnInit {
   modalRef?: BsModalRef;
 
-  userId: number = 0;
-  userName: string = '';
-  login: string = '';
-  senha: string = '';
-  confirmarSenha: string = '';
-  academiaId: string = '';
-  role: string = '';
+  userId = 0;
+  userName = '';
+  login = '';
+  email = '';
+  senha = '';
+  confirmarSenha = '';
+  academiaId = '';
+  role = '';
   academias: any[] = [];
   usuarios: any[] = [];
-  editando: boolean = false;
+  editando = false;
+  currentRole = '';
 
   modalUsuario!: TemplateRef<any>;
 
@@ -35,10 +37,12 @@ export class UsuariosComponent implements OnInit {
     private spinner: NgxSpinnerService,
     private service: UserService,
     private cd: ChangeDetectorRef,
-    private acad: AcademiasService
+    private acad: AcademiasService,
   ) {}
 
   ngOnInit() {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    this.currentRole = usuario.role || '';
     this.carregarAcademias();
     this.loadUsers();
   }
@@ -51,11 +55,14 @@ export class UsuariosComponent implements OnInit {
     });
 
     usuario.menuAberto = !usuario.menuAberto;
-
     this.usuarios = [...this.usuarios];
   }
 
   openModals(template: TemplateRef<any>) {
+    if (!this.editando) {
+      this.resetForm();
+    }
+
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
     });
@@ -63,6 +70,7 @@ export class UsuariosComponent implements OnInit {
 
   closeModals() {
     this.modalRef?.hide();
+    this.resetForm();
   }
 
   getInicial(nome: string): string {
@@ -72,7 +80,6 @@ export class UsuariosComponent implements OnInit {
   carregarAcademias() {
     this.acad.getAcademias().subscribe({
       next: (res) => {
-        console.log('Academias recebidas:', res);
         this.spinner.hide();
         this.academias = res.map((m) => ({
           ...m,
@@ -81,7 +88,6 @@ export class UsuariosComponent implements OnInit {
 
         this.cd.markForCheck();
       },
-
       error: (err) => {
         console.error(err);
         this.toastr.error('Erro ao carregar academias.');
@@ -93,7 +99,6 @@ export class UsuariosComponent implements OnInit {
     this.spinner.show();
     this.service.getUsuarios().subscribe({
       next: (res) => {
-        console.log('Usuários recebidos:', res);
         this.spinner.hide();
         this.usuarios = res.map((m) => ({
           ...m,
@@ -102,7 +107,6 @@ export class UsuariosComponent implements OnInit {
 
         this.cd.markForCheck();
       },
-
       error: (err) => {
         console.error(err);
         this.toastr.error('Erro ao carregar usuários.');
@@ -111,40 +115,53 @@ export class UsuariosComponent implements OnInit {
   }
 
   salvar() {
-    if (this.senha !== this.confirmarSenha) {
+    if (!this.editando && this.senha !== this.confirmarSenha) {
       this.toastr.warning('As senhas não coincidem.');
       return;
     }
 
-    const payload = {
-      userId: 0,
+    const payload: any = {
+      userId: this.userId,
       userName: this.userName,
       login: this.login,
-      password: this.senha,
-      academiaId: this.role == 'Admin' ? 0 : parseInt(this.academiaId),
+      email: this.email,
+      academiaId: this.role === 'Academia' ? parseInt(this.academiaId, 10) : undefined,
       role: this.role,
     };
 
-    this.service.novoUsuario(payload).subscribe({
+    if (!this.editando) {
+      payload.password = this.senha;
+    } else if (this.senha) {
+      payload.password = this.senha;
+    }
+
+    const request$ = this.editando
+      ? this.service.atualizarUsuario(payload)
+      : this.service.novoUsuario(payload);
+
+    request$.subscribe({
       next: () => {
-        this.toastr.success('Usuário criado com sucesso!');
+        this.toastr.success(this.editando ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!');
         this.closeModals();
         this.loadUsers();
       },
       error: (error) => {
-        console.error('Erro ao criar usuário:', error);
-        this.toastr.error('Ocorreu um erro ao criar o usuário. Tente novamente.');
+        console.error('Erro ao salvar usuário:', error);
+        this.toastr.error('Ocorreu um erro ao salvar o usuário. Tente novamente.');
       },
     });
   }
 
   editar(user: any) {
-    this.userId = user.id;
+    this.userId = user.userId ?? user.id;
     this.editando = true;
     this.userName = user.userName;
     this.login = user.login;
+    this.email = user.email || '';
     this.role = user.role;
-    this.academiaId = user.academiaId || '';
+    this.academiaId = user.academiaId ? String(user.academiaId) : '';
+    this.senha = '';
+    this.confirmarSenha = '';
 
     this.openModals(this.modalUsuario);
   }
@@ -167,5 +184,19 @@ export class UsuariosComponent implements OnInit {
     }
   }
 
-  cancelar() {}
+  cancelar() {
+    this.closeModals();
+  }
+
+  private resetForm() {
+    this.userId = 0;
+    this.userName = '';
+    this.login = '';
+    this.email = '';
+    this.senha = '';
+    this.confirmarSenha = '';
+    this.academiaId = '';
+    this.role = '';
+    this.editando = false;
+  }
 }

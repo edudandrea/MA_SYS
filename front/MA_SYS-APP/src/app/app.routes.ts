@@ -13,6 +13,7 @@ import { DashboardComponent } from '../Dashboard/Dashboard.component';
 import { PagamentosComponent } from '../Pagamentos/Pagamentos.component';
 import { MatriculasComponent } from '../Matriculas/Matriculas.component';
 import { CadastroAlunosComponent } from '../CadastroAlunos/CadastroAlunos.component';
+import { FluxoCaixaComponent } from '../FluxoCaixa/FluxoCaixa.component';
 
 
 export const routes: Routes = [
@@ -35,6 +36,7 @@ export const routes: Routes = [
             { path: 'professores', component: ProfessoresComponent },
             { path: 'planos', component: PlanosComponent },
             { path: 'pagamentos', component: PagamentosComponent },
+            { path: 'fluxo-caixa', component: FluxoCaixaComponent },
             { path: 'usuarios', component: UsuariosComponent },
             { path: 'matriculas', component: MatriculasComponent },
         ]

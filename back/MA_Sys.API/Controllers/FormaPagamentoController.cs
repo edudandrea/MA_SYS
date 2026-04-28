@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.FormaPagamentos;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using MA_Sys.API.Data.Repository.interfaces;
 
 namespace MA_Sys.API.Controllers
 {
@@ -29,11 +23,8 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] FormaPagamentoFiltroDto filtro)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Role do usuário: {role}");
-            Console.WriteLine($"Academia ID do usuário: {academiaId}");
-            Console.WriteLine($"ACADEMIA LOGADA: {academiaId}");
-            var formaPagamento = _service.Get(role, filtro, academiaId);
+            var (role, academiaId, userId) = GetUserInfo();
+            var formaPagamento = _service.Get(role, filtro, academiaId, userId);
 
             return Ok(formaPagamento);
         }
@@ -41,10 +32,8 @@ namespace MA_Sys.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] FormaPagamentoCreateDto dto)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
-
-            _service.Add(dto, academiaId, role);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Add(dto, academiaId, role, userId);
 
             return Ok();
         }
@@ -52,10 +41,8 @@ namespace MA_Sys.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] FormaPagamentoUpdateDto dto, int id)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
-
-            _service.Update(id, dto);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Update(id, dto, role, academiaId, userId);
 
             return Ok();
         }

@@ -26,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
 
     importProvidersFrom(
-      ModalModule.forRoot(),
+      ModalModule,
       ToastrModule.forRoot({
         positionClass: 'toast-bottom-right',
         preventDuplicates: true,

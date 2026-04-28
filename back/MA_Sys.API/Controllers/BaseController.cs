@@ -23,9 +23,20 @@ namespace MA_Sys.API.Controllers
             return int.TryParse(claim.Value, out var academiaId) ? academiaId : null;
         }
 
-        protected (string role, int? academiaId) GetUserInfo()
+        protected int? GetUserId()
         {
-            return (GetUserRole(), GetAcademiaId());
+            var claim = User.FindFirst("UserId");
+            if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
+            {
+                return null;
+            }
+
+            return int.TryParse(claim.Value, out var userId) ? userId : null;
+        }
+
+        protected (string role, int? academiaId, int? userId) GetUserInfo()
+        {
+            return (GetUserRole(), GetAcademiaId(), GetUserId());
         }
 
         protected int ObterAcademiaIdPeloSlug(string slug)

@@ -1,15 +1,15 @@
-<div class="dashboard-page">
+﻿<div class="dashboard-page">
   <section class="dashboard-hero">
     <div class="hero-copy">
       <span class="page-kicker">Centro de comando</span>
       <h1>Dashboard Marcial ProX</h1>
-      <p>Leia crescimento, retenção e alertas operacionais em um único painel.</p>
+      <p>Leia crescimento, retenção e alertas operacionais em um Único painel.</p>
     </div>
 
     <div class="hero-actions">
       <div class="hero-chip">
         <i class="fa-solid fa-shield-halved"></i>
-        <span>{{ isAdmin ? 'Visão administrativa' : 'Visão da academia' }}</span>
+        <span>{{ isSuperAdmin ? 'Visão global' : (isAdmin ? 'Visão do admin' : 'Visão da academia') }}</span>
       </div>
 
       <div class="filter">
@@ -29,7 +29,7 @@
 
   <ng-container *ngIf="dashboard">
     <section class="stats-grid">
-      <article class="stat-card accent-orange" *ngIf="isAdmin">
+      <article class="stat-card accent-orange" *ngIf="isAdmin || isSuperAdmin">
         <i class="fa-solid fa-building"></i>
         <div>
           <h3>{{ dashboard?.totalAcademias }}</h3>
@@ -37,7 +37,7 @@
         </div>
       </article>
 
-      <article class="stat-card accent-teal">
+      <article class="stat-card accent-teal" *ngIf="isAcademia">
         <i class="fa-solid fa-users"></i>
         <div>
           <h3>{{ dashboard?.totalAlunos }}</h3>
@@ -46,7 +46,7 @@
         </div>
       </article>
 
-      <article class="stat-card accent-blue">
+      <article class="stat-card accent-blue" *ngIf="isAcademia">
         <i class="fa-solid fa-chalkboard-user"></i>
         <div>
           <h3>{{ dashboard?.totalProfessores }}</h3>
@@ -54,7 +54,7 @@
         </div>
       </article>
 
-      <article class="stat-card accent-amber">
+      <article class="stat-card accent-amber" *ngIf="isAcademia">
         <i class="fa-solid fa-user-clock"></i>
         <div>
           <h3>{{ dashboard?.alunosInativos || 0 }}</h3>
@@ -62,29 +62,61 @@
         </div>
       </article>
 
-      <article class="stat-card accent-green" *ngIf="isAdmin">
-        <i class="fa-solid fa-circle-check"></i>
+      <article class="stat-card accent-amber" *ngIf="isAdmin || isSuperAdmin">
+        <i class="fa-solid fa-hourglass-half"></i>
         <div>
-          <h3>{{ dashboard?.academiasEmDia }}</h3>
-          <span>Unidades em dia</span>
+          <h3>{{ dashboard?.totalAcademiasComPendencia || 0 }}</h3>
+          <span>Academias com pendências</span>
         </div>
       </article>
 
-      <article class="stat-card accent-red" *ngIf="isAdmin">
+      <article class="stat-card accent-red" *ngIf="isAdmin || isSuperAdmin">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <div>
+          <h3>{{ dashboard?.totalPagamentosPendentes || 0 }}</h3>
+          <span>Pagamentos pendentes</span>
+        </div>
+      </article>
+
+      <article class="stat-card accent-green" *ngIf="isAdmin || isSuperAdmin">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+          <h3>{{ dashboard?.totalUsuarios || 0 }}</h3>
+          <span>Usuários visíveis</span>
+        </div>
+      </article>
+
+      <article class="stat-card accent-red" *ngIf="isAdmin || isSuperAdmin">
         <i class="fa-solid fa-triangle-exclamation"></i>
         <div>
-          <h3>{{ dashboard?.academiasAtraso }}</h3>
-          <span>Unidades em atraso</span>
+          <h3>{{ (dashboard?.receitasMes || 0) | currency: 'BRL' }}</h3>
+          <span>Receitas do mês</span>
+        </div>
+      </article>
+
+      <article class="stat-card accent-amber" *ngIf="isAcademia">
+        <i class="fa-solid fa-hourglass-half"></i>
+        <div>
+          <h3>{{ dashboard?.totalMensalidadesVencendo10Dias || 0 }}</h3>
+          <span>Mensalidades vencendo em 10 dias</span>
+        </div>
+      </article>
+
+      <article class="stat-card accent-red" *ngIf="isAcademia">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <div>
+          <h3>{{ dashboard?.totalMensalidadesVencidas || 0 }}</h3>
+          <span>Mensalidades vencidas</span>
         </div>
       </article>
     </section>
 
     <section class="dashboard-grid">
-      <article class="dashboard-card chart-card">
+      <article class="dashboard-card chart-card" *ngIf="isAcademia">
         <div class="card-heading">
           <div>
             <h4>Crescimento de alunos</h4>
-            <span>Entradas recentes e ritmo de expansão</span>
+            <span>Entradas recentes e ritmo de expansÃ£o</span>
           </div>
         </div>
         <div class="chart-shell">
@@ -104,22 +136,22 @@
         </div>
       </article>
 
-      <article class="dashboard-card">
+      <article class="dashboard-card" *ngIf="isAcademia">
         <div class="card-heading">
           <div>
             <h4>Alertas</h4>
-            <span>Pontos que pedem atenção imediata</span>
+            <span>Pontos que pedem ATENÇÃO IMEDIATA</span>
           </div>
         </div>
 
         <div class="alert danger" *ngFor="let a of dashboard?.academiasAtrasadas">
           <i class="fa-solid fa-circle-exclamation"></i>
-          <span><strong>{{ a.nome }}</strong> está com <strong>{{ a.diasAtraso }} dias</strong> de atraso</span>
+          <span><strong>{{ a.nome }}</strong> estão com <strong>{{ a.diasAtraso }} dias</strong> de atraso</span>
         </div>
 
         <div class="alert warning" *ngFor="let a of dashboard?.academiasSemAlunos">
           <i class="fa-solid fa-user-slash"></i>
-          <span><strong>{{ a.nome }}</strong> está sem alunos cadastrados</span>
+          <span><strong>{{ a.nome }}</strong> estão sem alunos cadastrados</span>
         </div>
 
         <div
@@ -130,21 +162,7 @@
         </div>
       </article>
 
-      <article class="dashboard-card" *ngIf="isAdmin">
-        <div class="card-heading">
-          <div>
-            <h4>Top academias</h4>
-            <span>Maior base ativa no período</span>
-          </div>
-        </div>
-
-        <div class="list-item" *ngFor="let a of dashboard?.topAcademias">
-          <span>{{ a.nome }}</span>
-          <strong>{{ a.totalAlunos }}</strong>
-        </div>
-      </article>
-
-      <article class="dashboard-card" *ngIf="!isAdmin">
+      <article class="dashboard-card" *ngIf="isAcademia">
         <div class="card-heading">
           <div>
             <h4>Seus planos</h4>
@@ -158,26 +176,67 @@
         </div>
       </article>
 
-      <article class="dashboard-card full" *ngIf="isAdmin">
+      <article class="dashboard-card" *ngIf="isAcademia">
         <div class="card-heading">
           <div>
-            <h4>Alunos por academia</h4>
-            <span>Comparativo geral entre unidades</span>
+            <h4>Mensalidades em alerta</h4>
+            <span>Alunos com vencimento em até 10 dias</span>
           </div>
         </div>
 
-        <div class="table">
-          <div class="table-header">
-            <span>Academia</span>
-            <span>Alunos</span>
-          </div>
+        <div class="list-item" *ngFor="let m of dashboard?.mensalidadesAlerta">
+          <span>{{ m.nomeAluno }}</span>
+          <strong>{{ m.diasParaVencimento }} dia(s)</strong>
+        </div>
 
-          <div class="table-row" *ngFor="let a of dashboard?.alunosPorAcademia">
-            <span>{{ a.nome }}</span>
-            <strong>{{ a.totalAlunos }}</strong>
-          </div>
+        <div *ngIf="!dashboard?.mensalidadesAlerta?.length" class="empty-note">
+          Nenhuma mensalidade em alerta no momento.
         </div>
       </article>
+
+      <article class="dashboard-card" *ngIf="isAdmin || isSuperAdmin">
+        <div class="card-heading">
+          <div>
+            <h4>Academias: status de pagamentos</h4>
+            <span>Unidades em dia ou com pendências</span>
+          </div>
+        </div>
+
+        <div class="list-item" *ngFor="let a of dashboard?.academiasPagamentoAlerta">
+          <span>{{ a.nomeAcademia }} - {{ a.statusGeral }}</span>
+          <strong>Pend: {{ a.totalPagamentosPendentes }} | Venc: {{ a.totalPagamentosVencidos }}</strong>
+        </div>
+
+        <div *ngIf="!dashboard?.academiasPagamentoAlerta?.length" class="empty-note">
+          Nenhum alerta de pagamento por academia no momento.
+        </div>
+      </article>
+
+      <article class="dashboard-card" *ngIf="isAdmin || isSuperAdmin">
+        <div class="card-heading">
+          <div>
+            <h4>Resumo financeiro</h4>
+            <span>Recorte consolidado do escopo atual</span>
+          </div>
+        </div>
+
+        <div class="list-item">
+          <span>Receitas do mês</span>
+          <strong>{{ (dashboard?.receitasMes || 0) | currency: 'BRL' }}</strong>
+        </div>
+
+        <div class="list-item">
+          <span>Saldo atual</span>
+          <strong>{{ (dashboard?.saldoCaixa || 0) | currency: 'BRL' }}</strong>
+        </div>
+
+        <div class="list-item">
+          <span>Pagamentos recebidos</span>
+          <strong>{{ dashboard?.totalPagamentosRecebidos || 0 }}</strong>
+        </div>
+      </article>
+
+      
     </section>
   </ng-container>
 </div>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MA_Sys.API.Dto.Matriculas;
+using MA_Sys.API.Security;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,10 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] MatriculasFiltro filtro)
         {
-            var (role, academiaId) = GetUserInfo();
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
+
+            var (role, academiaId, _) = GetUserInfo();
             var matriculas = _service.Get(role, filtro, academiaId);
 
             return Ok(matriculas);
@@ -34,7 +38,10 @@ namespace MA_Sys.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] MatriculasCreateDto dto)
         {
-            var (role, academiaId) = GetUserInfo();
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
+
+            var (role, academiaId, _) = GetUserInfo();
             await _service.Add(dto, academiaId, role);
 
             return Ok();

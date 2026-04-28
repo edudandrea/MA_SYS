@@ -10,6 +10,7 @@ export interface Academias {
   cidade: string;
   email: string;
   telefone: string;
+  logoUrl?: string;
   redeSocial: string;
   dataCadastro: string;
   ativo: boolean;
@@ -18,6 +19,9 @@ export interface Academias {
   totalProf: number;
   diasAtraso: number;
   slug: string;
+  chavePix: string;
+  mercadoPagoPublicKey: string;
+  mercadoPagoAccessToken?: string;
   menuAberto?: boolean;
 }
 
@@ -36,6 +40,13 @@ export class AcademiasService {
   novaAcademia(acad: Partial<Academias>): Observable<Academias> {
     return this.http.post<Academias>(this.apiUrl, acad);
   }
+
+  uploadLogo(file: File): Observable<{ logoUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ logoUrl: string }>(`${this.apiUrl}/upload-logo`, formData);
+  }
+
   excluirAcademia(id: number): Observable<Academias> {
     return this.http.delete<Academias>(`${this.apiUrl}/${id}`);
   }
@@ -46,5 +57,15 @@ export class AcademiasService {
 
   atualizarStatus(id: number, ativo: boolean): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/status`, ativo);
+  }
+
+  getAcademiaById(id: number): Observable<Academias> {
+    return this.http.get<Academias>(`${this.apiUrl}/${id}`);
+  }
+
+  getPagamentoConfigPublico(slug: string): Observable<{ chavePix?: string; mercadoPagoPublicKey?: string }> {
+    return this.http.get<{ chavePix?: string; mercadoPagoPublicKey?: string }>(
+      `${this.apiUrl}/public/${slug}/pagamento-config`,
+    );
   }
 }

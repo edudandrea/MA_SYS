@@ -5,6 +5,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Planos, PlanosService } from '../Services/Planos/Planos.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
 
 @Component({
   selector: 'app-Planos',
@@ -23,6 +24,8 @@ export class PlanosComponent implements OnInit {
   editarId: number | null = null;
   duracaoMeses: number = 0;
   totalAlunos: number = 0;
+  academias: Academias[] = [];
+  role = '';
 
   planoMap = new Map<number, string>();
 
@@ -32,10 +35,21 @@ export class PlanosComponent implements OnInit {
     private toastr: ToastrService,
     private cd: ChangeDetectorRef,
     private spinner: NgxSpinnerService,
+    private academiasService: AcademiasService,
   ) {}
 
   ngOnInit() {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    this.role = usuario.role || '';
+    this.academiaId = usuario.academiaId || 0;
+    if (this.role !== 'Academia') {
+      this.carregarAcademias();
+    }
     this.carregarPlanos();
+  }
+
+  get isAcademia(): boolean {
+    return this.role === 'Academia';
   }
 
   getInicial(nome: string): string {
@@ -117,6 +131,17 @@ export class PlanosComponent implements OnInit {
     });
   }
 
+  carregarAcademias() {
+    this.academiasService.getAcademias().subscribe({
+      next: (res) => {
+        this.academias = res;
+      },
+      error: () => {
+        this.toastr.error('Erro ao carregar academias.');
+      },
+    });
+  }
+
   novoPlano() {
     this.spinner.show();
 
@@ -156,6 +181,7 @@ export class PlanosComponent implements OnInit {
     this.editarId = plano.id;
     this.nome = plano.nome;
     this.valor = plano.valor;
+    this.duracaoMeses = plano.duracaoMeses;
     plano.menuAberto = false;
   }
 

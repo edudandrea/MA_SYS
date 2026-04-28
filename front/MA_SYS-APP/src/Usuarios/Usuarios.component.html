@@ -27,7 +27,7 @@
 
           <div class="dropdown" *ngIf="user.menuAberto">
             <button (click)="editar(user)"><i class="fa-solid fa-pen"></i> Editar</button>
-            <button class="danger" (click)="deleteUsuario(user.id)">
+            <button class="danger" (click)="deleteUsuario(user.userId ?? user.id)">
               <i class="fa-solid fa-trash"></i> Excluir
             </button>
           </div>
@@ -76,7 +76,7 @@
       <form class="form-grid">
         <div class="form-group full">
           <label>Nome</label>
-          <input [(ngModel)]="userName" name="nome" />
+          <input [(ngModel)]="userName" name="userName" />
         </div>
 
         <div class="form-group">
@@ -85,11 +85,27 @@
         </div>
 
         <div class="form-group">
+          <label>E-mail</label>
+          <input [(ngModel)]="email" name="email" />
+        </div>
+
+        <div class="form-group">
           <label>Perfil</label>
           <select [(ngModel)]="role" name="role">
             <option value="">Selecione</option>
+            <option value="SuperAdmin">Super Admin</option>
             <option value="Admin">Admin</option>
             <option value="Academia">Academia</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="!editando || role === 'Academia'">
+          <label>Academia</label>
+          <select [(ngModel)]="academiaId" name="academiaId">
+            <option value="">Selecione</option>
+            <option *ngFor="let a of academias" [value]="a.id">
+              {{ a.nome }}
+            </option>
           </select>
         </div>
 
@@ -103,13 +119,9 @@
           <input type="password" [(ngModel)]="confirmarSenha" name="confirmarSenha" />
         </div>
 
-        <div class="form-group" *ngIf="role === 'Academia'">
-          <label>Academia</label>
-          <select [(ngModel)]="academiaId" name="academiaId">
-            <option *ngFor="let a of academias" [value]="a.id">
-              {{ a.nome }}
-            </option>
-          </select>
+        <div class="form-group" *ngIf="editando">
+          <label>Nova senha</label>
+          <input type="password" [(ngModel)]="senha" name="novaSenha" />
         </div>
       </form>
     </div>

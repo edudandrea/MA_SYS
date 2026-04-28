@@ -17,19 +17,21 @@
 
       <div class="brand-copy" *ngIf="!sidebarCollapsed">
         <strong>Marcial ProX</strong>
-        <span>Gestão para artes marciais</span>
+        <span>Gestao para artes marciais</span>
       </div>
     </div>
 
-    <nav class="sidebar-nav" aria-label="Navegação principal">
+    <nav class="sidebar-nav" aria-label="Navegacao principal">
       <a
         routerLink="/dashboard"
         routerLinkActive="active"
         data-label="Dashboard"
         [attr.title]="sidebarCollapsed ? 'Dashboard' : null"
       >
-        <i class="fa-solid fa-chart-line"></i>
-        <span *ngIf="!sidebarCollapsed">Dashboard</span>
+        <div class="menu-left">
+          <i class="fa-solid fa-chart-line"></i>
+          <span *ngIf="!sidebarCollapsed">Dashboard</span>
+        </div>
       </a>
 
       <button
@@ -53,27 +55,27 @@
       </button>
 
       <div class="submenu" *ngIf="cadastroOpen && !sidebarCollapsed">
-        <a *ngIf="isAdmin()" routerLink="/academias" routerLinkActive="active">
+        <a *ngIf="canViewAcademias()" routerLink="/academias" routerLinkActive="active">
           <i class="fa-solid fa-building"></i>
           <span>Academias</span>
         </a>
 
-        <a routerLink="/alunos" routerLinkActive="active">
+        <a *ngIf="canViewCadastrosAcademia()" routerLink="/alunos" routerLinkActive="active">
           <i class="fa-solid fa-circle-user"></i>
           <span>Alunos</span>
         </a>
 
-        <a routerLink="/matriculas" routerLinkActive="active">
+        <a *ngIf="canViewCadastrosAcademia()" routerLink="/matriculas" routerLinkActive="active">
           <i class="fa-solid fa-money-bills"></i>
-          <span>Matrículas</span>
+          <span>Matriculas</span>
         </a>
 
-        <a routerLink="/professores" routerLinkActive="active">
+        <a *ngIf="canViewCadastrosAcademia()" routerLink="/professores" routerLinkActive="active">
           <i class="fa-solid fa-chalkboard-user"></i>
           <span>Professores</span>
         </a>
 
-        <a routerLink="/modalidades" routerLinkActive="active">
+        <a *ngIf="canViewCadastrosAcademia()" routerLink="/modalidades" routerLinkActive="active">
           <i class="fa-solid fa-dumbbell"></i>
           <span>Modalidades</span>
         </a>
@@ -100,26 +102,33 @@
       </button>
 
       <div class="submenu" *ngIf="financeiroOpen && !sidebarCollapsed">
-        <a routerLink="/planos" routerLinkActive="active">
+        <a *ngIf="canViewFinanceiroAcademia() || canViewFinanceiroSistema()" routerLink="/planos" routerLinkActive="active">
           <i class="fa-solid fa-layer-group"></i>
           <span>Planos</span>
         </a>
 
-        <a routerLink="/pagamentos" routerLinkActive="active">
+        <a *ngIf="canViewFinanceiroAcademia() || canViewFinanceiroSistema()" routerLink="/pagamentos" routerLinkActive="active">
           <i class="fa-solid fa-credit-card"></i>
           <span>Pagamentos</span>
+        </a>
+
+        <a routerLink="/fluxo-caixa" routerLinkActive="active">
+          <i class="fa-solid fa-cash-register"></i>
+          <span>Fluxo de Caixa</span>
         </a>
       </div>
 
       <a
-        *ngIf="isAdmin()"
+        *ngIf="canViewUsuarios()"
         routerLink="/usuarios"
         routerLinkActive="active"
-        data-label="Usuários"
-        [attr.title]="sidebarCollapsed ? 'Usuários' : null"
+        data-label="Usuarios"
+        [attr.title]="sidebarCollapsed ? 'Usuarios' : null"
       >
-        <i class="fa-solid fa-users"></i>
-        <span *ngIf="!sidebarCollapsed">Usuários</span>
+        <div class="menu-left">
+          <i class="fa-solid fa-users"></i>
+          <span *ngIf="!sidebarCollapsed">Usuarios</span>
+        </div>
       </a>
     </nav>
 
@@ -133,7 +142,15 @@
     <header class="topbar">
       <div class="topbar-copy">
         <span class="eyebrow">Painel operacional</span>
-        <strong>{{ academiaNome }}</strong>
+        <div class="academy-banner">
+          <div class="academy-logo" *ngIf="academiaLogoUrl; else academyFallback">
+            <img [src]="academiaLogoUrl" [alt]="academiaNome" />
+          </div>
+          <ng-template #academyFallback>
+            <div class="academy-logo fallback">{{ academiaNome.charAt(0) || 'M' }}</div>
+          </ng-template>
+          <strong>{{ academiaNome }}</strong>
+        </div>
       </div>
 
       <div class="topbar-right">
@@ -146,20 +163,33 @@
           </select>
         </label>
 
-        <div class="user-info">
-          <div class="user-text">
-            <span class="user-name">{{ userName }}</span>
-            <span class="user-academia">{{ academiaNome }}</span>
-          </div>
+        <div class="profile-dropdown">
+          <button class="user-info user-trigger" type="button" (click)="toggleProfileMenu($event)">
+            <div class="user-text">
+              <span class="user-name">{{ userName }}</span>
+              <span class="user-academia">{{ academiaNome }}</span>
+            </div>
 
-          <div class="avatar">
-            {{ userName?.charAt(0) }}
+            <div class="avatar">
+              {{ userName.charAt(0) }}
+            </div>
+          </button>
+
+          <div class="profile-menu" *ngIf="profileMenuOpen">
+            <button type="button" (click)="openPerfilModal(templateEditarPerfil, $event)">
+              <i class="fa-solid fa-user-pen"></i>
+              Editar perfil
+            </button>
+            <button type="button" (click)="openSenhaModal(templateTrocarSenha, $event)">
+              <i class="fa-solid fa-key"></i>
+              Trocar senha
+            </button>
+            <button type="button" class="danger" (click)="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              Deslogar
+            </button>
           </div>
         </div>
-
-        <button class="btn-logout" type="button" (click)="logout()" aria-label="Sair">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
       </div>
     </header>
 
@@ -168,3 +198,59 @@
     </main>
   </div>
 </div>
+
+<ng-template #templateEditarPerfil>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Editar perfil</h4>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-grid">
+        <div class="form-group full">
+          <label>Nome</label>
+          <input [(ngModel)]="perfilForm.userName" name="perfilUserName" />
+        </div>
+
+        <div class="form-group full">
+          <label>E-mail</label>
+          <input [(ngModel)]="perfilForm.email" name="perfilEmail" />
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+      <button class="btn-save" (click)="salvarPerfil()">Salvar</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateTrocarSenha>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Trocar senha</h4>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-grid">
+        <div class="form-group full">
+          <label>Nova senha</label>
+          <input type="password" [(ngModel)]="senhaForm.novaSenha" name="novaSenhaPerfil" />
+        </div>
+
+        <div class="form-group full">
+          <label>Confirmar nova senha</label>
+          <input type="password" [(ngModel)]="senhaForm.confirmarNovaSenha" name="confirmarNovaSenhaPerfil" />
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+      <button class="btn-save" (click)="trocarSenha()">Salvar</button>
+    </div>
+  </div>
+</ng-template>

@@ -7,8 +7,9 @@ export interface Usuarios {
   userId: number;
   userName: string;
   login: string;
+  email?: string;
   password: string;
-  academiaId: number;
+  academiaId?: number;
   role: string;
   nomeAcademia: string;
 }
@@ -27,6 +28,10 @@ export class UserService {
 
   novoUsuario(usuario: Partial<Usuarios>): Observable<Usuarios> {
     return this.http.post<Usuarios>(this.apiUrl, usuario);
+  }
+
+  atualizarUsuario(usuario: Partial<Usuarios>): Observable<Usuarios> {
+    return this.http.put<Usuarios>(`${this.apiUrl}/${usuario.userId}`, usuario);
   }
 
   deleteUsuario(userId: number): Observable<Usuarios> {

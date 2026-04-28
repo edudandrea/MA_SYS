@@ -7,6 +7,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import * as QRCode from 'qrcode';
 import { PixResponse } from '../Model/pix-response.model';
+import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
 
 @Component({
   selector: 'app-Pagamentos',
@@ -26,6 +27,9 @@ export class PagamentosComponent implements OnInit {
   qrCodePix: string = '';
   pixPayload: string = '';
   valor: number = 0;
+  academias: Academias[] = [];
+  academiaId = 0;
+  role = '';
 
   novoFormaPgto = {
     nome: '',
@@ -43,10 +47,21 @@ export class PagamentosComponent implements OnInit {
     private spinner: NgxSpinnerService,
     private cd: ChangeDetectorRef,
     private modalService: BsModalService,
+    private academiasService: AcademiasService,
   ) {}
 
   ngOnInit() {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    this.role = usuario.role || '';
+    this.academiaId = usuario.academiaId || 0;
+    if (this.role !== 'Academia') {
+      this.carregarAcademias();
+    }
     this.carregarFormaPgtos();
+  }
+
+  get isAcademia(): boolean {
+    return this.role === 'Academia';
   }
 
   @HostListener('document:click', ['$event'])
@@ -170,6 +185,17 @@ export class PagamentosComponent implements OnInit {
     });
   }
 
+  carregarAcademias() {
+    this.academiasService.getAcademias().subscribe({
+      next: (res) => {
+        this.academias = res;
+      },
+      error: () => {
+        this.toastr.error('Erro ao carregar academias.', 'Erro');
+      },
+    });
+  }
+
   // ---------- POST ----------
   cadastrarNovaFormaPgto() {
     this.spinner.show();
@@ -180,6 +206,7 @@ export class PagamentosComponent implements OnInit {
       taxa: this.taxa,
       parcelas: this.parcelas,
       dias: this.dias,
+      academiaId: this.academiaId,
     };
 
     console.group('📤 NOVA FORMA DE PAGAMENTO');
@@ -209,6 +236,9 @@ export class PagamentosComponent implements OnInit {
   editarFormaPagamento(pg: Pagamentos) {
     this.editarId = pg.id;
     this.nome = pg.nome;
+    this.taxa = pg.taxa;
+    this.parcelas = pg.parcelas;
+    this.dias = pg.dias;
     pg.menuAberto = false;
   }
 

@@ -4,7 +4,7 @@ namespace MA_Sys.API.Data.Repository.interfaces
 {
     public interface IUserRepository : IBaseRepository<Users>
     {
-        Users GetByLogin(string login);
-        
+        Users? GetByLogin(string login);
+        bool HasAnyUser();
     }
 }

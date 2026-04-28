@@ -18,8 +18,11 @@ namespace MA_SYS.Api.Models
         [Required(ErrorMessage = "O campo senha é obrigatório")]
         [StringLength(10, MinimumLength = 6, ErrorMessage = "A senha deve ter entre 6 e 10 caracteres")]
         public string? Password { get; set; }
-        public string? Role { get; set; }        
+        public string? Role { get; set; }
         public int? AcademiaId { get; set; }
+        public int? CreatedByUserId { get; set; }
         public Academia? Academia { get; set; }
+        public Users? CreatedByUser { get; set; }
+        public ICollection<Users>? CreatedUsers { get; set; }
     }
 }

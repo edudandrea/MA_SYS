@@ -118,6 +118,15 @@
           <label>Duração (meses)</label>
           <input [(ngModel)]="duracaoMeses" name="duracaoMeses" />
         </div>
+
+        <div class="form-group full" *ngIf="!isAcademia">
+          <label>Academia</label>
+          <select [(ngModel)]="academiaId" name="academiaId">
+            <option *ngFor="let academia of academias" [ngValue]="academia.id">
+              {{ academia.nome }}
+            </option>
+          </select>
+        </div>
       </form>
     </div>
 

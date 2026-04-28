@@ -33,6 +33,11 @@
             <i class="fa-solid fa-trash"></i>
             Excluir
           </button>
+
+          <button (click)="openModalCobrancas(templateCobrancasAcademia, academia)">
+            <i class="fa-solid fa-receipt"></i>
+            Cobrancas do sistema
+          </button>
         </div>
       </div>
 
@@ -49,9 +54,15 @@
       </div>
 
       <div class="card-header-kpi">
-        <div class="avatar">
-          {{ getInicial(academia.nome) }}
+        <div class="avatar avatar-logo" *ngIf="academia.logoUrl; else academiaSemLogo">
+          <img [src]="academia.logoUrl" [alt]="academia.nome" />
         </div>
+
+        <ng-template #academiaSemLogo>
+          <div class="avatar">
+            {{ getInicial(academia.nome) }}
+          </div>
+        </ng-template>
 
         <div class="title-block">
           <div class="academia-title">
@@ -126,131 +137,197 @@
     </div>
 
     <div class="modal-body">
-      <div class="input-group">
-        <label>Nome da Academia</label>
-        <div class="input-modern">
-          <i class="fa-solid fa-user"></i>
-          <input [(ngModel)]="nome" />
-        </div>
-      </div>
-
-      <div class="form-row contato">
-        <div class="input-group">
-          <label>Cidade</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-city"></i>
-            <input [(ngModel)]="cidade" />
+      <div class="academia-form-layout">
+        <section class="form-section logo-section">
+          <div class="section-head">
+            <h5>Logo da academia</h5>
+            <p>Envie uma imagem para usar no card da academia e no topo do sistema.</p>
           </div>
-        </div>
 
-        <div class="input-group">
-          <label>Email</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-envelope"></i>
-            <input [(ngModel)]="email" name="email" />
-          </div>
-        </div>
+          <div class="logo-uploader">
+            <div class="logo-preview" [class.has-image]="!!logoPreviewUrl">
+              <img *ngIf="logoPreviewUrl" [src]="logoPreviewUrl" alt="Preview da logo" />
+              <div class="logo-placeholder" *ngIf="!logoPreviewUrl">
+                <i class="fa-solid fa-image"></i>
+                <span>Nenhuma logo selecionada</span>
+              </div>
+            </div>
 
-        <div class="input-group">
-          <label>Rede social</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-globe"></i>
-            <input [(ngModel)]="redeSocial" name="redeSocial" />
-          </div>
-        </div>
-      </div>
+            <div class="logo-actions">
+              <label class="upload-button">
+                <input type="file" accept="image/*" (change)="onLogoSelecionada($event)" hidden />
+                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                Enviar imagem
+              </label>
 
-      <div class="form-row telefone-responsavel">
-        <div class="input-group telefone">
-          <label>Telefone</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-phone"></i>
-            <input [(ngModel)]="telefone" name="telefone" />
+              <button type="button" class="btn-cancel subtle" *ngIf="logoPreviewUrl" (click)="removerLogoSelecionada()">
+                Remover
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div class="input-group responsavel">
-          <label>Responsável</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-user"></i>
-            <input [(ngModel)]="responsavel" name="responsavel" />
+        <section class="form-section">
+          <div class="section-head">
+            <h5>Dados principais</h5>
+            <p>Informações exibidas no cadastro e na identificação da academia.</p>
           </div>
+
+          <div class="form-grid-modal">
+            <div class="input-group full">
+              <label>Nome da Academia</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-user"></i>
+                <input [(ngModel)]="nome" />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Responsável</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-user-tie"></i>
+                <input [(ngModel)]="responsavel" name="responsavel" />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Telefone</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-phone"></i>
+                <input [(ngModel)]="telefone" name="telefone" />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Email</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-envelope"></i>
+                <input [(ngModel)]="email" name="email" />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Cidade</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-city"></i>
+                <input [(ngModel)]="cidade" />
+              </div>
+            </div>
+
+            <div class="input-group full">
+              <label>Rede social</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-globe"></i>
+                <input [(ngModel)]="redeSocial" name="redeSocial" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-head">
+            <h5>Financeiro e integrações</h5>
+            <p>Informações usadas nas cobranças e nas integrações de pagamento.</p>
+          </div>
+
+          <div class="form-grid-modal">
+            <div class="input-group">
+              <label>Chave PIX</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-qrcode"></i>
+                <input [(ngModel)]="chavePix" name="chavePix" />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Mercado Pago Public Key</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-key"></i>
+                <input [(ngModel)]="mercadoPagoPublicKey" name="mercadoPagoPublicKey" />
+              </div>
+            </div>
+
+            <div class="input-group full">
+              <label>Mercado Pago Access Token</label>
+              <div class="input-modern">
+                <i class="fa-solid fa-lock"></i>
+                <input [(ngModel)]="mercadoPagoAccessToken" name="mercadoPagoAccessToken" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-note">
+          <i class="fa-solid fa-circle-info"></i>
+          A imagem é enviada para o servidor e vinculada automaticamente à academia.
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal-footer">
-    <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-    <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+      <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
+    </div>
   </div>
 </ng-template>
 
-<ng-template #templateEditarAcademia>
+<ng-template #templateCobrancasAcademia>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Editar Academia</h4>
+      <h4>Cobrancas - {{ academiaCobrancaSelecionada?.nome }}</h4>
       <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
     </div>
 
     <div class="modal-body">
-      <div class="input-group">
-        <label>Nome da Academia</label>
-        <div class="input-modern">
-          <i class="fa-solid fa-user"></i>
-          <input [(ngModel)]="nome" />
+      <div class="cobranca-form">
+        <div class="form-row">
+          <div class="input-group">
+            <label>Valor</label>
+            <div class="input-modern">
+              <i class="fa-solid fa-dollar-sign"></i>
+              <input type="number" [(ngModel)]="cobrancaValor" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Vencimento</label>
+            <div class="input-modern">
+              <i class="fa-solid fa-calendar"></i>
+              <input type="date" [(ngModel)]="cobrancaDataVencimento" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Descricao</label>
+          <div class="input-modern">
+            <i class="fa-solid fa-file-lines"></i>
+            <input [(ngModel)]="cobrancaDescricao" />
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn-save" (click)="criarCobrancaSistema(academiaCobrancaSelecionada!)">Criar cobranca</button>
         </div>
       </div>
 
-      <div class="form-row contato">
-        <div class="input-group">
-          <label>Cidade</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-city"></i>
-            <input [(ngModel)]="cidade" />
+      <div class="cobranca-historico">
+        <h5>Historico</h5>
+        <div class="cobranca-item" *ngFor="let c of cobrancasAcademia">
+          <div>
+            <strong>R$ {{ c.valor }}</strong>
+            <small>{{ c.dataVencimento | date:'dd/MM/yyyy' }} - {{ c.status }}</small>
+            <p>{{ c.descricao || 'Sem descricao' }}</p>
           </div>
+          <button class="btn-save" *ngIf="c.status !== 'Pago'" (click)="baixarCobranca(c.id)">Baixar (Pago)</button>
         </div>
-
-        <div class="input-group">
-          <label>Email</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-envelope"></i>
-            <input [(ngModel)]="email" name="email" />
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Rede social</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-globe"></i>
-            <input [(ngModel)]="redeSocial" name="redeSocial" />
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row telefone-responsavel">
-        <div class="input-group telefone">
-          <label>Telefone</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-phone"></i>
-            <input [(ngModel)]="telefone" name="telefone" />
-          </div>
-        </div>
-
-        <div class="input-group responsavel">
-          <label>Responsável</label>
-          <div class="input-modern">
-            <i class="fa-solid fa-user"></i>
-            <input [(ngModel)]="responsavel" name="responsavel" />
-          </div>
-        </div>
+        <div class="empty-note" *ngIf="!cobrancasAcademia.length">Nenhuma cobranca registrada.</div>
       </div>
     </div>
-  </div>
 
-  <div class="modal-footer">
-    <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-    <button class="btn-save" (click)="salvarNovaAcademia()">Salvar</button>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="modalRef?.hide()">Fechar</button>
+    </div>
   </div>
 </ng-template>
 

@@ -1,6 +1,7 @@
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto;
 using MA_Sys.API.Dto.UsersDto;
+using MA_Sys.API.Security;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,18 +27,25 @@ namespace MA_Sys.API.Controllers
         [HttpGet]
         public IActionResult List()
         {
-            var (role, academiaId) = GetUserInfo();
-            var user = _service.List(role, academiaId);
+            var (role, academiaId, userId) = GetUserInfo();
+            var user = _service.List(role, academiaId, userId);
             return Ok(user);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get([FromBody] UserFiltroDto filtro)
+        [HttpGet("search")]
+        public IActionResult Search([FromQuery] UserFiltroDto filtro)
         {
-            var (role, academiaId) = GetUserInfo();
-            
-            var user = _service.Get(role, academiaId, filtro);
+            var (role, academiaId, userId) = GetUserInfo();
+            var user = _service.Get(role, academiaId, userId, filtro);
 
+            return Ok(user);
+        }
+
+        [HttpGet("{id:int}")]
+        public IActionResult GetById(int id)
+        {
+            var (role, academiaId, userId) = GetUserInfo();
+            var user = _service.GetById(id, role, academiaId, userId);
             return Ok(user);
         }
 
@@ -45,54 +53,88 @@ namespace MA_Sys.API.Controllers
         [AllowAnonymous]
         public IActionResult Login([FromBody] UserLoginDto dto)
         {
-            var user = _userRepo.GetByLogin(dto.Login);
+            if (string.IsNullOrWhiteSpace(dto.Login) || string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest("Login e senha sao obrigatorios.");
 
-            if(user == null)
-                return Unauthorized("Usuário não encontrado");
-                
+            var user = _userRepo.GetByLogin(dto.Login.Trim());
 
-            if(!BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
-                return Unauthorized("Senha inválida");
+            if (user == null)
+                return Unauthorized("Usuario nao encontrado");
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
+                return Unauthorized("Senha invalida");
 
             var token = _tokenService.GenerateToken(user);
 
-            return Ok(new { 
-                
-                token = token,
+            return Ok(new
+            {
+                token,
                 usuario = new
                 {
                     id = user.UserId,
-                    userName = user.UserName,                    
+                    userName = user.UserName,
+                    email = user.Email,
                     login = user.Login,
                     role = user.Role,
                     academiaId = user.AcademiaId,
-                    academiaNome = user.Academia != null ? user.Academia.Nome : null
+                    academiaNome = user.Academia != null ? user.Academia.Nome : null,
+                    academiaLogoUrl = user.Academia != null ? user.Academia.LogoUrl : null
                 }
-                   
             });
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Add ([FromBody] UserCreateDto dto)
+        public IActionResult Add([FromBody] UserCreateDto dto)
         {
-            _service.Add(dto);
+            var bootstrapMode = !_userRepo.HasAnyUser();
+
+            if (!bootstrapMode && !(User.Identity?.IsAuthenticated ?? false))
+            {
+                return Unauthorized();
+            }
+
+            if (bootstrapMode)
+            {
+                dto.Role = "SuperAdmin";
+                dto.AcademiaId = null;
+            }
+            else
+            {
+                var (role, academiaId, userId) = GetUserInfo();
+                if (!RoleScope.IsAdmin(role) && !RoleScope.IsSuperAdmin(role))
+                {
+                    return Forbid();
+                }
+
+                if (!string.Equals(dto.Role, "Admin", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(dto.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase))
+                {
+                    dto.AcademiaId = dto.AcademiaId ?? academiaId;
+                }
+
+                _service.Add(dto, userId);
+                return NoContent();
+            }
+
+            _service.Add(dto, null);
             return NoContent();
         }
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] UserUpdateDto dto)
         {
-            _service.Update(id, dto);
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Update(id, dto, role, academiaId, userId);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int userId)
+        public IActionResult Delete(int id)
         {
-            _service.Delete(userId, 0); 
+            var (role, academiaId, userId) = GetUserInfo();
+            _service.Delete(id, role, academiaId, userId);
             return NoContent();
         }
-
     }
 }

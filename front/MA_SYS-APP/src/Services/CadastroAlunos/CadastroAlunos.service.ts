@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../app/environments/environment.prod';
+import { environment } from '../../app/environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -21,7 +21,7 @@ export class CadastroAlunosService {
   ) {}
 
   getByCpfEmail(cpf: string, email: string) {
-    return this.http.get(`${this.apiUrl}/${this.context.slug}?cpf=${cpf}&email=${email}`);
+    return this.http.post(`${this.apiUrl}/public/${this.context.slug}/buscar`, { cpf, email });
   }
 
   cadastrar(slug: string, payload: any) {

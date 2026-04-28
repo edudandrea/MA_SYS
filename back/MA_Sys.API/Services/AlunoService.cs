@@ -11,7 +11,6 @@ namespace MA_Sys.API.Services
         private readonly IAlunoRepository _repo;
         private readonly IMatriculaRepository _matriculaRepo;
 
-
         public AlunoService(IAlunoRepository repo, IMatriculaRepository matriculaRepo)
         {
             _repo = repo;
@@ -22,11 +21,10 @@ namespace MA_Sys.API.Services
         {
             var alunos = _repo.Query();
 
-            if (role != "Admin")
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
             {
                 alunos = alunos.Where(a => a.AcademiaId == academiaId);
             }
-
 
             return alunos.Select(a => new AlunoResponseDto
             {
@@ -42,11 +40,10 @@ namespace MA_Sys.API.Services
         {
             var query = _repo.Query();
 
-            if (role != "Admin")
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
             {
                 query = query.Where(a => a.AcademiaId == academiaId);
             }
-
 
             if (filtro.Id.HasValue)
                 query = query.Where(a => a.Id == filtro.Id);
@@ -77,16 +74,14 @@ namespace MA_Sys.API.Services
                 Ativo = a.Ativo,
                 AcademiaId = a.AcademiaId,
                 PlanoId = a.PlanoId,
-                Obs = a.Obs,
-
+                Obs = a.Obs
             }).ToList();
         }
 
         public AlunoDto? GetById(int id, int academiaId)
         {
             return _repo.Query()
-
-                .Where(a => a.Id == id)
+                .Where(a => a.Id == id && a.AcademiaId == academiaId)
                 .Select(a => new AlunoDto
                 {
                     Id = a.Id,
@@ -111,7 +106,7 @@ namespace MA_Sys.API.Services
         public Aluno? BuscarPorCpfEmail(string cpf, string email, int academiaId)
         {
             var cpfLimpo = cpf.Replace(".", "").Replace("-", "").Trim();
-            var emailLimpo = email.Trim().ToLower();
+            var emailLimpo = email.Trim().ToLowerInvariant();
 
             return _repo.Query()
                 .FirstOrDefault(a =>
@@ -123,12 +118,15 @@ namespace MA_Sys.API.Services
 
         public Matricula? BuscarMatriculaPorCpfEmail(string cpf, string email, int academiaId)
         {
+            var cpfLimpo = cpf.Replace(".", "").Replace("-", "").Trim();
+            var emailLimpo = email.Trim().ToLowerInvariant();
+
             return _matriculaRepo.Query()
                 .Include(m => m.Aluno)
                 .Include(m => m.Plano)
                 .FirstOrDefault(m =>
-                    m.Aluno.CPF == cpf &&
-                    m.Aluno.Email == email &&
+                    m.Aluno.CPF.Replace(".", "").Replace("-", "") == cpfLimpo &&
+                    m.Aluno.Email.ToLower() == emailLimpo &&
                     m.AcademiaId == academiaId
                 );
         }
@@ -136,7 +134,7 @@ namespace MA_Sys.API.Services
         public List<AlunoResponseDto> GetByCpfEmail(string cpf, string email, int academiaId)
         {
             var cpfLimpo = cpf.Replace(".", "").Replace("-", "").Trim();
-            var emailLimpo = email.Trim().ToLower();
+            var emailLimpo = email.Trim().ToLowerInvariant();
 
             var query = _repo.Query()
                 .Where(a =>
@@ -157,7 +155,6 @@ namespace MA_Sys.API.Services
 
         public void Add(AlunosCreateDto dto, int? academiaId)
         {
-
             var aluno = new Aluno
             {
                 Nome = dto.Nome,
@@ -176,13 +173,19 @@ namespace MA_Sys.API.Services
             _repo.Save();
         }
 
-        public void Update(int id, AlunoUpdateDto dto)
+        public void Update(int id, AlunoUpdateDto dto, string role, int? academiaId)
         {
-            var aluno = _repo.Query()
-                        .FirstOrDefault(a => a.Id == id);
+            var query = _repo.Query().Where(a => a.Id == id);
+
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(a => a.AcademiaId == academiaId);
+            }
+
+            var aluno = query.FirstOrDefault();
 
             if (aluno == null)
-                throw new Exception("Aluno não encontrado");
+                throw new Exception("Aluno nao encontrado");
 
             aluno.Nome = dto.Nome?.Trim();
             aluno.CPF = dto.CPF?.Trim();
@@ -207,7 +210,7 @@ namespace MA_Sys.API.Services
             var aluno = _repo.GetById(id, academiaId ?? 0);
 
             if (aluno == null)
-                throw new Exception("Aluno não encontrado");
+                throw new Exception("Aluno nao encontrado");
 
             aluno.Ativo = ativo;
 

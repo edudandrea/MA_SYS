@@ -2,13 +2,13 @@
   <section class="cadastro-hero">
     <div class="hero-brand">
       <img src="assets/logo-marcial-prox.png" alt="Logo Marcial ProX" class="hero-logo" />
-      <span class="hero-badge">Pré-cadastro de aluno</span>
+      <span class="hero-badge">Pre-cadastro de aluno</span>
     </div>
 
     <div class="hero-copy">
       <h1>Confirme seus dados e conclua sua entrada no Marcial ProX.</h1>
       <p>
-        Uma experiência mais clara para matrícula, revisão cadastral e escolha da forma de
+        Uma experiencia mais clara para matricula, revisao cadastral e escolha da forma de
         pagamento.
       </p>
     </div>
@@ -16,19 +16,19 @@
     <div class="hero-points">
       <div class="hero-point">
         <strong>Cadastro guiado</strong>
-        <span>Informações organizadas em blocos simples e objetivos.</span>
+        <span>Informacoes organizadas em blocos simples e objetivos.</span>
       </div>
 
       <div class="hero-point">
         <strong>Pagamento integrado</strong>
-        <span>PIX e cartão no mesmo fluxo, respeitando o tema ativo do sistema.</span>
+        <span>PIX e cartao no mesmo fluxo, respeitando o tema ativo do sistema.</span>
       </div>
     </div>
   </section>
 
   <section class="cadastro-panel">
     <div class="panel-heading">
-      <span class="eyebrow">Identificação</span>
+      <span class="eyebrow">Identificacao</span>
       <h2>Vamos localizar seu cadastro</h2>
       <p>Informe CPF e email para carregar seus dados e continuar.</p>
     </div>
@@ -39,7 +39,7 @@
           <label>CPF</label>
           <div class="input-modern">
             <i class="fa-solid fa-id-card"></i>
-            <input [(ngModel)]="cpfBusca" placeholder="000.000.000-00" />
+            <input [(ngModel)]="cpfBusca" placeholder="000.000.000-00" (keyup.enter)="pesquisarAlunos()" />
           </div>
         </div>
 
@@ -47,12 +47,12 @@
           <label>Email</label>
           <div class="input-modern">
             <i class="fa-solid fa-envelope"></i>
-            <input [(ngModel)]="emailBusca" placeholder="voce@exemplo.com" />
+            <input [(ngModel)]="emailBusca" placeholder="voce@exemplo.com" (keyup.enter)="pesquisarAlunos()" />
           </div>
         </div>
       </div>
 
-      <button class="btn-primary-block" (click)="pesquisarAlunos()">Buscar cadastro</button>
+      <button type="button" class="btn-primary-block" (click)="pesquisarAlunos()">Buscar cadastro</button>
     </div>
 
     <ng-container *ngIf="alunoEncontrado">
@@ -65,12 +65,12 @@
         <div class="student-chips">
           <span class="info-chip">
             <i class="fa-solid fa-building"></i>
-            {{ aluno?.academiaNome || 'Sem academia vinculada' }}
+            Marcial ProX
           </span>
 
           <span class="info-chip emphasis">
             <i class="fa-solid fa-file-signature"></i>
-            Revisão cadastral pronta para envio
+            Revisao cadastral pronta para envio
           </span>
         </div>
       </div>
@@ -79,7 +79,7 @@
         <section class="form-section">
           <div class="section-heading">
             <h4>Dados pessoais</h4>
-            <p>Confira suas informações principais antes de seguir para o pagamento.</p>
+            <p>Confira suas informacoes principais antes de seguir para o pagamento.</p>
           </div>
 
           <div class="form-grid cols-2">
@@ -102,7 +102,7 @@
 
           <div class="form-grid cols-3">
             <div class="input-group">
-              <label>Graduação</label>
+              <label>Graduacao</label>
               <div class="input-modern">
                 <i class="fa-solid fa-award"></i>
                 <input [(ngModel)]="graduacao" name="graduacao" />
@@ -129,13 +129,13 @@
 
         <section class="form-section">
           <div class="section-heading">
-            <h4>Endereço</h4>
-            <p>Mantenha o endereço atualizado para comunicação e documentação.</p>
+            <h4>Endereco</h4>
+            <p>Mantenha o endereco atualizado para comunicacao e documentacao.</p>
           </div>
 
           <div class="form-grid cols-2">
             <div class="input-group">
-              <label>Endereço</label>
+              <label>Endereco</label>
               <div class="input-modern">
                 <i class="fa-solid fa-location-dot"></i>
                 <input [(ngModel)]="endereco" name="endereco" />
@@ -181,7 +181,7 @@
         <section class="form-section">
           <div class="section-heading">
             <h4>Contato</h4>
-            <p>Esses dados ajudam no envio de avisos, recibos e confirmações.</p>
+            <p>Esses dados ajudam no envio de avisos, recibos e confirmacoes.</p>
           </div>
 
           <div class="form-grid cols-3">
@@ -213,12 +213,12 @@
 
         <section class="form-section">
           <div class="section-heading">
-            <h4>Observações</h4>
-            <p>Adicione aqui alguma informação importante para a academia.</p>
+            <h4>Observacoes</h4>
+            <p>Adicione aqui alguma informacao importante para a academia.</p>
           </div>
 
           <div class="input-group">
-            <label>Observações</label>
+            <label>Observacoes</label>
             <textarea [(ngModel)]="obs" name="observacoes" rows="4"></textarea>
           </div>
         </section>
@@ -228,13 +228,34 @@
         <div class="payment-summary">
           <div class="summary-box">
             <span class="summary-label">Plano</span>
-            <strong>{{ aluno?.plano || 'Não informado' }}</strong>
+            <strong>{{ aluno?.plano || 'Nao informado' }}</strong>
           </div>
 
           <div class="summary-box value">
             <span class="summary-label">Valor</span>
             <strong>R$ {{ aluno?.valor }}</strong>
           </div>
+        </div>
+
+        <div class="mensalidade-status" [ngClass]="{
+          'status-ok': diasParaVencimento > 10,
+          'status-alerta': diasParaVencimento >= 0 && diasParaVencimento <= 10,
+          'status-vencida': diasParaVencimento < 0
+        }">
+          <div class="status-line">
+            <strong>Mensalidade</strong>
+            <span>{{ mensalidadeStatus || 'Sem status' }}</span>
+          </div>
+          <div class="status-line">
+            <small>Validade até {{ dataVencimentoMensalidade || '--/--/----' }}</small>
+            <small>{{ diasParaVencimento }} dia(s)</small>
+          </div>
+          <p *ngIf="diasParaVencimento >= 0 && diasParaVencimento <= 10">
+            Alerta: sua mensalidade vence em até 10 dias.
+          </p>
+          <p *ngIf="diasParaVencimento < 0">
+            Mensalidade vencida. Regularize o pagamento para manter o plano ativo.
+          </p>
         </div>
 
         <div class="input-group">
@@ -251,27 +272,27 @@
         </div>
 
         <div *ngIf="isPix && !showQrCode" class="payment-action">
-          <button class="btn-primary-block" (click)="gerarPix()">Gerar PIX</button>
+          <button type="button" class="btn-primary-block" (click)="gerarPix()">Gerar PIX</button>
         </div>
 
         <div *ngIf="showQrCode" class="qr-container">
           <div class="qr-card">
             <img [src]="qrCodePix" alt="QR Code PIX" />
-            <p>Escaneie o código com o aplicativo do seu banco.</p>
+            <p>Escaneie o codigo com o aplicativo do seu banco.</p>
           </div>
 
-          <button class="btn-secondary-block" (click)="copiarPix()">Copiar código PIX</button>
+          <button type="button" class="btn-secondary-block" (click)="copiarPix()">Copiar codigo PIX</button>
         </div>
 
         <div *ngIf="isCartao" class="card-section">
           <div class="section-heading">
-            <h4>Pagamento por cartão</h4>
-            <p>Preencha os dados abaixo para concluir a cobrança.</p>
+            <h4>Pagamento por cartao</h4>
+            <p>Preencha os dados abaixo para concluir a cobranca.</p>
           </div>
 
           <div class="form-grid cols-1">
             <div class="input-group">
-              <label>Número do cartão</label>
+              <label>Numero do cartao</label>
               <div class="input-modern">
                 <i class="fa-solid fa-credit-card"></i>
                 <input [(ngModel)]="cartao.numero" placeholder="0000 0000 0000 0000" />
@@ -281,7 +302,7 @@
 
           <div class="form-grid cols-1">
             <div class="input-group">
-              <label>Nome no cartão</label>
+              <label>Nome no cartao</label>
               <div class="input-modern">
                 <i class="fa-solid fa-user"></i>
                 <input [(ngModel)]="cartao.nome" />
@@ -307,7 +328,20 @@
             </div>
           </div>
 
-          <button class="btn-primary-block" (click)="pagarCartao()">Pagar com cartão</button>
+          <button type="button" class="btn-primary-block" (click)="pagarCartao()">Pagar com cartao</button>
+
+          <div *ngIf="pagamentoStatus" class="payment-status" [ngClass]="{
+            'status-paid': pagamentoStatus === 'Pago',
+            'status-pending': pagamentoStatus === 'Pendente' || pagamentoStatus === 'EmAnalise',
+            'status-failed': pagamentoStatus === 'Recusado' || pagamentoStatus === 'Erro'
+          }">
+            <div class="status-head">
+              <strong>Status do pagamento:</strong>
+              <span>{{ pagamentoStatus }}</span>
+            </div>
+            <p>{{ pagamentoMensagem }}</p>
+            <small *ngIf="pagamentoId">ID: {{ pagamentoId }}</small>
+          </div>
         </div>
       </section>
     </ng-container>

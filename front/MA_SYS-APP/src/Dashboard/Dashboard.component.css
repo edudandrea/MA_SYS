@@ -222,6 +222,7 @@
 
 .card-heading span {
   font-size: 0.84rem;
+  color: var(--text-secondary);
 }
 
 .alert {
@@ -264,12 +265,29 @@
   border-top: 1px solid rgba(148, 163, 184, 0.08);
 }
 
+.list-item span,
+.table-row span {
+  color: var(--text-primary);
+}
+
 .table-header {
   padding-bottom: 12px;
   color: var(--text-muted);
   font-size: 0.84rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+body[data-theme='system'] .card-heading span,
+body[data-theme='green-gold'] .card-heading span,
+body[data-theme='red-black'] .card-heading span,
+body[data-theme='system'] .table-header,
+body[data-theme='green-gold'] .table-header,
+body[data-theme='red-black'] .table-header,
+body[data-theme='system'] .empty-note,
+body[data-theme='green-gold'] .empty-note,
+body[data-theme='red-black'] .empty-note {
+  color: var(--text-secondary);
 }
 
 .filter {

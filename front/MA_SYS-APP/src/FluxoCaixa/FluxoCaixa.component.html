@@ -1,0 +1,123 @@
+<div class="fluxo-page">
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1>Fluxo de Caixa</h1>
+      <p>Leia entradas, saídas e saldo consolidado do seu escopo de acesso.</p>
+    </div>
+
+    <div class="header-actions">
+      <select *ngIf="!isAcademia" [(ngModel)]="academiaIdSelecionada" (change)="carregarFluxo()">
+        <option [ngValue]="null">Todas as academias visíveis</option>
+        <option *ngFor="let academia of academias" [ngValue]="academia.id">
+          {{ academia.nome }}
+        </option>
+      </select>
+
+      <button class="btn-save page-action" (click)="openModalNovoLancamento(templateNovoLancamento)">
+        <i class="fa-solid fa-plus"></i>
+        Novo lançamento
+      </button>
+    </div>
+  </div>
+
+  <section class="summary-grid">
+    <article class="summary-card positive">
+      <span>Entradas</span>
+      <strong>{{ resumo.totalEntradas | currency: 'BRL' }}</strong>
+    </article>
+
+    <article class="summary-card negative">
+      <span>Saídas</span>
+      <strong>{{ resumo.totalSaidas | currency: 'BRL' }}</strong>
+    </article>
+
+    <article class="summary-card neutral">
+      <span>Saldo</span>
+      <strong>{{ resumo.saldo | currency: 'BRL' }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Movimentos</span>
+      <strong>{{ resumo.totalMovimentos }}</strong>
+    </article>
+  </section>
+
+  <div class="movimentos-list">
+    <div class="empty-state" *ngIf="movimentos.length === 0">
+      <i class="fa-solid fa-receipt"></i>
+      <p>Nenhum movimento encontrado para o filtro atual.</p>
+    </div>
+
+    <article class="movimento-card" *ngFor="let movimento of movimentos">
+      <div class="movimento-topline">
+        <span class="badge" [class.entrada]="movimento.tipo === 'Entrada'" [class.saida]="movimento.tipo === 'Saida'">
+          {{ movimento.tipo }}
+        </span>
+        <strong>{{ movimento.valor | currency: 'BRL' }}</strong>
+      </div>
+
+      <h3>{{ movimento.descricao }}</h3>
+      <p>{{ movimento.academiaNome }} • {{ movimento.categoria }} • {{ movimento.origem }}</p>
+
+      <div class="movimento-meta">
+        <span>{{ movimento.data | date: 'dd/MM/yyyy' }}</span>
+        <span>{{ movimento.status }}</span>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #templateNovoLancamento>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>Novo lançamento</h4>
+        <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="form-grid">
+          <div class="form-group" *ngIf="!isAcademia">
+            <label>Academia</label>
+            <select [(ngModel)]="novoLancamento.academiaId" name="academiaId">
+              <option *ngFor="let academia of academias" [ngValue]="academia.id">
+                {{ academia.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo</label>
+            <select [(ngModel)]="novoLancamento.tipo" name="tipo">
+              <option value="Entrada">Entrada</option>
+              <option value="Saida">Saida</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Valor</label>
+            <input type="number" [(ngModel)]="novoLancamento.valor" name="valor" />
+          </div>
+
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" [(ngModel)]="novoLancamento.data" name="data" />
+          </div>
+
+          <div class="form-group">
+            <label>Categoria</label>
+            <input [(ngModel)]="novoLancamento.categoria" name="categoria" />
+          </div>
+
+          <div class="form-group full">
+            <label>Descrição</label>
+            <input [(ngModel)]="novoLancamento.descricao" name="descricao" />
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+        <button class="btn-save" (click)="salvarLancamento()">Salvar</button>
+      </div>
+    </div>
+  </ng-template>
+</div>

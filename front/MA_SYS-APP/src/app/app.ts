@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterModule, RouterOutlet } from "@angular/router";
 import { ThemeService } from '../Services/Theme/theme.service';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterModule, NgxSpinnerModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

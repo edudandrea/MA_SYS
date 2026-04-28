@@ -17,9 +17,15 @@ namespace MA_SYS.Api.Models
         public string? RedeSocial { get; set; }
         public string? Responsavel { get; set; }
         public string? Telefone { get; set; }
+        public string? LogoUrl { get; set; }
+        public string? ChavePix { get; set; }
+        public string? MercadoPagoPublicKey { get; set; }
+        public string? MercadoPagoAccessToken { get; set; }
+        public int? OwnerUserId { get; set; }
         public DateTime DataCadastro { get; set; }
         public bool Ativo { get; set; }
         public ICollection<Modalidade>? Alunos { get; set; }
         public ICollection<Professor>? Professores { get; set; }
+        public Users? OwnerUser { get; set; }
     }
 }

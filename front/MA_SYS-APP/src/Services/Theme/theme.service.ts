@@ -15,6 +15,8 @@ export class ThemeService {
   readonly themes: ThemeOption[] = [
     { value: 'system', label: 'Sistema' },
     { value: 'blue-light', label: 'Branco + Azul Escuro' },
+    { value: 'yellow-white', label: 'Amarelo + Branco' },
+    { value: 'purple-white', label: 'Roxo + Branco' },
     { value: 'green-gold', label: 'Verde + Dourado' },
     { value: 'red-black', label: 'Vermelho + Preto' },
     { value: 'windows', label: 'Padrao Windows' },

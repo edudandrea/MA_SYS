@@ -1,5 +1,6 @@
 using MA_Sys.API.Controllers;
 using MA_Sys.API.Dto.ProfessoresDto;
+using MA_Sys.API.Security;
 using MA_Sys.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +17,15 @@ namespace MA_SYS.Api.Controllers
         public ProfessoresController(ProfessorService service)
         {
             _service = service;
-        }        
-        
+        }
+
         [HttpGet]
         public IActionResult Get([FromQuery] ProfessorFiltroDto filtro)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"ROLE: {role}");
-            Console.WriteLine($"ACADEMIA ID: {academiaId}");
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
 
+            var (role, academiaId, _) = GetUserInfo();
             var prof = _service.Get(role, filtro, academiaId);
 
             return Ok(prof);
@@ -33,9 +34,10 @@ namespace MA_SYS.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProfessorCreateDto dto)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
 
+            var (role, academiaId, _) = GetUserInfo();
             _service.Add(dto, academiaId, role);
 
             return Ok();
@@ -44,10 +46,11 @@ namespace MA_SYS.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] ProfessorUpdateDto dto, int id)
         {
-            var (role, academiaId) = GetUserInfo();
-            Console.WriteLine($"Academia ID: {academiaId}");
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
 
-            _service.Update(id, dto);
+            var (role, academiaId, _) = GetUserInfo();
+            _service.Update(id, dto, role, academiaId);
 
             return Ok();
         }
@@ -55,11 +58,13 @@ namespace MA_SYS.Api.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var (role, academiaId) = GetUserInfo();
+            if (RoleScope.IsAdmin(GetUserRole()))
+                return Forbid();
+
+            var (_, academiaId, _) = GetUserInfo();
             _service.Delete(id, academiaId ?? 0);
 
             return NoContent();
         }
-
     }
 }

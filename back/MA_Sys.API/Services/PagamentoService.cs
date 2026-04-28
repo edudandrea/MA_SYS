@@ -10,17 +10,23 @@ namespace MA_Sys.API.Services
         private readonly IPagamentoRepository _pagRepo;
         private readonly IMatriculaRepository _matriculaRepo;
         private readonly IFormaPagamentoRepository _formaPagamentoRepo;
+        private readonly IAcademiaRepository _academiaRepo;
+        private readonly MercadoPagoGatewayService _mercadoPagoGateway;
 
         public PagamentoService(
             IPlanosRepository planoRepo,
             IPagamentoRepository pagRepo,
             IMatriculaRepository matriculaRepo,
-            IFormaPagamentoRepository formaPagamentoRepo)
+            IFormaPagamentoRepository formaPagamentoRepo,
+            IAcademiaRepository academiaRepo,
+            MercadoPagoGatewayService mercadoPagoGateway)
         {
             _planoRepo = planoRepo;
             _pagRepo = pagRepo;
             _matriculaRepo = matriculaRepo;
             _formaPagamentoRepo = formaPagamentoRepo;
+            _academiaRepo = academiaRepo;
+            _mercadoPagoGateway = mercadoPagoGateway;
         }
 
         public List<Pagamentos> GetPagamentosAlunos(int alunoId)
@@ -57,7 +63,7 @@ namespace MA_Sys.API.Services
             return Task.FromResult(pagamento);
         }
 
-        public Pagamentos ProcessarPagamentoCartaoPublico(PagamentoCartaoPublicoDto dto, int academiaId)
+        public async Task<Pagamentos> ProcessarPagamentoCartaoPublico(PagamentoCartaoPublicoDto dto, int academiaId)
         {
             if (dto.AlunoId <= 0 || dto.MatriculaId <= 0 || dto.PlanoId <= 0)
             {
@@ -69,7 +75,10 @@ namespace MA_Sys.API.Services
                 throw new InvalidOperationException("Forma de pagamento invalida.");
             }
 
-            ValidarCartao(dto.Cartao);
+            if (string.IsNullOrWhiteSpace(dto.CardToken))
+            {
+                throw new InvalidOperationException("Token de cartao nao informado.");
+            }
 
             var matricula = _matriculaRepo.Query()
                 .FirstOrDefault(m =>
@@ -114,6 +123,33 @@ namespace MA_Sys.API.Services
                 throw new InvalidOperationException("O valor informado nao corresponde ao plano contratado.");
             }
 
+            var academia = _academiaRepo.Query()
+                .FirstOrDefault(a => a.Id == academiaId);
+
+            if (academia == null)
+            {
+                throw new InvalidOperationException("Academia nao encontrada para processar o pagamento.");
+            }
+
+            if (string.IsNullOrWhiteSpace(academia.MercadoPagoAccessToken))
+            {
+                throw new InvalidOperationException("A academia ainda nao configurou o token de recebimento do cartao.");
+            }
+
+            var descricao = $"Plano {plano.Nome} - Aluno {dto.AlunoId}";
+            var gatewayResult = await _mercadoPagoGateway.ProcessarPagamentoCartaoAsync(
+                dto,
+                descricao,
+                academia.MercadoPagoAccessToken);
+
+            var statusPagamento = gatewayResult.Status.ToLowerInvariant() switch
+            {
+                "approved" => "Pago",
+                "pending" => "Pendente",
+                "in_process" => "EmAnalise",
+                _ => "Recusado"
+            };
+
             var agora = DateTime.UtcNow;
             var pagamento = new Pagamentos
             {
@@ -125,15 +161,18 @@ namespace MA_Sys.API.Services
                 Valor = dto.Valor,
                 DataPagamento = agora,
                 DataVencimento = agora.AddMonths(plano.DuracaoMeses),
-                Status = "Pago",
-                ExternalId = $"CARD-{Guid.NewGuid():N}"
+                Status = statusPagamento,
+                ExternalId = gatewayResult.ExternalId
             };
 
             _pagRepo.Add(pagamento);
 
-            matricula.MensalidadePaga = true;
-            matricula.DataPagamento = agora;
-            matricula.FormaPagamentoId = dto.FormaPagamentoId;
+            if (statusPagamento == "Pago")
+            {
+                matricula.MensalidadePaga = true;
+                matricula.DataPagamento = agora;
+                matricula.FormaPagamentoId = dto.FormaPagamentoId;
+            }
 
             _pagRepo.Save();
 
@@ -175,94 +214,11 @@ namespace MA_Sys.API.Services
             }
         }
 
-        private static void ValidarCartao(CartaoDto cartao)
+        public Pagamentos? ObterPagamentoPorId(int pagamentoId, int academiaId)
         {
-            if (cartao == null)
-            {
-                throw new InvalidOperationException("Dados do cartao nao informados.");
-            }
-
-            var numero = SomenteDigitos(cartao.Numero);
-            if (numero.Length < 13 || numero.Length > 19 || !PassaLuhn(numero))
-            {
-                throw new InvalidOperationException("Numero do cartao invalido.");
-            }
-
-            if (string.IsNullOrWhiteSpace(cartao.Nome) || cartao.Nome.Trim().Length < 5)
-            {
-                throw new InvalidOperationException("Nome impresso no cartao invalido.");
-            }
-
-            if (!ValidadeCartaoEhValida(cartao.Validade))
-            {
-                throw new InvalidOperationException("Validade do cartao invalida.");
-            }
-
-            var cvv = SomenteDigitos(cartao.Cvv);
-            if (cvv.Length < 3 || cvv.Length > 4)
-            {
-                throw new InvalidOperationException("CVV invalido.");
-            }
+            return _pagRepo.Query()
+                .FirstOrDefault(p => p.Id == pagamentoId && p.AcademiaId == academiaId);
         }
 
-        private static string SomenteDigitos(string valor)
-        {
-            return new string((valor ?? string.Empty).Where(char.IsDigit).ToArray());
-        }
-
-        private static bool PassaLuhn(string numero)
-        {
-            var soma = 0;
-            var dobrar = false;
-
-            for (var i = numero.Length - 1; i >= 0; i--)
-            {
-                var digito = numero[i] - '0';
-
-                if (dobrar)
-                {
-                    digito *= 2;
-                    if (digito > 9)
-                    {
-                        digito -= 9;
-                    }
-                }
-
-                soma += digito;
-                dobrar = !dobrar;
-            }
-
-            return soma % 10 == 0;
-        }
-
-        private static bool ValidadeCartaoEhValida(string validade)
-        {
-            if (string.IsNullOrWhiteSpace(validade))
-            {
-                return false;
-            }
-
-            var partes = validade.Split('/');
-            if (partes.Length != 2)
-            {
-                return false;
-            }
-
-            if (!int.TryParse(partes[0], out var mes) || !int.TryParse(partes[1], out var anoCurto))
-            {
-                return false;
-            }
-
-            if (mes < 1 || mes > 12)
-            {
-                return false;
-            }
-
-            var ano = 2000 + anoCurto;
-            var ultimoDia = DateTime.DaysInMonth(ano, mes);
-            var expiracao = new DateTime(ano, mes, ultimoDia, 23, 59, 59, DateTimeKind.Utc);
-
-            return expiracao >= DateTime.UtcNow;
-        }
     }
 }

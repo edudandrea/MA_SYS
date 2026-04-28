@@ -49,7 +49,7 @@ namespace MA_Sys.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("public/cartao")]
-        public IActionResult PagarCartaoPublico([FromBody] PagamentoCartaoPublicoDto dto)
+        public async Task<IActionResult> PagarCartaoPublico([FromBody] PagamentoCartaoPublicoDto dto)
         {
             try
             {
@@ -63,13 +63,60 @@ namespace MA_Sys.API.Controllers
                     return NotFound(new { message = "Academia nao encontrada." });
                 }
 
-                var pagamento = _service.ProcessarPagamentoCartaoPublico(dto, academiaId);
+                var pagamento = await _service.ProcessarPagamentoCartaoPublico(dto, academiaId);
+
+                var mensagem = pagamento.Status switch
+                {
+                    "Pago" => "Pagamento com cartao aprovado com sucesso.",
+                    "Pendente" => "Pagamento pendente. Aguarde a confirmacao do emissor.",
+                    "EmAnalise" => "Pagamento em analise. Retorne em instantes para consultar o status.",
+                    _ => "Pagamento recusado."
+                };
 
                 return Ok(new
                 {
                     pagamentoId = pagamento.Id,
                     status = pagamento.Status,
-                    mensagem = "Pagamento com cartao aprovado com sucesso."
+                    mensagem
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("public/{pagamentoId}/status")]
+        public IActionResult ConsultarStatusPublico(int pagamentoId, [FromQuery] string slug)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(slug))
+                {
+                    return BadRequest(new { message = "Slug da academia nao informado." });
+                }
+
+                var academiaId = _academiaRepository.Query()
+                    .Where(a => a.Slug == slug)
+                    .Select(a => a.Id)
+                    .FirstOrDefault();
+
+                if (academiaId <= 0)
+                {
+                    return NotFound(new { message = "Academia nao encontrada." });
+                }
+
+                var pagamento = _service.ObterPagamentoPorId(pagamentoId, academiaId);
+                if (pagamento == null)
+                {
+                    return NotFound(new { message = "Pagamento nao encontrado." });
+                }
+
+                return Ok(new
+                {
+                    pagamentoId = pagamento.Id,
+                    status = pagamento.Status
                 });
             }
             catch (Exception ex)
