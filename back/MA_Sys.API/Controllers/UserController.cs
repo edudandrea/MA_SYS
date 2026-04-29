@@ -83,6 +83,16 @@ namespace MA_Sys.API.Controllers
             });
         }
 
+        [HttpGet("bootstrap-status")]
+        [AllowAnonymous]
+        public IActionResult GetBootstrapStatus()
+        {
+            return Ok(new
+            {
+                requiresBootstrap = !_userRepo.HasAnyUser()
+            });
+        }
+
         [HttpPost]
         [AllowAnonymous]
         public IActionResult Add([FromBody] UserCreateDto dto)

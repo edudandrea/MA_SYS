@@ -31,12 +31,106 @@
     </div>
 
     <div class="login-copy">
-      <span class="eyebrow">Acesso seguro</span>
-      <h2>Entrar no Marcial ProX</h2>
-      <p>Use seu login para continuar.</p>
+      <span class="eyebrow">{{ requiresBootstrap ? 'Primeiro acesso' : 'Acesso seguro' }}</span>
+      <h2>{{ requiresBootstrap ? 'Criar Super Admin' : 'Entrar no Marcial ProX' }}</h2>
+      <p>
+        {{
+          requiresBootstrap
+            ? 'Esse formulario aparece apenas enquanto o sistema ainda nao possui usuarios.'
+            : 'Use seu login para continuar.'
+        }}
+      </p>
     </div>
 
-    <form class="login-form" (ngSubmit)="entrar()">
+    <div *ngIf="checkingBootstrap" class="bootstrap-notice">
+      Verificando configuracao inicial...
+    </div>
+
+    <form *ngIf="!checkingBootstrap && requiresBootstrap" class="login-form" (ngSubmit)="criarPrimeiroAcesso()">
+      <div class="bootstrap-notice">
+        Crie o primeiro usuario com perfil <strong>Super Admin</strong>. Depois disso, esta etapa deixa de ficar disponivel.
+      </div>
+
+      <div class="input-group">
+        <label for="bootstrapUserName">Nome</label>
+        <div class="field-shell">
+          <i class="fa-solid fa-id-badge"></i>
+          <input
+            id="bootstrapUserName"
+            [(ngModel)]="bootstrapUserName"
+            name="bootstrapUserName"
+            autocomplete="name"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="bootstrapLogin">Login</label>
+        <div class="field-shell">
+          <i class="fa-solid fa-user"></i>
+          <input
+            id="bootstrapLogin"
+            [(ngModel)]="bootstrapLogin"
+            name="bootstrapLogin"
+            autocomplete="username"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="bootstrapEmail">Email</label>
+        <div class="field-shell">
+          <i class="fa-solid fa-envelope"></i>
+          <input
+            id="bootstrapEmail"
+            type="email"
+            [(ngModel)]="bootstrapEmail"
+            name="bootstrapEmail"
+            autocomplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="bootstrapPassword">Senha</label>
+        <div class="field-shell">
+          <i class="fa-solid fa-lock"></i>
+          <input
+            id="bootstrapPassword"
+            type="password"
+            [(ngModel)]="bootstrapPassword"
+            name="bootstrapPassword"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="bootstrapPasswordConfirm">Confirmar senha</label>
+        <div class="field-shell">
+          <i class="fa-solid fa-shield-halved"></i>
+          <input
+            id="bootstrapPasswordConfirm"
+            type="password"
+            [(ngModel)]="bootstrapPasswordConfirm"
+            name="bootstrapPasswordConfirm"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <button class="btn-login" type="submit">
+        <span>{{ creatingBootstrap ? 'Criando acesso...' : 'Criar primeiro acesso' }}</span>
+        <i class="fa-solid fa-user-plus"></i>
+      </button>
+    </form>
+
+    <form *ngIf="!checkingBootstrap && !requiresBootstrap" class="login-form" (ngSubmit)="entrar()">
       <div class="input-group">
         <label for="login">Usuario</label>
         <div class="field-shell">

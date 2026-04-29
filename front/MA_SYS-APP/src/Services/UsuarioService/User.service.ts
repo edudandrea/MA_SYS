@@ -14,6 +14,10 @@ export interface Usuarios {
   nomeAcademia: string;
 }
 
+export interface BootstrapStatus {
+  requiresBootstrap: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -21,6 +25,10 @@ export class UserService {
   private apiUrl = `${environment.apiUrl}/User`;
 
   constructor(private http: HttpClient) {}
+
+  getBootstrapStatus(): Observable<BootstrapStatus> {
+    return this.http.get<BootstrapStatus>(`${this.apiUrl}/bootstrap-status`);
+  }
 
   getUsuarios() {
     return this.http.get<any[]>(this.apiUrl);
@@ -37,5 +45,4 @@ export class UserService {
   deleteUsuario(userId: number): Observable<Usuarios> {
     return this.http.delete<Usuarios>(`${this.apiUrl}/${userId}`);
   }
-
 }

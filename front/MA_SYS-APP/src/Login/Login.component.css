@@ -1,10 +1,12 @@
 .login-shell {
-  min-height: 100vh;
-  padding: 32px;
+  min-height: 100dvh;
+  height: 100dvh;
+  padding: 24px;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, 440px);
-  gap: 28px;
+  gap: 24px;
   align-items: stretch;
+  overflow: hidden;
   background:
     radial-gradient(circle at top left, var(--accent-glow), transparent 26%),
     radial-gradient(circle at bottom right, var(--accent-secondary-glow), transparent 28%),
@@ -19,10 +21,11 @@
 }
 
 .login-hero {
-  padding: 34px;
+  min-height: 0;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 22px;
   justify-content: space-between;
   background:
     linear-gradient(145deg, var(--accent-surface), transparent),
@@ -69,7 +72,7 @@
 
 .login-hero h1 {
   max-width: 14ch;
-  font-size: clamp(2.1rem, 4.5vw, 3.8rem);
+  font-size: clamp(1.9rem, 3.8vw, 3.2rem);
   line-height: 1.02;
   letter-spacing: -0.04em;
 }
@@ -89,7 +92,7 @@
 .hero-highlights {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 .hero-highlights div {
@@ -107,7 +110,8 @@
 }
 
 .login-card {
-  padding: 34px;
+  min-height: 0;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -144,6 +148,16 @@
   flex-direction: column;
   gap: 18px;
   width: 100%;
+}
+
+.bootstrap-notice {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--accent-border-soft);
+  background: var(--accent-surface);
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .field-shell {
@@ -193,27 +207,22 @@
 @media (max-width: 980px) {
   .login-shell {
     grid-template-columns: 1fr;
+    place-items: center;
     padding: 20px;
   }
 
   .login-hero {
-    min-height: 0;
+    display: none;
   }
 
-  .login-hero h1,
-  .hero-logo {
-    max-width: 100%;
+  .login-card {
+    width: min(100%, 440px);
   }
 }
 
 @media (max-width: 640px) {
   .login-shell,
-  .login-hero,
   .login-card {
     padding: 18px;
-  }
-
-  .hero-highlights {
-    grid-template-columns: 1fr;
   }
 }
