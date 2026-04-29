@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
   requiresBootstrap = false;
   checkingBootstrap = true;
   creatingBootstrap = false;
+  private bootstrapCheckTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private auth: AuthService,
@@ -117,17 +118,32 @@ export class LoginComponent implements OnInit {
 
   private checkBootstrapStatus() {
     this.checkingBootstrap = true;
+    this.clearBootstrapCheckTimeout();
+
+    this.bootstrapCheckTimeoutId = setTimeout(() => {
+      this.requiresBootstrap = false;
+      this.checkingBootstrap = false;
+    }, 4000);
 
     this.userService.getBootstrapStatus().subscribe({
       next: (response) => {
+        this.clearBootstrapCheckTimeout();
         this.requiresBootstrap = !!response.requiresBootstrap;
         this.checkingBootstrap = false;
       },
       error: () => {
+        this.clearBootstrapCheckTimeout();
         this.requiresBootstrap = false;
         this.checkingBootstrap = false;
       },
     });
+  }
+
+  private clearBootstrapCheckTimeout() {
+    if (this.bootstrapCheckTimeoutId) {
+      clearTimeout(this.bootstrapCheckTimeoutId);
+      this.bootstrapCheckTimeoutId = null;
+    }
   }
 
   private resetBootstrapForm() {
