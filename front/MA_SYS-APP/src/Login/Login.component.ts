@@ -95,6 +95,7 @@ export class LoginComponent implements OnInit {
           this.password = '';
           this.requiresBootstrap = false;
           this.resetBootstrapForm();
+          this.creatingBootstrap = false;
         },
         error: (error) => {
           const message =
@@ -102,10 +103,8 @@ export class LoginComponent implements OnInit {
               ? error.error
               : 'Nao foi possivel criar o primeiro usuario.';
           this.toastr.error(message, 'Erro');
-          this.checkBootstrapStatus();
-        },
-        complete: () => {
           this.creatingBootstrap = false;
+          this.checkBootstrapStatus();
         },
       });
   }
@@ -122,11 +121,10 @@ export class LoginComponent implements OnInit {
     this.userService.getBootstrapStatus().subscribe({
       next: (response) => {
         this.requiresBootstrap = !!response.requiresBootstrap;
+        this.checkingBootstrap = false;
       },
       error: () => {
         this.requiresBootstrap = false;
-      },
-      complete: () => {
         this.checkingBootstrap = false;
       },
     });
