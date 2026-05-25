@@ -149,6 +149,61 @@ namespace MA_Sys.API.Services
             return GetById(turmaId, academiaId)!;
         }
 
+        public TurmaResponseDto DesfazerCheckIn(int turmaId, int checkInId, int academiaId)
+        {
+            ValidarTurma(turmaId, academiaId);
+
+            var checkIn = _context.CheckInsAulas
+                .FirstOrDefault(c => c.Id == checkInId && c.TurmaId == turmaId && c.AcademiaId == academiaId);
+
+            if (checkIn == null)
+            {
+                throw new InvalidOperationException("Check-in nao encontrado.");
+            }
+
+            _context.CheckInsAulas.Remove(checkIn);
+            _context.SaveChanges();
+            return GetById(turmaId, academiaId)!;
+        }
+
+        public List<object> RelatorioCheckIns(int academiaId, int? professorId, DateTime? dataInicio, DateTime? dataFim)
+        {
+            var inicio = (dataInicio ?? DateTime.UtcNow.Date.AddDays(-30)).Date;
+            var fim = (dataFim ?? DateTime.UtcNow.Date).Date.AddDays(1).AddTicks(-1);
+
+            var query = _context.CheckInsAulas
+                .AsNoTracking()
+                .Where(c => c.AcademiaId == academiaId && c.DataCheckIn >= inicio && c.DataCheckIn <= fim)
+                .Include(c => c.Aluno)
+                .Include(c => c.Turma)
+                .ThenInclude(t => t!.Professor)
+                .AsQueryable();
+
+            if (professorId.HasValue && professorId.Value > 0)
+            {
+                query = query.Where(c => c.Turma != null && c.Turma.ProfessorId == professorId.Value);
+            }
+
+            return query
+                .OrderByDescending(c => c.DataCheckIn)
+                .ThenBy(c => c.Aluno!.Nome)
+                .Select(c => new
+                {
+                    checkInId = c.Id,
+                    alunoId = c.AlunoId,
+                    alunoNome = c.Aluno != null ? c.Aluno.Nome : string.Empty,
+                    turmaId = c.TurmaId,
+                    turmaNome = c.Turma != null ? c.Turma.Nome : string.Empty,
+                    professorId = c.Turma != null ? c.Turma.ProfessorId : null,
+                    professorNome = c.Turma != null && c.Turma.Professor != null ? c.Turma.Professor.Nome : null,
+                    dataAula = c.DataCheckIn,
+                    diaSemana = ObterNomeDiaSemana(c.DataCheckIn),
+                    origem = c.Origem
+                })
+                .Cast<object>()
+                .ToList();
+        }
+
         public TurmaResponseDto? GetById(int id, int academiaId)
         {
             return List(academiaId).FirstOrDefault(t => t.Id == id);

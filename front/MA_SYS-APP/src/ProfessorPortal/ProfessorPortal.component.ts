@@ -5,7 +5,7 @@ import { forkJoin } from 'rxjs';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ProfessorService, Professores } from '../Services/ProfessorService/Professor.service';
-import { Turma, TurmasService } from '../Services/TurmasService/Turmas.service';
+import { CheckInRelatorio, Turma, TurmasService } from '../Services/TurmasService/Turmas.service';
 
 @Component({
   selector: 'app-professor-portal',
@@ -19,6 +19,10 @@ export class ProfessorPortalComponent implements OnInit {
   turmas: Turma[] = [];
   professorId: number | null = null;
   buscaAluno = '';
+  dataInicioRelatorio = '';
+  dataFimRelatorio = '';
+  relatorioCheckIns: CheckInRelatorio[] = [];
+  relatorioCarregado = false;
 
   constructor(
     private professorService: ProfessorService,
@@ -82,6 +86,7 @@ export class ProfessorPortalComponent implements OnInit {
         this.spinner.hide();
         this.professores = (professores ?? []).filter((professor) => professor.ativo !== false);
         this.turmas = turmas ?? [];
+        this.prepararPeriodoRelatorio();
         this.selecionarPrimeiroProfessor();
         this.cd.detectChanges();
       },
@@ -94,6 +99,45 @@ export class ProfessorPortalComponent implements OnInit {
 
   nomesDias(turma: Turma): string {
     return turma.diasSemana?.length ? turma.diasSemana.join(', ') : 'Agenda nao informada';
+  }
+
+  desfazerCheckIn(turma: Turma, checkInId: number): void {
+    this.spinner.show();
+    this.turmasService.desfazerCheckIn(turma.id, checkInId).subscribe({
+      next: (turmaAtualizada) => {
+        this.spinner.hide();
+        this.turmas = this.turmas.map((item) => item.id === turmaAtualizada.id ? turmaAtualizada : item);
+        if (this.relatorioCarregado) {
+          this.carregarRelatorioCheckIns();
+        }
+        this.toastr.success('Check-in desfeito com sucesso.');
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        this.spinner.hide();
+        this.toastr.error(err?.error?.message || 'Nao foi possivel desfazer o check-in.');
+      },
+    });
+  }
+
+  carregarRelatorioCheckIns(): void {
+    this.spinner.show();
+    this.turmasService.relatorioCheckIns({
+      professorId: this.professorId,
+      dataInicio: this.dataInicioRelatorio,
+      dataFim: this.dataFimRelatorio,
+    }).subscribe({
+      next: (res) => {
+        this.spinner.hide();
+        this.relatorioCheckIns = res ?? [];
+        this.relatorioCarregado = true;
+        this.cd.detectChanges();
+      },
+      error: () => {
+        this.spinner.hide();
+        this.toastr.error('Nao foi possivel carregar o relatorio de check-ins.');
+      },
+    });
   }
 
   formatarDataAula(data?: string): string {
@@ -111,5 +155,24 @@ export class ProfessorPortalComponent implements OnInit {
     return Number.isNaN(date.getTime())
       ? ''
       : date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  }
+
+  private prepararPeriodoRelatorio(): void {
+    if (this.dataInicioRelatorio || this.dataFimRelatorio) {
+      return;
+    }
+
+    const hoje = new Date();
+    const inicio = new Date();
+    inicio.setDate(hoje.getDate() - 30);
+    this.dataInicioRelatorio = this.formatarInputData(inicio);
+    this.dataFimRelatorio = this.formatarInputData(hoje);
+  }
+
+  private formatarInputData(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
   }
 }

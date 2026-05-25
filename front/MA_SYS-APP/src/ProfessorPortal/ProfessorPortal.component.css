@@ -228,6 +228,78 @@
   color: color-mix(in srgb, var(--text-primary) 82%, #22c55e);
   font-size: 0.78rem;
   font-weight: 800;
+  cursor: pointer;
+}
+
+button.checkin-pill:hover {
+  transform: none;
+  border-color: rgba(239, 68, 68, 0.36);
+  background: rgba(239, 68, 68, 0.12);
+  color: color-mix(in srgb, var(--text-primary) 76%, #ef4444);
+}
+
+.report-workspace {
+  gap: 18px;
+}
+
+.report-filters {
+  display: grid;
+  grid-template-columns: 160px 160px auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.btn-report {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 18px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
+  box-shadow: 0 12px 24px var(--accent-shadow);
+  font-weight: 800;
+}
+
+.report-table {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.report-head,
+.report-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(160px, 1fr) minmax(160px, 1fr) minmax(140px, 0.8fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+}
+
+.report-head {
+  color: var(--text-muted);
+  background: rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.report-row {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.report-row:last-child {
+  border-bottom: 0;
+}
+
+.report-row strong {
+  color: var(--text-primary);
 }
 
 .student-avatar {
@@ -276,6 +348,20 @@
   .checkin-pill {
     flex: 1 1 140px;
     justify-content: center;
+  }
+
+  .report-filters,
+  .report-head,
+  .report-row {
+    grid-template-columns: 1fr;
+  }
+
+  .report-head {
+    display: none;
+  }
+
+  .report-row {
+    gap: 6px;
   }
 }
 

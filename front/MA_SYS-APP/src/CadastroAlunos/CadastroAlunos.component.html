@@ -75,6 +75,14 @@
         </div>
       </div>
 
+      <div class="birthday-alert" *ngIf="aniversarioHoje">
+        <i class="fa-solid fa-cake-candles"></i>
+        <div>
+          <strong>Feliz aniversário, {{ nome }}! 🎉🎂</strong>
+          <p>Que seu novo ciclo seja cheio de energia, conquistas e muitos treinos incríveis! 🥳</p>
+        </div>
+      </div>
+
       <form class="cadastro-form" autocomplete="off">
         <section class="form-section">
           <div class="section-heading">

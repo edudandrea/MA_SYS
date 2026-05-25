@@ -89,6 +89,7 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
   dataVencimentoMensalidade: string = '';
   diasParaVencimento: number = 0;
   alertaVencimento: boolean = false;
+  aniversarioHoje = false;
   aulasDisponiveis: any[] = [];
   checkInEmAndamentoId: number | null = null;
 
@@ -186,6 +187,7 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
         this.dataVencimentoMensalidade = res.dataVencimentoMensalidade || '';
         this.diasParaVencimento = Number(res.diasParaVencimento ?? 0);
         this.alertaVencimento = !!res.alertaVencimento;
+        this.aniversarioHoje = this.ehAniversarioHoje(res.dataNascimento);
         this.aulasDisponiveis = (res.aulas || []).map((aula: any) => ({
           ...aula,
           diasSemanaLista: this.normalizarDiasSemana(aula.diasSemana),
@@ -698,5 +700,19 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
   private temCheckInHoje(aula: any): boolean {
     const hoje = new Date().toISOString().slice(0, 10);
     return (aula?.opcoesCheckIn || []).some((opcao: any) => opcao.dataAula === hoje && opcao.checkInRealizado);
+  }
+
+  private ehAniversarioHoje(dataNascimento?: string): boolean {
+    if (!dataNascimento) {
+      return false;
+    }
+
+    const partes = dataNascimento.slice(0, 10).split('-');
+    if (partes.length !== 3) {
+      return false;
+    }
+
+    const hoje = new Date();
+    return Number(partes[1]) === hoje.getMonth() + 1 && Number(partes[2]) === hoje.getDate();
   }
 }

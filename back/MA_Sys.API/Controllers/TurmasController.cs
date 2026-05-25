@@ -82,6 +82,33 @@ namespace MA_Sys.API.Controllers
             }
         }
 
+        [HttpDelete("{id}/check-ins/{checkInId}")]
+        public IActionResult DesfazerCheckIn(int id, int checkInId)
+        {
+            if (RoleScope.IsAdmin(GetUserRole()) || RoleScope.IsFederacao(GetUserRole()))
+                return Forbid();
+
+            try
+            {
+                var academiaId = GetAcademiaId();
+                return Ok(_service.DesfazerCheckIn(id, checkInId, academiaId ?? 0));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("check-ins/relatorio")]
+        public IActionResult RelatorioCheckIns([FromQuery] int? professorId, [FromQuery] DateTime? dataInicio, [FromQuery] DateTime? dataFim)
+        {
+            if (RoleScope.IsAdmin(GetUserRole()) || RoleScope.IsFederacao(GetUserRole()))
+                return Forbid();
+
+            var academiaId = GetAcademiaId();
+            return Ok(_service.RelatorioCheckIns(academiaId ?? 0, professorId, dataInicio, dataFim));
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

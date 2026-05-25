@@ -82,10 +82,17 @@
             <div class="student-avatar">{{ aluno.nome.charAt(0) }}</div>
             <span class="student-name">{{ aluno.nome }}</span>
             <div class="checkin-pill-list" *ngIf="aluno.checkInsAulas?.length">
-              <span class="checkin-pill" *ngFor="let checkIn of aluno.checkInsAulas">
+              <button
+                type="button"
+                class="checkin-pill"
+                *ngFor="let checkIn of aluno.checkInsAulas"
+                title="Desfazer check-in"
+                (click)="desfazerCheckIn(turma, checkIn.checkInId)"
+              >
                 <i class="fa-solid fa-circle-check"></i>
                 {{ checkIn.diaSemana }} {{ formatarDataAula(checkIn.dataAula) }}
-              </span>
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -100,6 +107,54 @@
       <div class="empty-state">
         <i class="fa-solid fa-chalkboard-user"></i>
         <p>Nenhuma turma vinculada a este professor</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <section class="professor-workspace report-workspace">
+    <div class="workspace-toolbar">
+      <div>
+        <span class="eyebrow">Relatorio</span>
+        <h2>Check-ins por periodo</h2>
+      </div>
+
+      <div class="report-filters">
+        <div class="input-group">
+          <label>Inicio</label>
+          <input type="date" [(ngModel)]="dataInicioRelatorio" />
+        </div>
+
+        <div class="input-group">
+          <label>Fim</label>
+          <input type="date" [(ngModel)]="dataFimRelatorio" />
+        </div>
+
+        <button type="button" class="btn-report" (click)="carregarRelatorioCheckIns()">
+          <i class="fa-solid fa-chart-simple"></i>
+          Gerar
+        </button>
+      </div>
+    </div>
+
+    <div class="report-table" *ngIf="relatorioCheckIns.length; else semRelatorio">
+      <div class="report-head">
+        <span>Aluno</span>
+        <span>Turma</span>
+        <span>Professor</span>
+        <span>Aula</span>
+      </div>
+
+      <div class="report-row" *ngFor="let item of relatorioCheckIns">
+        <strong>{{ item.alunoNome }}</strong>
+        <span>{{ item.turmaNome }}</span>
+        <span>{{ item.professorNome || 'Sem professor' }}</span>
+        <span>{{ item.diaSemana }} {{ formatarDataAula(item.dataAula) }}</span>
+      </div>
+    </div>
+
+    <ng-template #semRelatorio>
+      <div class="empty-line">
+        {{ relatorioCarregado ? 'Nenhum check-in encontrado no periodo.' : 'Informe o periodo e gere o relatorio.' }}
       </div>
     </ng-template>
   </section>

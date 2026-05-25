@@ -18,6 +18,19 @@ export interface TurmaAlunoCheckIn {
   diaSemana: string;
 }
 
+export interface CheckInRelatorio {
+  checkInId: number;
+  alunoId: number;
+  alunoNome: string;
+  turmaId: number;
+  turmaNome: string;
+  professorId?: number | null;
+  professorNome?: string | null;
+  dataAula: string;
+  diaSemana: string;
+  origem?: string;
+}
+
 export interface Turma {
   id: number;
   nome: string;
@@ -55,6 +68,18 @@ export class TurmasService {
 
   removerAluno(turmaId: number, alunoId: number): Observable<Turma> {
     return this.http.delete<Turma>(`${this.apiUrl}/${turmaId}/alunos/${alunoId}`);
+  }
+
+  desfazerCheckIn(turmaId: number, checkInId: number): Observable<Turma> {
+    return this.http.delete<Turma>(`${this.apiUrl}/${turmaId}/check-ins/${checkInId}`);
+  }
+
+  relatorioCheckIns(params: { professorId?: number | null; dataInicio?: string; dataFim?: string }): Observable<CheckInRelatorio[]> {
+    const query: any = {};
+    if (params.professorId) query.professorId = params.professorId;
+    if (params.dataInicio) query.dataInicio = params.dataInicio;
+    if (params.dataFim) query.dataFim = params.dataFim;
+    return this.http.get<CheckInRelatorio[]>(`${this.apiUrl}/check-ins/relatorio`, { params: query });
   }
 
   excluirTurma(id: number): Observable<void> {
