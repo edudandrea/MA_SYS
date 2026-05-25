@@ -9,6 +9,13 @@ export interface TurmaAluno {
   checkInProximaAula?: boolean;
   dataCheckInProximaAula?: string;
   diaSemanaCheckIn?: string;
+  checkInsAulas?: TurmaAlunoCheckIn[];
+}
+
+export interface TurmaAlunoCheckIn {
+  checkInId: number;
+  dataAula: string;
+  diaSemana: string;
 }
 
 export interface Turma {

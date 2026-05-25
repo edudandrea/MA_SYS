@@ -49,10 +49,11 @@ namespace MA_Sys.API.Services
                         .OrderBy(a => a.Aluno!.Nome)
                         .Select(a =>
                         {
-                            var proximoCheckIn = checkIns
+                            var checkInsAluno = checkIns
                                 .Where(c => c.TurmaId == t.Id && c.AlunoId == a.AlunoId)
                                 .OrderBy(c => c.DataCheckIn)
-                                .FirstOrDefault();
+                                .ToList();
+                            var proximoCheckIn = checkInsAluno.FirstOrDefault();
 
                             return new TurmaAlunoDto
                             {
@@ -60,7 +61,15 @@ namespace MA_Sys.API.Services
                                 Nome = a.Aluno!.Nome ?? string.Empty,
                                 CheckInProximaAula = proximoCheckIn != null,
                                 DataCheckInProximaAula = proximoCheckIn?.DataCheckIn,
-                                DiaSemanaCheckIn = proximoCheckIn != null ? ObterNomeDiaSemana(proximoCheckIn.DataCheckIn) : null
+                                DiaSemanaCheckIn = proximoCheckIn != null ? ObterNomeDiaSemana(proximoCheckIn.DataCheckIn) : null,
+                                CheckInsAulas = checkInsAluno
+                                    .Select(c => new TurmaAlunoCheckInDto
+                                    {
+                                        CheckInId = c.Id,
+                                        DataAula = c.DataCheckIn,
+                                        DiaSemana = ObterNomeDiaSemana(c.DataCheckIn)
+                                    })
+                                    .ToList()
                             };
                         })
                         .ToList()

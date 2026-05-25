@@ -62,7 +62,7 @@ export class ProfessorPortalComponent implements OnInit {
   get totalCheckInsProximasAulas(): number {
     return this.turmasDoProfessor
       .flatMap((turma) => turma.alunos)
-      .filter((aluno) => aluno.checkInProximaAula).length;
+      .reduce((total, aluno) => total + (aluno.checkInsAulas?.length || 0), 0);
   }
 
   selecionarPrimeiroProfessor(): void {

@@ -81,10 +81,12 @@
           <div class="student-row" *ngFor="let aluno of turma.alunos">
             <div class="student-avatar">{{ aluno.nome.charAt(0) }}</div>
             <span class="student-name">{{ aluno.nome }}</span>
-            <span class="checkin-pill" *ngIf="aluno.checkInProximaAula">
-              <i class="fa-solid fa-circle-check"></i>
-              Check-in {{ aluno.diaSemanaCheckIn }} {{ formatarDataAula(aluno.dataCheckInProximaAula) }}
-            </span>
+            <div class="checkin-pill-list" *ngIf="aluno.checkInsAulas?.length">
+              <span class="checkin-pill" *ngFor="let checkIn of aluno.checkInsAulas">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ checkIn.diaSemana }} {{ formatarDataAula(checkIn.dataAula) }}
+              </span>
+            </div>
           </div>
         </div>
 

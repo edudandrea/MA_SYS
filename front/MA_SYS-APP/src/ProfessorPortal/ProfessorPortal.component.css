@@ -208,6 +208,14 @@
   flex: 1;
 }
 
+.checkin-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 58%;
+}
+
 .checkin-pill {
   display: inline-flex;
   align-items: center;
@@ -259,8 +267,14 @@
     flex-wrap: wrap;
   }
 
-  .checkin-pill {
+  .checkin-pill-list {
     width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  .checkin-pill {
+    flex: 1 1 140px;
     justify-content: center;
   }
 }
@@ -269,7 +283,7 @@
   .professor-hero,
   .professor-workspace {
     padding: 18px;
-    border-radius: 22px;
+    border-radius: 14px;
   }
 
   .turma-list {

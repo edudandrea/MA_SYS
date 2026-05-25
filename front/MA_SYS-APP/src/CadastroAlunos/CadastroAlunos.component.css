@@ -2,8 +2,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 22px;
+  gap: 18px;
+  padding: 18px;
   color: var(--text-primary);
   background:
     radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent-primary) 18%, transparent) 0, transparent 36%),
@@ -21,11 +21,9 @@
 }
 
 .cadastro-hero {
-  position: sticky;
-  top: 14px;
-  z-index: 20;
-  min-height: 104px;
-  padding: 18px 22px;
+  position: static;
+  min-height: auto;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -44,7 +42,7 @@
 }
 
 .hero-logo {
-  width: 72px;
+  width: 58px;
   height: auto;
   filter: drop-shadow(0 14px 28px var(--accent-shadow));
 }
@@ -73,7 +71,7 @@
 }
 
 .hero-copy h1 {
-  font-size: clamp(1.55rem, 2.2vw, 2.35rem);
+  font-size: clamp(1.35rem, 1.8vw, 2rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
 }
@@ -98,13 +96,13 @@
   display: flex;
   align-items: stretch;
   gap: 10px;
-  min-width: min(460px, 36vw);
+  min-width: min(430px, 34vw);
 }
 
 .hero-point,
 .summary-box,
 .qr-card {
-  padding: 16px;
+  padding: 14px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
   background: color-mix(in srgb, var(--bg-panel-strong) 92%, transparent);
@@ -176,9 +174,9 @@
 }
 
 .cadastro-panel {
-  width: min(1280px, 100%);
+  width: min(1680px, 100%);
   margin: 0 auto;
-  padding: 28px;
+  padding: 28px 36px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -673,7 +671,6 @@ textarea {
 
 @media (max-width: 1180px) {
   .cadastro-hero {
-    position: static;
     align-items: flex-start;
     flex-direction: column;
   }
@@ -686,13 +683,13 @@ textarea {
 
 @media (max-width: 820px) {
   .cadastro-shell {
-    padding: 18px;
+    padding: 12px;
   }
 
   .cadastro-hero,
   .cadastro-panel {
-    padding: 22px;
-    border-radius: 14px;
+    padding: 16px;
+    border-radius: 12px;
   }
 
   .student-banner,
@@ -730,19 +727,33 @@ textarea {
 
 @media (max-width: 560px) {
   .cadastro-shell {
-    padding: 14px;
-    gap: 14px;
+    padding: 10px;
+    gap: 10px;
   }
 
   .hero-logo {
-    width: 58px;
+    width: 48px;
+  }
+
+  .hero-brand {
+    gap: 10px;
   }
 
   .hero-copy h1 {
-    font-size: 1.45rem;
+    font-size: 1.28rem;
   }
 
   .hero-points {
+    display: none;
+  }
+
+  .panel-heading h2 {
+    font-size: 1.45rem;
+  }
+
+  .class-card-main,
+  .status-line {
+    align-items: flex-start;
     flex-direction: column;
   }
 }
