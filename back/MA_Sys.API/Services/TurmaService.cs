@@ -16,6 +16,7 @@ namespace MA_Sys.API.Services
 
         public List<TurmaResponseDto> List(int academiaId)
         {
+            var hoje = DateTime.UtcNow.Date;
             // Execute database query first
             var turmas = _context.Set<Turma>()
                 .AsNoTracking()
@@ -24,6 +25,11 @@ namespace MA_Sys.API.Services
                 .Include(t => t.Alunos)
                 .ThenInclude(ta => ta.Aluno)
                 .OrderBy(t => t.Nome)
+                .ToList();
+            var turmaIds = turmas.Select(t => t.Id).ToList();
+            var checkIns = _context.CheckInsAulas
+                .AsNoTracking()
+                .Where(c => c.AcademiaId == academiaId && turmaIds.Contains(c.TurmaId) && c.DataCheckIn.Date >= hoje)
                 .ToList();
 
             // Then do client-side processing
@@ -41,10 +47,21 @@ namespace MA_Sys.API.Services
                     Ativo = t.Ativo,
                     Alunos = t.Alunos
                         .OrderBy(a => a.Aluno!.Nome)
-                        .Select(a => new TurmaAlunoDto
+                        .Select(a =>
                         {
-                            AlunoId = a.AlunoId,
-                            Nome = a.Aluno!.Nome ?? string.Empty
+                            var proximoCheckIn = checkIns
+                                .Where(c => c.TurmaId == t.Id && c.AlunoId == a.AlunoId)
+                                .OrderBy(c => c.DataCheckIn)
+                                .FirstOrDefault();
+
+                            return new TurmaAlunoDto
+                            {
+                                AlunoId = a.AlunoId,
+                                Nome = a.Aluno!.Nome ?? string.Empty,
+                                CheckInProximaAula = proximoCheckIn != null,
+                                DataCheckInProximaAula = proximoCheckIn?.DataCheckIn,
+                                DiaSemanaCheckIn = proximoCheckIn != null ? ObterNomeDiaSemana(proximoCheckIn.DataCheckIn) : null
+                            };
                         })
                         .ToList()
                 })
@@ -66,7 +83,8 @@ namespace MA_Sys.API.Services
             _context.Set<Turma>().Add(turma);
             _context.SaveChanges();
 
-            SincronizarAlunos(turma.Id, dto.AlunoIds);
+            AdicionarAlunos(turma.Id, dto.AlunoIds);
+            _context.SaveChanges();
             return GetById(turma.Id, academiaId)!;
         }
 
@@ -87,9 +105,39 @@ namespace MA_Sys.API.Services
             turma.DiasSemana = string.Join(",", dto.DiasSemana.Distinct(StringComparer.OrdinalIgnoreCase));
             turma.Ativo = dto.Ativo;
 
-            SincronizarAlunos(turma.Id, dto.AlunoIds);
+            AdicionarAlunos(turma.Id, dto.AlunoIds);
             _context.SaveChanges();
             return GetById(turma.Id, academiaId)!;
+        }
+
+        public TurmaResponseDto AdicionarAluno(int turmaId, int alunoId, int academiaId)
+        {
+            ValidarTurma(turmaId, academiaId);
+            ValidarAluno(alunoId, academiaId);
+            AdicionarAlunos(turmaId, new[] { alunoId });
+            _context.SaveChanges();
+            return GetById(turmaId, academiaId)!;
+        }
+
+        public TurmaResponseDto RemoverAluno(int turmaId, int alunoId, int academiaId)
+        {
+            ValidarTurma(turmaId, academiaId);
+
+            var vinculo = _context.Set<TurmaAluno>()
+                .FirstOrDefault(ta => ta.TurmaId == turmaId && ta.AlunoId == alunoId);
+
+            if (vinculo == null)
+            {
+                throw new InvalidOperationException("Aluno nao esta vinculado a esta turma.");
+            }
+
+            var checkIns = _context.CheckInsAulas
+                .Where(c => c.TurmaId == turmaId && c.AlunoId == alunoId && c.AcademiaId == academiaId);
+
+            _context.CheckInsAulas.RemoveRange(checkIns);
+            _context.Set<TurmaAluno>().Remove(vinculo);
+            _context.SaveChanges();
+            return GetById(turmaId, academiaId)!;
         }
 
         public TurmaResponseDto? GetById(int id, int academiaId)
@@ -117,22 +165,38 @@ namespace MA_Sys.API.Services
             _context.SaveChanges();
         }
 
-        private void SincronizarAlunos(int turmaId, IEnumerable<int> alunoIds)
+        private void AdicionarAlunos(int turmaId, IEnumerable<int> alunoIds)
         {
             var ids = alunoIds.Distinct().ToList();
             var atuais = _context.Set<TurmaAluno>().Where(ta => ta.TurmaId == turmaId).ToList();
-
-            var remover = atuais.Where(a => !ids.Contains(a.AlunoId)).ToList();
-            if (remover.Count > 0)
-            {
-                _context.Set<TurmaAluno>().RemoveRange(remover);
-            }
 
             var existentes = atuais.Select(a => a.AlunoId).ToHashSet();
             var novos = ids.Where(id => !existentes.Contains(id))
                 .Select(id => new TurmaAluno { TurmaId = turmaId, AlunoId = id });
 
             _context.Set<TurmaAluno>().AddRange(novos);
+        }
+
+        private void ValidarTurma(int turmaId, int academiaId)
+        {
+            var turmaExiste = _context.Set<Turma>()
+                .Any(t => t.Id == turmaId && t.AcademiaId == academiaId);
+
+            if (!turmaExiste)
+            {
+                throw new InvalidOperationException("Turma nao encontrada.");
+            }
+        }
+
+        private void ValidarAluno(int alunoId, int academiaId)
+        {
+            var alunoExiste = _context.Alunos
+                .Any(a => a.Id == alunoId && a.AcademiaId == academiaId);
+
+            if (!alunoExiste)
+            {
+                throw new InvalidOperationException("Aluno nao encontrado para esta turma.");
+            }
         }
 
         private int? ValidarProfessor(int? professorId, int academiaId)
@@ -151,6 +215,21 @@ namespace MA_Sys.API.Services
             }
 
             return professorId.Value;
+        }
+
+        private static string ObterNomeDiaSemana(DateTime data)
+        {
+            return data.DayOfWeek switch
+            {
+                DayOfWeek.Sunday => "Domingo",
+                DayOfWeek.Monday => "Segunda",
+                DayOfWeek.Tuesday => "Terca",
+                DayOfWeek.Wednesday => "Quarta",
+                DayOfWeek.Thursday => "Quinta",
+                DayOfWeek.Friday => "Sexta",
+                DayOfWeek.Saturday => "Sabado",
+                _ => string.Empty
+            };
         }
     }
 }

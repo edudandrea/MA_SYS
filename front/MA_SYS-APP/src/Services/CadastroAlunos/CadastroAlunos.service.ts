@@ -24,8 +24,14 @@ export class CadastroAlunosService {
     return this.http.post(`${this.apiUrl}/public/${this.context.slug}/buscar`, { cpf, email });
   }
 
-  realizarCheckIn(cpf: string, email: string, turmaId: number) {
-    return this.http.post(`${this.apiUrl}/public/${this.context.slug}/check-in`, { cpf, email, turmaId });
+  realizarCheckIn(cpf: string, email: string, turmaId: number, dataAula: string) {
+    return this.http.post(`${this.apiUrl}/public/${this.context.slug}/check-in`, { cpf, email, turmaId, dataAula });
+  }
+
+  desfazerCheckIn(cpf: string, email: string, checkInId: number) {
+    return this.http.delete(`${this.apiUrl}/public/${this.context.slug}/check-in/${checkInId}`, {
+      params: { cpf, email },
+    });
   }
 
   cadastrar(slug: string, payload: any) {

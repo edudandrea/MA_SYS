@@ -99,11 +99,50 @@
 
       <div class="form-group full">
         <label>Alunos da turma</label>
-        <select multiple [(ngModel)]="form.alunoIds" class="multi-select">
-          <option *ngFor="let aluno of alunos" [ngValue]="aluno.id">
-            {{ aluno.nome }}
-          </option>
-        </select>
+        <div class="add-student-row">
+          <select [(ngModel)]="alunoParaAdicionarId" [class.input-alert]="alunoJaVinculado()">
+            <option [ngValue]="null">Selecione um aluno</option>
+            <option *ngFor="let aluno of alunos" [ngValue]="aluno.id">
+              {{ aluno.nome }}
+            </option>
+          </select>
+          <button type="button" class="btn-save" (click)="adicionarAlunoSelecionado()">Adicionar</button>
+        </div>
+
+        <div class="student-alert" *ngIf="alunoJaVinculado()">
+          <i class="fa-solid fa-circle-info"></i>
+          Este aluno ja esta cadastrado nesta turma.
+        </div>
+
+        <div class="students-linked" *ngIf="alunosVinculadosNoFormulario().length; else turmaSemAlunosModal">
+          <div
+            class="student-linked-item"
+            *ngFor="let aluno of alunosVinculadosNoFormulario()"
+            [class.selected]="alunoSelecionadoParaRemoverId === aluno.id"
+            (click)="selecionarAlunoDaTurma(aluno.id)"
+          >
+            <span>
+              <strong>{{ aluno.nome }}</strong>
+              <small>Clique para ver a acao</small>
+            </span>
+
+            <button
+              *ngIf="alunoSelecionadoParaRemoverId === aluno.id"
+              type="button"
+              class="remove-student-btn"
+              (click)="$event.stopPropagation(); removerAlunoDaTurma(aluno.id)"
+            >
+              Remover da turma
+            </button>
+          </div>
+        </div>
+
+        <ng-template #turmaSemAlunosModal>
+          <div class="student-alert muted">
+            <i class="fa-solid fa-user-plus"></i>
+            Nenhum aluno vinculado a esta turma ainda.
+          </div>
+        </ng-template>
       </div>
     </div>
 

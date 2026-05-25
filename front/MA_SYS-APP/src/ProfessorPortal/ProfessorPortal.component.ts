@@ -59,6 +59,12 @@ export class ProfessorPortalComponent implements OnInit {
     return this.turmasDoProfessor.filter((turma) => turma.ativo).length;
   }
 
+  get totalCheckInsProximasAulas(): number {
+    return this.turmasDoProfessor
+      .flatMap((turma) => turma.alunos)
+      .filter((aluno) => aluno.checkInProximaAula).length;
+  }
+
   selecionarPrimeiroProfessor(): void {
     if (!this.professorId && this.professores.length) {
       this.professorId = this.professores[0].id;
@@ -88,5 +94,22 @@ export class ProfessorPortalComponent implements OnInit {
 
   nomesDias(turma: Turma): string {
     return turma.diasSemana?.length ? turma.diasSemana.join(', ') : 'Agenda nao informada';
+  }
+
+  formatarDataAula(data?: string): string {
+    if (!data) {
+      return '';
+    }
+
+    const dataIso = data.slice(0, 10);
+    const partes = dataIso.split('-');
+    if (partes.length === 3) {
+      return `${partes[2]}/${partes[1]}`;
+    }
+
+    const date = new Date(data);
+    return Number.isNaN(date.getTime())
+      ? ''
+      : date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   }
 }

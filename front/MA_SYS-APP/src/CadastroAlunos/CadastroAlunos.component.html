@@ -240,9 +240,9 @@
                 <p>{{ aula.descricao || 'Turma ativa para check-in.' }}</p>
               </div>
 
-              <span class="checkin-badge" [class.done]="aula.checkInHoje">
-                <i class="fa-solid" [class.fa-circle-check]="aula.checkInHoje" [class.fa-clock]="!aula.checkInHoje"></i>
-                {{ aula.checkInHoje ? 'Check-in feito hoje' : 'Aberto hoje' }}
+              <span class="checkin-badge" [class.done]="getOpcaoCheckInSelecionada(aula)?.checkInRealizado">
+                <i class="fa-solid" [class.fa-circle-check]="getOpcaoCheckInSelecionada(aula)?.checkInRealizado" [class.fa-clock]="!getOpcaoCheckInSelecionada(aula)?.checkInRealizado"></i>
+                {{ getOpcaoCheckInSelecionada(aula)?.checkInRealizado ? 'Check-in feito' : 'Aberto' }}
               </span>
             </div>
 
@@ -257,14 +257,38 @@
               </span>
             </div>
 
+            <div class="input-group checkin-select" *ngIf="aula.opcoesCheckIn?.length">
+              <label>Escolha a aula</label>
+              <div class="input-modern select-shell">
+                <i class="fa-solid fa-calendar-day"></i>
+                <select [(ngModel)]="aula.dataAulaSelecionada">
+                  <option *ngFor="let opcao of aula.opcoesCheckIn" [ngValue]="opcao.dataAula">
+                    {{ opcao.diaSemana }} - {{ formatarDataAula(opcao.dataAula) }}{{ opcao.checkInRealizado ? ' (check-in feito)' : '' }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
             <button
+              *ngIf="!getOpcaoCheckInSelecionada(aula)?.checkInRealizado"
               type="button"
               class="btn-checkin"
-              [disabled]="aula.checkInHoje || checkInEmAndamentoId === aula.turmaId"
+              [disabled]="checkInEmAndamentoId === aula.turmaId"
               (click)="realizarCheckIn(aula)"
             >
               <i class="fa-solid fa-circle-check"></i>
-              {{ aula.checkInHoje ? 'Presenca confirmada' : (checkInEmAndamentoId === aula.turmaId ? 'Confirmando...' : 'Fazer check-in') }}
+              {{ checkInEmAndamentoId === aula.turmaId ? 'Confirmando...' : 'Fazer check-in' }}
+            </button>
+
+            <button
+              *ngIf="getOpcaoCheckInSelecionada(aula)?.checkInRealizado"
+              type="button"
+              class="btn-checkin undo"
+              [disabled]="checkInEmAndamentoId === aula.turmaId"
+              (click)="desfazerCheckIn(aula)"
+            >
+              <i class="fa-solid fa-rotate-left"></i>
+              {{ checkInEmAndamentoId === aula.turmaId ? 'Desfazendo...' : 'Desfazer check-in' }}
             </button>
           </article>
         </div>

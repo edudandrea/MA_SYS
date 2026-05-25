@@ -153,6 +153,10 @@ namespace MA_Sys.API.Services
         public List<object> ListarTurmasPublicasDoAluno(int alunoId, int academiaId)
         {
             var hoje = DateTime.UtcNow.Date;
+            var checkIns = _context.CheckInsAulas
+                .AsNoTracking()
+                .Where(c => c.AlunoId == alunoId && c.AcademiaId == academiaId && c.DataCheckIn.Date >= hoje)
+                .ToList();
 
             return _context.TurmasAlunos
                 .AsNoTracking()
@@ -160,6 +164,7 @@ namespace MA_Sys.API.Services
                 .Include(ta => ta.Turma)
                 .ThenInclude(t => t!.Professor)
                 .OrderBy(ta => ta.Turma!.Nome)
+                .ToList()
                 .Select(ta => new
                 {
                     turmaId = ta.TurmaId,
@@ -167,16 +172,14 @@ namespace MA_Sys.API.Services
                     descricao = ta.Turma.Descricao,
                     professor = ta.Turma.Professor != null ? ta.Turma.Professor.Nome : null,
                     diasSemana = ta.Turma.DiasSemana,
-                    checkInHoje = _context.CheckInsAulas.Any(c =>
-                        c.AlunoId == alunoId &&
-                        c.TurmaId == ta.TurmaId &&
-                        c.DataCheckIn.Date == hoje)
+                    opcoesCheckIn = MontarOpcoesCheckIn(ta.Turma.DiasSemana, ta.TurmaId, checkIns),
+                    checkInHoje = checkIns.Any(c => c.TurmaId == ta.TurmaId && c.DataCheckIn.Date == hoje)
                 })
                 .Cast<object>()
                 .ToList();
         }
 
-        public object RealizarCheckInPublico(string cpf, string email, int turmaId, int academiaId)
+        public object RealizarCheckInPublico(string cpf, string email, int turmaId, DateTime? dataAula, int academiaId)
         {
             var aluno = BuscarPorCpfEmail(cpf, email, academiaId);
 
@@ -196,9 +199,16 @@ namespace MA_Sys.API.Services
             if (turmaAluno?.Turma == null)
                 throw new InvalidOperationException("Aluno nao esta vinculado a esta turma.");
 
-            var hoje = DateTime.UtcNow.Date;
+            var dataCheckIn = (dataAula ?? DateTime.UtcNow).Date;
+            if (dataCheckIn < DateTime.UtcNow.Date)
+                throw new InvalidOperationException("Nao e possivel fazer check-in para uma aula passada.");
+
+            var diasTurma = SepararDiasSemana(turmaAluno.Turma.DiasSemana);
+            if (diasTurma.Count > 0 && !diasTurma.Any(d => ObterDiaSemana(d) == dataCheckIn.DayOfWeek))
+                throw new InvalidOperationException("A data selecionada nao pertence a agenda desta turma.");
+
             var checkInExistente = _context.CheckInsAulas
-                .FirstOrDefault(c => c.AlunoId == aluno.Id && c.TurmaId == turmaId && c.DataCheckIn.Date == hoje);
+                .FirstOrDefault(c => c.AlunoId == aluno.Id && c.TurmaId == turmaId && c.DataCheckIn.Date == dataCheckIn);
 
             if (checkInExistente != null)
             {
@@ -207,6 +217,7 @@ namespace MA_Sys.API.Services
                     jaRegistrado = true,
                     checkInId = checkInExistente.Id,
                     dataCheckIn = checkInExistente.DataCheckIn,
+                    diaSemana = ObterNomeDiaSemana(checkInExistente.DataCheckIn),
                     turma = turmaAluno.Turma.Nome,
                     professor = turmaAluno.Turma.Professor?.Nome
                 };
@@ -217,7 +228,7 @@ namespace MA_Sys.API.Services
                 AcademiaId = academiaId,
                 AlunoId = aluno.Id,
                 TurmaId = turmaId,
-                DataCheckIn = DateTime.UtcNow
+                DataCheckIn = dataCheckIn
             };
 
             _context.CheckInsAulas.Add(checkIn);
@@ -228,9 +239,120 @@ namespace MA_Sys.API.Services
                 jaRegistrado = false,
                 checkInId = checkIn.Id,
                 dataCheckIn = checkIn.DataCheckIn,
+                diaSemana = ObterNomeDiaSemana(checkIn.DataCheckIn),
                 turma = turmaAluno.Turma.Nome,
                 professor = turmaAluno.Turma.Professor?.Nome
             };
+        }
+
+        public object DesfazerCheckInPublico(string cpf, string email, int checkInId, int academiaId)
+        {
+            var aluno = BuscarPorCpfEmail(cpf, email, academiaId);
+
+            if (aluno == null)
+                throw new InvalidOperationException("Aluno nao encontrado para esta academia.");
+
+            var checkIn = _context.CheckInsAulas
+                .Include(c => c.Turma)
+                .FirstOrDefault(c =>
+                    c.Id == checkInId &&
+                    c.AlunoId == aluno.Id &&
+                    c.AcademiaId == academiaId &&
+                    c.DataCheckIn.Date >= DateTime.UtcNow.Date);
+
+            if (checkIn == null)
+                throw new InvalidOperationException("Check-in nao encontrado ou ja indisponivel para cancelamento.");
+
+            var turma = checkIn.Turma?.Nome;
+            var data = checkIn.DataCheckIn;
+
+            _context.CheckInsAulas.Remove(checkIn);
+            _context.SaveChanges();
+
+            return new
+            {
+                checkInId,
+                turma,
+                dataCheckIn = data,
+                diaSemana = ObterNomeDiaSemana(data)
+            };
+        }
+
+        private static List<object> MontarOpcoesCheckIn(string diasSemana, int turmaId, List<CheckInAula> checkIns)
+        {
+            var hoje = DateTime.UtcNow.Date;
+            return SepararDiasSemana(diasSemana)
+                .Select(dia => new
+                {
+                    diaSemana = dia,
+                    dataAula = ProximaDataParaDia(dia, hoje),
+                })
+                .OrderBy(opcao => opcao.dataAula)
+                .Select(opcao =>
+                {
+                    var checkIn = checkIns.FirstOrDefault(c => c.TurmaId == turmaId && c.DataCheckIn.Date == opcao.dataAula.Date);
+                    return new
+                    {
+                        opcao.diaSemana,
+                        dataAula = opcao.dataAula.ToString("yyyy-MM-dd"),
+                        checkInRealizado = checkIn != null,
+                        checkInId = checkIn?.Id
+                    };
+                })
+                .Cast<object>()
+                .ToList();
+        }
+
+        private static List<string> SepararDiasSemana(string diasSemana)
+        {
+            return (diasSemana ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private static DateTime ProximaDataParaDia(string dia, DateTime hoje)
+        {
+            var target = ObterDiaSemana(dia);
+            var delta = ((int)target - (int)hoje.DayOfWeek + 7) % 7;
+            return hoje.AddDays(delta);
+        }
+
+        private static DayOfWeek ObterDiaSemana(string dia)
+        {
+            return NormalizarDia(dia) switch
+            {
+                "domingo" => DayOfWeek.Sunday,
+                "segunda" => DayOfWeek.Monday,
+                "terca" => DayOfWeek.Tuesday,
+                "terça" => DayOfWeek.Tuesday,
+                "quarta" => DayOfWeek.Wednesday,
+                "quinta" => DayOfWeek.Thursday,
+                "sexta" => DayOfWeek.Friday,
+                "sabado" => DayOfWeek.Saturday,
+                "sábado" => DayOfWeek.Saturday,
+                _ => DateTime.UtcNow.DayOfWeek
+            };
+        }
+
+        private static string ObterNomeDiaSemana(DateTime data)
+        {
+            return data.DayOfWeek switch
+            {
+                DayOfWeek.Sunday => "Domingo",
+                DayOfWeek.Monday => "Segunda",
+                DayOfWeek.Tuesday => "Terca",
+                DayOfWeek.Wednesday => "Quarta",
+                DayOfWeek.Thursday => "Quinta",
+                DayOfWeek.Friday => "Sexta",
+                DayOfWeek.Saturday => "Sabado",
+                _ => string.Empty
+            };
+        }
+
+        private static string NormalizarDia(string valor)
+        {
+            return valor.Trim().ToLowerInvariant();
         }
 
         public List<AlunoResponseDto> GetByCpfEmail(string cpf, string email, int academiaId)

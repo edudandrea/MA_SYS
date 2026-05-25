@@ -5,5 +5,6 @@ namespace MA_Sys.API.Dto.Alunos
         public string Cpf { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public int TurmaId { get; set; }
+        public DateTime? DataAula { get; set; }
     }
 }

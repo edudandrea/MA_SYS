@@ -6,6 +6,9 @@ import { environment } from '../../app/environments/environment';
 export interface TurmaAluno {
   alunoId: number;
   nome: string;
+  checkInProximaAula?: boolean;
+  dataCheckInProximaAula?: string;
+  diaSemanaCheckIn?: string;
 }
 
 export interface Turma {
@@ -37,6 +40,14 @@ export class TurmasService {
 
   atualizarTurma(id: number, payload: Partial<Turma>): Observable<Turma> {
     return this.http.put<Turma>(`${this.apiUrl}/${id}`, payload);
+  }
+
+  adicionarAluno(turmaId: number, alunoId: number): Observable<Turma> {
+    return this.http.post<Turma>(`${this.apiUrl}/${turmaId}/alunos/${alunoId}`, {});
+  }
+
+  removerAluno(turmaId: number, alunoId: number): Observable<Turma> {
+    return this.http.delete<Turma>(`${this.apiUrl}/${turmaId}/alunos/${alunoId}`);
   }
 
   excluirTurma(id: number): Observable<void> {

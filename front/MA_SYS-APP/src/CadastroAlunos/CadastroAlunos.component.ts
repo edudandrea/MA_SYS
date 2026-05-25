@@ -189,6 +189,7 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
         this.aulasDisponiveis = (res.aulas || []).map((aula: any) => ({
           ...aula,
           diasSemanaLista: this.normalizarDiasSemana(aula.diasSemana),
+          dataAulaSelecionada: this.obterDataAulaInicial(aula),
         }));
         this.alunoEncontrado = true;
         this.formaPagamentoId = 0;
@@ -210,23 +211,62 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
   }
 
   realizarCheckIn(aula: any) {
-    if (!aula?.turmaId || aula.checkInHoje) {
+    if (!aula?.turmaId) {
+      return;
+    }
+
+    if (!aula.dataAulaSelecionada) {
+      this.toastr.warning('Selecione a aula para fazer o check-in.');
+      return;
+    }
+
+    const opcao = this.obterOpcaoCheckInSelecionada(aula);
+    if (opcao?.checkInRealizado) {
+      this.toastr.info('Check-in ja realizado para esta aula.');
       return;
     }
 
     this.checkInEmAndamentoId = aula.turmaId;
-    this.cadastroAlunosService.realizarCheckIn(this.cpfBusca || this.cpf, this.emailBusca || this.email, aula.turmaId).subscribe({
+    this.cadastroAlunosService.realizarCheckIn(this.cpfBusca || this.cpf, this.emailBusca || this.email, aula.turmaId, aula.dataAulaSelecionada).subscribe({
       next: (res: any) => {
-        aula.checkInHoje = true;
-        aula.checkInId = res?.checkInId;
+        const opcaoAtual = this.obterOpcaoCheckInSelecionada(aula);
+        if (opcaoAtual) {
+          opcaoAtual.checkInRealizado = true;
+          opcaoAtual.checkInId = res?.checkInId;
+        }
+        aula.checkInHoje = this.temCheckInHoje(aula);
         aula.dataCheckIn = res?.dataCheckIn;
         this.checkInEmAndamentoId = null;
-        this.toastr.success(res?.jaRegistrado ? 'Check-in ja registrado para hoje.' : 'Check-in realizado com sucesso.');
+        this.toastr.success(res?.jaRegistrado ? 'Check-in ja registrado para esta aula.' : 'Check-in realizado com sucesso.');
         this.cd.detectChanges();
       },
       error: (err) => {
         this.checkInEmAndamentoId = null;
         this.toastr.error(err?.error?.message || 'Nao foi possivel realizar o check-in.');
+        this.cd.detectChanges();
+      },
+    });
+  }
+
+  desfazerCheckIn(aula: any) {
+    const opcao = this.obterOpcaoCheckInSelecionada(aula);
+    if (!opcao?.checkInRealizado || !opcao.checkInId) {
+      return;
+    }
+
+    this.checkInEmAndamentoId = aula.turmaId;
+    this.cadastroAlunosService.desfazerCheckIn(this.cpfBusca || this.cpf, this.emailBusca || this.email, opcao.checkInId).subscribe({
+      next: () => {
+        opcao.checkInRealizado = false;
+        opcao.checkInId = null;
+        aula.checkInHoje = this.temCheckInHoje(aula);
+        this.checkInEmAndamentoId = null;
+        this.toastr.success('Check-in desfeito com sucesso.');
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        this.checkInEmAndamentoId = null;
+        this.toastr.error(err?.error?.message || 'Nao foi possivel desfazer o check-in.');
         this.cd.detectChanges();
       },
     });
@@ -630,5 +670,33 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
       .split(',')
       .map((dia) => dia.trim())
       .filter(Boolean);
+  }
+
+  getOpcaoCheckInSelecionada(aula: any): any {
+    return this.obterOpcaoCheckInSelecionada(aula);
+  }
+
+  formatarDataAula(data: string): string {
+    if (!data) {
+      return '';
+    }
+
+    const partes = data.split('-');
+    return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+  }
+
+  private obterOpcaoCheckInSelecionada(aula: any): any {
+    return (aula?.opcoesCheckIn || []).find((opcao: any) => opcao.dataAula === aula.dataAulaSelecionada);
+  }
+
+  private obterDataAulaInicial(aula: any): string {
+    const opcoes = aula?.opcoesCheckIn || [];
+    const semCheckIn = opcoes.find((opcao: any) => !opcao.checkInRealizado);
+    return (semCheckIn || opcoes[0])?.dataAula || '';
+  }
+
+  private temCheckInHoje(aula: any): boolean {
+    const hoje = new Date().toISOString().slice(0, 10);
+    return (aula?.opcoesCheckIn || []).some((opcao: any) => opcao.dataAula === hoje && opcao.checkInRealizado);
   }
 }

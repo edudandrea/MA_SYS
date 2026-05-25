@@ -71,7 +71,7 @@ namespace MA_Sys.API.Controllers
             }
 
             var formasPagamento = _service.List(academiaId)
-                .Where(f => f.Ativo)
+                .OrderBy(f => f.Nome)
                 .ToList();
 
             return Ok(formasPagamento);

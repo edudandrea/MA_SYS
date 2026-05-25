@@ -48,6 +48,40 @@ namespace MA_Sys.API.Controllers
             return Ok(_service.Update(id, dto, academiaId ?? 0));
         }
 
+        [HttpPost("{id}/alunos/{alunoId}")]
+        public IActionResult AdicionarAluno(int id, int alunoId)
+        {
+            if (RoleScope.IsAdmin(GetUserRole()) || RoleScope.IsFederacao(GetUserRole()))
+                return Forbid();
+
+            try
+            {
+                var academiaId = GetAcademiaId();
+                return Ok(_service.AdicionarAluno(id, alunoId, academiaId ?? 0));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}/alunos/{alunoId}")]
+        public IActionResult RemoverAluno(int id, int alunoId)
+        {
+            if (RoleScope.IsAdmin(GetUserRole()) || RoleScope.IsFederacao(GetUserRole()))
+                return Forbid();
+
+            try
+            {
+                var academiaId = GetAcademiaId();
+                return Ok(_service.RemoverAluno(id, alunoId, academiaId ?? 0));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

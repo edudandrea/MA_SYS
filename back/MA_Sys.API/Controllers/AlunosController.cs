@@ -102,7 +102,22 @@ namespace MA_Sys.API.Controllers
             try
             {
                 var academiaId = ObterAcademiaIdPeloSlug(slug);
-                return Ok(_service.RealizarCheckInPublico(dto.Cpf, dto.Email, dto.TurmaId, academiaId));
+                return Ok(_service.RealizarCheckInPublico(dto.Cpf, dto.Email, dto.TurmaId, dto.DataAula, academiaId));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpDelete("public/{slug}/check-in/{checkInId}")]
+        public IActionResult DesfazerCheckInPublico(string slug, int checkInId, [FromQuery] string cpf, [FromQuery] string email)
+        {
+            try
+            {
+                var academiaId = ObterAcademiaIdPeloSlug(slug);
+                return Ok(_service.DesfazerCheckInPublico(cpf, email, checkInId, academiaId));
             }
             catch (InvalidOperationException ex)
             {

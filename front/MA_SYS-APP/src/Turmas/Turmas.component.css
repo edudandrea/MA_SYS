@@ -150,8 +150,84 @@
   gap: 8px;
 }
 
-.multi-select {
-  min-height: 180px;
+.add-student-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-student-row .btn-save {
+  min-height: 48px;
+}
+
+.input-alert {
+  border-color: rgba(245, 158, 11, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16) !important;
+}
+
+.student-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.1);
+  color: color-mix(in srgb, var(--text-primary) 82%, #f59e0b);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.student-alert.muted {
+  border-color: var(--border-color);
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text-secondary);
+}
+
+.students-linked {
+  display: grid;
+  gap: 10px;
+}
+
+.student-linked-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-panel) 90%, transparent);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.student-linked-item:hover,
+.student-linked-item.selected {
+  transform: none;
+  border-color: var(--accent-border-soft);
+  background: var(--accent-surface);
+}
+
+.student-linked-item small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.remove-student-btn {
+  flex-shrink: 0;
+  border: 1px solid rgba(239, 68, 68, 0.34);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .empty-state {
@@ -187,5 +263,15 @@
 
   .row-actions {
     justify-content: flex-start;
+  }
+
+  .add-student-row,
+  .student-linked-item {
+    grid-template-columns: 1fr;
+  }
+
+  .student-linked-item {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
