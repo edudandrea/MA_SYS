@@ -1,95 +1,59 @@
 <div class="page-header">
   <div class="page-title-group">
     <h1>Professores</h1>
-    <p>Visualize rapidamente vínculos, graduação e carga de alunos por professor.</p>
+    <p>Visualize vínculos, graduação e carga de alunos em grade operacional.</p>
   </div>
 </div>
 
 <div class="professores-page">
-  <div class="professor-grid">
+  <div class="cadastro-list">
+    <div class="list-head professores-row">
+      <span>Professor</span>
+      <span>Modalidade</span>
+      <span>Academia</span>
+      <span>Contato</span>
+      <span>Alunos</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
     <div class="empty-state" *ngIf="!professores || professores.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhum professor cadastrado</p>
     </div>
 
-    <article class="professor-card" *ngFor="let professor of professores">
-      <div class="card-topline">
-        <span class="entity-badge">Professor</span>
+    <button type="button" class="list-row professores-row" *ngFor="let professor of professores" (click)="editarProfessor(templateNovoProfessor, professor)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ getInicial(professor.nome) }}</span>
+        <span>
+          <strong>{{ professor.nome }}</strong>
+          <small>{{ professor.graduacao || 'Graduação não informada' }}</small>
+        </span>
+      </span>
+
+      <span>{{ professor.nomeModalidade || 'Modalidade não informada' }}</span>
+      <span>{{ professor.academiaNome || 'Não informada' }}</span>
+      <span>
+        <strong class="line-value">{{ professor.telefone || 'Sem telefone' }}</strong>
+        <small>{{ professor.email || 'Sem email' }}</small>
+      </span>
+      <span>{{ professor.totalAlunos || 0 }}</span>
+      <span>
         <span
           class="status clickable"
           [class.ativo]="professor.ativo"
           [class.inativo]="!professor.ativo"
-          (click)="toggleStatus(professor)"
+          (click)="$event.stopPropagation(); toggleStatus(professor)"
         >
           {{ professor.ativo ? 'Ativo' : 'Inativo' }}
         </span>
-      </div>
-
-      <div class="card-header-kpi">
-        <div class="avatar">
-          {{ getInicial(professor.nome) }}
-        </div>
-
-        <div class="title-block">
-          <div class="professor-title">
-            <span *ngIf="editarId !== professor.id">{{ professor.nome }}</span>
-            <input *ngIf="editarId === professor.id" [(ngModel)]="nome" class="edit-input" />
-          </div>
-
-          <span class="subtitle">{{ professor.nomeModalidade || 'Modalidade não informada' }}</span>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <span class="kpi-label">Alunos</span>
-          <strong class="kpi-value">{{ professor.totalAlunos || 0 }}</strong>
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-label">Graduação</span>
-          <strong class="kpi-value kpi-text" *ngIf="editarId !== professor.id">
-            {{ professor.graduacao || 'Não informada' }}
-          </strong>
-          <input *ngIf="editarId === professor.id" [(ngModel)]="graduacao" class="edit-input" />
-        </div>
-      </div>
-
-      <div class="detail-list">
-        <div class="detail-item">
-          <i class="fa-solid fa-building"></i>
-          <div>
-            <span class="detail-label">Academia</span>
-            <strong>{{ professor.academiaNome || 'Não informada' }}</strong>
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <i class="fa-solid fa-phone"></i>
-          <div>
-            <span class="detail-label">Telefone</span>
-            <strong *ngIf="editarId !== professor.id">{{ professor.telefone || 'Não informado' }}</strong>
-            <input *ngIf="editarId === professor.id" [(ngModel)]="telefone" class="edit-input" />
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <i class="fa-solid fa-envelope"></i>
-          <div>
-            <span class="detail-label">Email</span>
-            <strong *ngIf="editarId !== professor.id">{{ professor.email || 'Não informado' }}</strong>
-            <input *ngIf="editarId === professor.id" [(ngModel)]="email" class="edit-input" />
-          </div>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save" *ngIf="editarId !== professor.id" (click)="editarProfessor(professor)">Editar</button>
-        <button class="btn-save" *ngIf="editarId === professor.id" (click)="salvarEdicao(professor)">Salvar</button>
-        <button class="btn-cancel" *ngIf="editarId === professor.id" (click)="cancelarEdicao()">Cancelar</button>
-        <button class="btn-cancel" *ngIf="editarId !== professor.id" (click)="excluirProfessor(professor.id)">Excluir</button>
-      </div>
-    </article>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="icon-action danger" title="Excluir" (click)="$event.stopPropagation(); excluirProfessor(professor.id)">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -101,8 +65,8 @@
 <ng-template #templateNovoProfessor>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Novo Professor</h4>
-      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      <h4>{{ editarId ? 'Editar Professor' : 'Novo Professor' }}</h4>
+      <button type="button" class="btn-close" (click)="cancelarEdicao()"></button>
     </div>
 
     <div class="modal-body">
@@ -149,8 +113,10 @@
     </div>
 
     <div class="modal-footer form-actions">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-      <button class="btn-save" (click)="cadastrarNovoProfessor()">Salvar Professor</button>
+      <button class="btn-cancel" (click)="cancelarEdicao()">Cancelar</button>
+      <button class="btn-save" (click)="salvarModal()">
+        {{ editarId ? 'Salvar alterações' : 'Salvar Professor' }}
+      </button>
     </div>
   </div>
 </ng-template>

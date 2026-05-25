@@ -26,6 +26,7 @@ export class PlanosComponent implements OnInit {
   totalAlunos: number = 0;
   academias: Academias[] = [];
   role = '';
+  planoSelecionado: Planos | null = null;
 
   planoMap = new Map<number, string>();
 
@@ -61,6 +62,7 @@ export class PlanosComponent implements OnInit {
   }
 
   openModalNovoPlano(template: TemplateRef<any>) {
+    this.resetForm();
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
     });
@@ -184,12 +186,17 @@ export class PlanosComponent implements OnInit {
     });
   }
 
-  editarPlano(plano: Planos) {
+  editarPlano(template: TemplateRef<any>, plano: Planos) {
+    this.planoSelecionado = plano;
     this.editarId = plano.id;
     this.nome = plano.nome;
     this.valor = plano.valor;
     this.duracaoMeses = plano.duracaoMeses;
+    this.academiaId = plano.academiaId || this.academiaId;
     plano.menuAberto = false;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-md modal-dialog-centered',
+    });
   }
 
   salvarEdicao(plano: Planos) {
@@ -207,6 +214,9 @@ export class PlanosComponent implements OnInit {
         plano.duracaoMeses = this.duracaoMeses;
 
         this.editarId = null;
+        this.planoSelecionado = null;
+        this.modalRef?.hide();
+        this.resetForm();
 
         this.carregarPlanos();
 
@@ -217,8 +227,31 @@ export class PlanosComponent implements OnInit {
 
   cancelarEdicao() {
     this.editarId = null;
+    this.planoSelecionado = null;
+    this.modalRef?.hide();
+    this.resetForm();
     this.planos.forEach((p) => (p.menuAberto = false));
   }
 
   excluirPlano(plano: number): void {}
+
+  salvarModal() {
+    if (this.editarId && this.planoSelecionado) {
+      this.salvarEdicao(this.planoSelecionado);
+      return;
+    }
+
+    this.novoPlano();
+  }
+
+  private resetForm() {
+    this.id = 0;
+    this.nome = '';
+    this.valor = 0;
+    this.ativo = true;
+    this.editarId = null;
+    this.planoSelecionado = null;
+    this.duracaoMeses = 0;
+    this.totalAlunos = 0;
+  }
 }

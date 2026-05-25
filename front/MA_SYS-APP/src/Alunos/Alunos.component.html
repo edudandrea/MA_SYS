@@ -27,11 +27,15 @@
 <!-- ================= TAB PESQUISA ================= -->
 
 <div class="surface-card aluno-card" *ngIf="activeTab === TabsCadastroAluno.Pesquisa">
-  <div class="surface-header">
-    <h2>Pesquisa de Alunos</h2>
+  <div class="surface-header aluno-search-header">
+    <div>
+      <span class="search-eyebrow">Consulta operacional</span>
+      <h2>Pesquisa de Alunos</h2>
+      <p>Localize o aluno por código, nome ou CPF e abra a ficha cadastral pelo registro listado.</p>
+    </div>
   </div>
 
-  <div class="form">
+  <div class="form aluno-search-panel">
     <div class="form-row pesquisa-row">
       <!-- ID -->
 
@@ -40,7 +44,7 @@
 
         <div class="input-modern">
           <i class="fa-solid fa-hashtag"></i>
-          <input type="text" [(ngModel)]="filtroAlunos.id" />
+          <input type="text" [(ngModel)]="filtroAlunos.id" placeholder="Ex.: 1024" />
         </div>
       </div>
 
@@ -59,6 +63,7 @@
             (focus)="abrirAutocomplete()"
             (keydown.enter)="onPesquisarClick()"
             autocomplete="off"
+            placeholder="Digite ao menos 2 letras"
           />
         </div>
 
@@ -84,7 +89,7 @@
 
         <div class="input-modern">
           <i class="fa-solid fa-id-card"></i>
-          <input type="text" [(ngModel)]="filtroAlunos.CPF" />
+          <input type="text" [(ngModel)]="filtroAlunos.CPF" placeholder="000.000.000-00" />
         </div>
       </div>
     </div>
@@ -92,11 +97,47 @@
     <!-- GRADUAÇÃO + MODALIDADE + BOTÕES -->
 
     <div class="actions-row">
+      <button class="btn-cancel" type="button" (click)="resetFiltro()">
+        <i class="fa-solid fa-eraser"></i>
+        Limpar
+      </button>
       <button class="btn-save" (click)="onPesquisarClick()">
         <i class="fa-solid fa-search"></i>
         Pesquisar
       </button>
     </div>
+  </div>
+
+  <div class="cadastro-list alunos-list" *ngIf="alunosResultado.length">
+    <div class="list-head alunos-row">
+      <span>Aluno</span>
+      <span>CPF</span>
+      <span>Contato</span>
+      <span>Academia</span>
+      <span>Status</span>
+    </div>
+
+    <button type="button" class="list-row alunos-row" *ngFor="let aluno of alunosResultado" (click)="abrirAluno(aluno)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ aluno.nome.charAt(0) }}</span>
+        <span>
+          <strong>{{ aluno.nome }}</strong>
+          <small>{{ aluno.graduacao || 'Graduação não informada' }}</small>
+        </span>
+      </span>
+
+      <span>{{ aluno.cpf || 'Não informado' }}</span>
+      <span>
+        <strong class="line-value">{{ aluno.telefone || 'Sem telefone' }}</strong>
+        <small>{{ aluno.email || 'Sem email' }}</small>
+      </span>
+      <span>{{ aluno.academiaNome || 'Sem Academia' }}</span>
+      <span>
+        <span class="status" [class.ativo]="aluno.ativo" [class.inativo]="!aluno.ativo">
+          {{ aluno.ativo ? 'Ativo' : 'Inativo' }}
+        </span>
+      </span>
+    </button>
   </div>
 </div>
 

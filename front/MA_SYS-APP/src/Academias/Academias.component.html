@@ -1,102 +1,69 @@
 <div class="page-header">
   <div class="page-title-group">
     <h1>Academias</h1>
-    <p>Gerencie as academias com uma leitura mais clara dos principais indicadores.</p>
+    <p>Gerencie as academias em uma lista executiva com indicadores essenciais.</p>
   </div>
 </div>
 
 <div class="academias-page">
-  <div class="academia-grid">
+  <div class="cadastro-list">
+    <div class="list-head academias-row">
+      <span>Academia</span>
+      <span>Responsável</span>
+      <span>Contato</span>
+      <span>Cidade</span>
+      <span>Alunos</span>
+      <span>Status</span>
+      <span>Ações</span>
+    </div>
+
     <div class="empty-state" *ngIf="!academias || academias.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhuma academia cadastrada</p>
     </div>
 
-    <article class="academia-card" *ngFor="let academia of academias">
-      <div class="card-topline">
-        <span class="entity-badge">Academia</span>
+    <button type="button" class="list-row academias-row" *ngFor="let academia of academias" (click)="editarAcademia(templateNovaAcademia, academia)">
+      <span class="entity-cell">
+        <span class="avatar avatar-logo small" *ngIf="academia.logoUrl; else academiaSemLogo">
+          <img [src]="academia.logoUrl" [alt]="academia.nome" />
+        </span>
+
+        <ng-template #academiaSemLogo>
+          <span class="avatar small">{{ getInicial(academia.nome) }}</span>
+        </ng-template>
+
+        <span>
+          <strong>{{ academia.nome }}</strong>
+          <small>{{ getCadastroLink(academia.slug) }}</small>
+        </span>
+      </span>
+
+      <span>{{ academia.responsavel || 'Não informado' }}</span>
+      <span>
+        <strong class="line-value">{{ academia.telefone || 'Sem telefone' }}</strong>
+        <small>{{ academia.email || 'Sem email' }}</small>
+      </span>
+      <span>{{ academia.cidade || 'Não informada' }}</span>
+      <span>{{ academia.totalAlunos || 0 }}</span>
+      <span>
         <span
           class="status clickable"
           [class.ativo]="academia.ativo"
           [class.inativo]="!academia.ativo"
-          (click)="toggleStatus(academia)"
+          (click)="$event.stopPropagation(); toggleStatus(academia)"
         >
           {{ academia.ativo ? 'Ativo' : 'Inativo' }}
         </span>
-      </div>
-
-      <div class="card-header-kpi">
-        <div class="avatar avatar-logo" *ngIf="academia.logoUrl; else academiaSemLogo">
-          <img [src]="academia.logoUrl" [alt]="academia.nome" />
-        </div>
-
-        <ng-template #academiaSemLogo>
-          <div class="avatar">
-            {{ getInicial(academia.nome) }}
-          </div>
-        </ng-template>
-
-        <div class="title-block">
-          <div class="academia-title">
-            <span>{{ academia.nome }}</span>
-          </div>
-
-          <span class="subtitle">{{ academia.cidade || 'Cidade não informada' }}</span>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <span class="kpi-label">Alunos</span>
-          <strong class="kpi-value">{{ academia.totalAlunos || 0 }}</strong>
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-label">Responsável</span>
-          <strong class="kpi-value kpi-text">{{ academia.responsavel || 'Não informado' }}</strong>
-        </div>
-      </div>
-
-      <div class="detail-list">
-        <div class="detail-item">
-          <i class="fa-solid fa-phone"></i>
-          <div>
-            <span class="detail-label">Telefone</span>
-            <strong>{{ academia.telefone || 'Não informado' }}</strong>
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <i class="fa-solid fa-envelope"></i>
-          <div>
-            <span class="detail-label">Email</span>
-            <strong>{{ academia.email || 'Não informado' }}</strong>
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <i class="fa-solid fa-globe"></i>
-          <div>
-            <span class="detail-label">Rede social</span>
-            <strong>{{ academia.redeSocial || 'Não informada' }}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="link-panel">
-        <div class="link-copy">
-          <span class="detail-label">Link público de cadastro</span>
-          <input [value]="getCadastroLink(academia.slug)" readonly />
-        </div>
-
-        <button class="link-action" (click)="copiarLink(academia.slug)">Copiar</button>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save" (click)="editarAcademia(templateNovaAcademia, academia)">Editar</button>
-        <button class="btn-cancel" (click)="openModalCobrancas(templateCobrancasAcademia, academia)">Cobrancas</button>
-      </div>
-    </article>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="icon-action" title="Copiar link" (click)="$event.stopPropagation(); copiarLink(academia.slug)">
+          <i class="fa-solid fa-link"></i>
+        </button>
+        <button type="button" class="icon-action" title="Cobranças" (click)="$event.stopPropagation(); openModalCobrancas(templateCobrancasAcademia, academia)">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </button>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -117,7 +84,7 @@
         <section class="form-section logo-section">
           <div class="section-head">
             <h5>Logo da academia</h5>
-            <p>Envie uma imagem para usar no card da academia e no topo do sistema.</p>
+            <p>Envie uma imagem para usar na lista da academia e no topo do sistema.</p>
           </div>
 
           <div class="logo-uploader">
@@ -146,7 +113,7 @@
         <section class="form-section">
           <div class="section-head">
             <h5>Dados principais</h5>
-            <p>Informações exibidas no cadastro e na identificação da academia.</p>
+            <p>Informações exibidas na identificação da academia.</p>
           </div>
 
           <div class="form-grid-modal">
@@ -203,7 +170,7 @@
         <section class="form-section">
           <div class="section-head">
             <h5>Financeiro e integrações</h5>
-            <p>Informações usadas nas cobranças e nas integrações de pagamento.</p>
+            <p>Informações usadas nas cobranças e integrações de pagamento.</p>
           </div>
 
           <div class="form-grid-modal">
@@ -224,18 +191,13 @@
             </div>
           </div>
         </section>
-
-        <div class="form-note">
-          <i class="fa-solid fa-circle-info"></i>
-          A imagem é enviada para o servidor e vinculada automaticamente à academia.
-        </div>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="fecharModal()">Cancelar</button>
       <button class="btn-save" (click)="editarId ? salvarEdicao() : salvarNovaAcademia()">
-        {{ editarId ? 'Salvar alteracoes' : 'Salvar' }}
+        {{ editarId ? 'Salvar alterações' : 'Salvar' }}
       </button>
     </div>
   </div>
@@ -244,7 +206,7 @@
 <ng-template #templateCobrancasAcademia>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Cobrancas - {{ academiaCobrancaSelecionada?.nome }}</h4>
+      <h4>Cobranças - {{ academiaCobrancaSelecionada?.nome }}</h4>
       <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
     </div>
 
@@ -257,7 +219,7 @@
             <select [(ngModel)]="mensalidadeSistemaSelecionadaId" (change)="onMensalidadeSistemaChange()">
               <option [ngValue]="null">Selecionar mensalidade</option>
               <option *ngFor="let mensalidade of mensalidadesSistema" [ngValue]="mensalidade.id">
-                {{ mensalidade.mesesUso }} {{ mensalidade.mesesUso === 1 ? 'mes' : 'meses' }} - {{ mensalidade.valor | currency:'BRL' }} - {{ mensalidade.prazoPagamentoDias }} dia(s)
+                {{ mensalidade.mesesUso }} {{ mensalidade.mesesUso === 1 ? 'mês' : 'meses' }} - {{ mensalidade.valor | currency:'BRL' }} - {{ mensalidade.prazoPagamentoDias }} dia(s)
               </option>
             </select>
           </div>
@@ -282,7 +244,7 @@
         </div>
 
         <div class="input-group">
-          <label>Descricao</label>
+          <label>Descrição</label>
           <div class="input-modern">
             <i class="fa-solid fa-file-lines"></i>
             <input [(ngModel)]="cobrancaDescricao" />
@@ -290,46 +252,27 @@
         </div>
 
         <div class="actions-row">
-          <button class="btn-save" (click)="criarCobrancaSistema(academiaCobrancaSelecionada!)">Criar cobranca</button>
+          <button class="btn-save" (click)="criarCobrancaSistema(academiaCobrancaSelecionada!)">Criar cobrança</button>
         </div>
       </div>
 
       <div class="cobranca-historico">
-        <h5>Historico</h5>
+        <h5>Histórico</h5>
         <div class="cobranca-item" *ngFor="let c of cobrancasAcademia">
           <div>
             <strong>R$ {{ c.valor }}</strong>
             <small>{{ c.dataVencimento | date:'dd/MM/yyyy' }} - {{ c.status }}</small>
             <small *ngIf="c.formaPagamentoNome">Forma de pagamento: {{ c.formaPagamentoNome }}</small>
-            <p>{{ c.descricao || 'Sem descricao' }}</p>
+            <p>{{ c.descricao || 'Sem descrição' }}</p>
           </div>
           <button class="btn-save" *ngIf="c.status !== 'Pago'" (click)="baixarCobranca(c.id)">Baixar (Pago)</button>
         </div>
-        <div class="empty-note" *ngIf="!cobrancasAcademia.length">Nenhuma cobranca registrada.</div>
+        <div class="empty-note" *ngIf="!cobrancasAcademia.length">Nenhuma cobrança registrada.</div>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="modalRef?.hide()">Fechar</button>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #templateExcluirAcademia>
-  <div class="modal-content modal-surface">
-    <div class="modal-header">
-      <h5 class="modal-title">Excluir Academia</h5>
-      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
-    </div>
-
-    <div class="modal-body">
-      <p class="modal-text">Deseja realmente excluir essa academia?</p>
-      <small class="modal-subtext">Esta ação não pode ser desfeita.</small>
-    </div>
-
-    <div class="modal-footer modal-actions">
-      <button type="button" class="btn-cancel" (click)="modalRef?.hide()">Sim, excluir</button>
-      <button type="button" class="btn-save" (click)="confirmarCancelarEdicao()">Não quero excluir</button>
     </div>
   </div>
 </ng-template>

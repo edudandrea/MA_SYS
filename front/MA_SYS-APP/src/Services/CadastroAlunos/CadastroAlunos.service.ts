@@ -24,6 +24,10 @@ export class CadastroAlunosService {
     return this.http.post(`${this.apiUrl}/public/${this.context.slug}/buscar`, { cpf, email });
   }
 
+  realizarCheckIn(cpf: string, email: string, turmaId: number) {
+    return this.http.post(`${this.apiUrl}/public/${this.context.slug}/check-in`, { cpf, email, turmaId });
+  }
+
   cadastrar(slug: string, payload: any) {
     return this.http.post(`${this.apiUrl}/${slug}`, payload);
   }

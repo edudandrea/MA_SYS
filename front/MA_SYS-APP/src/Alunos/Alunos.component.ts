@@ -75,6 +75,7 @@ export class AlunosComponent implements OnInit {
   mostrarListaAlunos = false;
 
   alunosFiltrados: Alunos[] = [];
+  alunosResultado: (Alunos & { academiaNome?: string })[] = [];
 
   selectedAluno?: Alunos & { academiaNome?: string };
 
@@ -165,6 +166,12 @@ export class AlunosComponent implements OnInit {
     this.onPesquisarClick();
   }
 
+  abrirAluno(aluno: Alunos) {
+    this.setAlunoAtual(aluno);
+    this.activeTab = TabsCadastroAluno.Cadastro;
+    this.modoEdicao = false;
+  }
+
   onInputNome(event: any) {
     const valor = event.target.value;
 
@@ -227,12 +234,19 @@ export class AlunosComponent implements OnInit {
       next: (res) => {
         this.spinner.hide();
         if (!res?.length) {
+          this.alunosResultado = [];
           this.toastr.info('Nenhum aluno encontrado.');
           return;
         }
-        this.setAlunoAtual(res[0]);
 
-        this.activeTab = TabsCadastroAluno.Cadastro;
+        this.alunosResultado = res.map((aluno) => ({
+          ...aluno,
+          academiaNome: this.academiaMap.get(aluno.academiaId) || 'Sem Academia',
+        }));
+
+        if (this.alunosResultado.length === 1) {
+          this.setAlunoAtual(this.alunosResultado[0]);
+        }
       },
       error: () => {
         this.spinner.hide();
@@ -475,6 +489,7 @@ export class AlunosComponent implements OnInit {
       graduacao: '',
       redeSocial: '',
     };
+    this.alunosResultado = [];
   }
 
   private resetNovoAlunoForm() {

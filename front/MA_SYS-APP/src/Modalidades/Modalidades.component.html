@@ -1,64 +1,51 @@
 <div class="page-header">
   <div class="page-title-group">
     <h1>Modalidades</h1>
-    <p>Acompanhe rapidamente o peso operacional de cada modalidade cadastrada.</p>
+    <p>Acompanhe alunos, professores e status em uma grade de cadastro objetiva.</p>
   </div>
 </div>
 
 <div class="modalidades-page">
-  <div class="modalidade-grid">
+  <div class="cadastro-list">
+    <div class="list-head modalidades-row">
+      <span>Modalidade</span>
+      <span>Academia</span>
+      <span>Alunos</span>
+      <span>Professores</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
     <div class="empty-state" *ngIf="!modalidades || modalidades.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhuma modalidade cadastrada</p>
     </div>
 
-    <article class="modalidade-card" *ngFor="let modalidade of modalidades">
-      <div class="card-topline">
-        <span class="entity-badge">Modalidade</span>
+    <button type="button" class="list-row modalidades-row" *ngFor="let modalidade of modalidades; trackBy: trackByModalidade" (click)="editarModalidade(templateNovaModalidade, modalidade)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ getInicial(modalidade.nomeModalidade) }}</span>
+        <strong>{{ modalidade.nomeModalidade }}</strong>
+      </span>
+
+      <span>{{ modalidade.academiaNome || 'Sem Academia' }}</span>
+      <span>{{ modalidade.totalAlunos || 0 }}</span>
+      <span>{{ modalidade.totalProf || 0 }}</span>
+      <span>
         <span
           class="status clickable"
           [class.ativo]="modalidade.ativo"
           [class.inativo]="!modalidade.ativo"
-          (click)="toggleStatus(modalidade)"
+          (click)="$event.stopPropagation(); toggleStatus(modalidade)"
         >
           {{ modalidade.ativo ? 'Ativo' : 'Inativo' }}
         </span>
-      </div>
-
-      <div class="card-header-kpi">
-        <div class="avatar">
-          {{ getInicial(modalidade.nomeModalidade) }}
-        </div>
-
-        <div class="title-block">
-          <div class="modalidade-title">
-            <span *ngIf="editarId !== modalidade.id">{{ modalidade.nomeModalidade }}</span>
-            <input *ngIf="editarId === modalidade.id" [(ngModel)]="nomeModalidade" class="edit-input" />
-          </div>
-
-          <span class="subtitle">Visão de ocupação da modalidade</span>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <span class="kpi-label">Alunos</span>
-          <strong class="kpi-value">{{ modalidade.totalAlunos || 0 }}</strong>
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-label">Professores</span>
-          <strong class="kpi-value">{{ modalidade.totalProf || 0 }}</strong>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save" *ngIf="editarId !== modalidade.id" (click)="editarModalidade(modalidade)">Editar</button>
-        <button class="btn-save" *ngIf="editarId === modalidade.id" (click)="salvarEdicao(modalidade)">Salvar</button>
-        <button class="btn-cancel" *ngIf="editarId === modalidade.id" (click)="cancelarEdicao()">Cancelar</button>
-        <button class="btn-cancel" *ngIf="editarId !== modalidade.id" (click)="excluirModalidade(modalidade.id)">Excluir</button>
-      </div>
-    </article>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="icon-action danger" title="Excluir" (click)="$event.stopPropagation(); excluirModalidade(modalidade.id)">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -70,23 +57,28 @@
 <ng-template #templateNovaModalidade>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Nova Modalidade</h4>
-      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      <h4>{{ editarId ? 'Editar Modalidade' : 'Nova Modalidade' }}</h4>
+      <button type="button" class="btn-close" (click)="cancelarEdicao()"></button>
     </div>
 
     <div class="modal-body">
       <div class="form-grid">
-        <label>Nome da Modalidade</label>
-        <div class="input-modern">
-          <i class="fa-solid fa-hand-fist"></i>
-          <input [(ngModel)]="novaModalidade.nomeModalidade" />
+        <div class="form-group full">
+          <label>Nome da Modalidade</label>
+          <div class="input-modern">
+            <i class="fa-solid fa-hand-fist"></i>
+            <input *ngIf="!editarId" [(ngModel)]="novaModalidade.nomeModalidade" />
+            <input *ngIf="editarId" [(ngModel)]="nomeModalidade" />
+          </div>
         </div>
       </div>
     </div>
 
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-      <button class="btn-save" (click)="cadastrarNovaModalidade()">Salvar</button>
+      <button class="btn-cancel" (click)="cancelarEdicao()">Cancelar</button>
+      <button class="btn-save" (click)="salvarModal()">
+        {{ editarId ? 'Salvar alterações' : 'Salvar' }}
+      </button>
     </div>
   </div>
 </ng-template>

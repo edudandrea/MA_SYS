@@ -37,6 +37,7 @@ export class ProfessoresComponent implements OnInit {
   academiaId: number = 0;
 
   editarId: number | null = null;
+  professorSelecionado: Professores | null = null;
 
   professores: (Professores & { menuAberto?: boolean; academiaNome?: string })[] = [];
 
@@ -220,6 +221,7 @@ export class ProfessoresComponent implements OnInit {
   // Abre o modal para cadastrar um novo professor
 
   openModalNovoProfessor(template: TemplateRef<any>) {
+    this.resetForm();
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
     });
@@ -247,7 +249,7 @@ export class ProfessoresComponent implements OnInit {
         this.spinner.hide();
         this.toastr.success('Professor cadastrado!', 'Sucesso');
 
-        this.nome = '';
+        this.resetForm();
 
         this.modalRef?.hide();
 
@@ -263,17 +265,27 @@ export class ProfessoresComponent implements OnInit {
 
   // ---------PUT ----------
 
-  editarProfessor(prof: Professores) {
+  editarProfessor(template: TemplateRef<any>, prof: Professores) {
+    this.professorSelecionado = prof;
     this.editarId = prof.id;
     this.nome= prof.nome;
     this.graduacao = prof.graduacao;
     this.email = prof.email;
-    this.telefone = prof.telefone
+    this.telefone = prof.telefone;
+    this.academiaId = prof.academiaId;
+    this.modalidadeId = prof.modalidadeId;
+    this.filtrarModalidades();
     prof.menuAberto = false;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-md modal-dialog-centered',
+    });
   }
 
   cancelarEdicao() {
     this.editarId = null;
+    this.professorSelecionado = null;
+    this.modalRef?.hide();
+    this.resetForm();
     this.professores.forEach(p => p.menuAberto = false);
   }
 
@@ -284,6 +296,7 @@ export class ProfessoresComponent implements OnInit {
       graduacao: this.graduacao,
       telefone: this.telefone,
       email: this.email,
+      modalidadeId: this.modalidadeId,
       ativo: prof.ativo,
     };
 
@@ -293,8 +306,12 @@ export class ProfessoresComponent implements OnInit {
         prof.graduacao = this.graduacao;
         prof.telefone = this.telefone,
         prof.email = this.email
+        prof.modalidadeId = this.modalidadeId;
 
         this.editarId = null;
+        this.professorSelecionado = null;
+        this.modalRef?.hide();
+        this.resetForm();
 
         this.carregarProfessores();
 
@@ -321,5 +338,29 @@ export class ProfessoresComponent implements OnInit {
         },
       });
     }
+  }
+
+  salvarModal() {
+    if (this.editarId && this.professorSelecionado) {
+      this.salvarEdicao(this.professorSelecionado);
+      return;
+    }
+
+    this.cadastrarNovoProfessor();
+  }
+
+  private resetForm() {
+    this.professorId = 0;
+    this.nome = '';
+    this.telefone = '';
+    this.nomeAcademia = '';
+    this.nomeModalidade = '';
+    this.ativo = true;
+    this.email = '';
+    this.graduacao = '';
+    this.modalidadeId = 0;
+    this.totalAlunos = 0;
+    this.editarId = null;
+    this.professorSelecionado = null;
   }
 }

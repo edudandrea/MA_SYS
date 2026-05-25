@@ -1,5 +1,6 @@
 using MA_Sys.API.Data.Repository.interfaces;
 using MA_Sys.API.Dto.Alunos;
+using MA_SYS.Api.Data;
 using MA_SYS.Api.Dto;
 using MA_SYS.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,15 +12,18 @@ namespace MA_Sys.API.Services
         private readonly IAlunoRepository _repo;
         private readonly IMatriculaRepository _matriculaRepo;
         private readonly MensalidadeStatusService _mensalidadeStatusService;
+        private readonly AppDbContext _context;
 
         public AlunoService(
             IAlunoRepository repo,
             IMatriculaRepository matriculaRepo,
-            MensalidadeStatusService mensalidadeStatusService)
+            MensalidadeStatusService mensalidadeStatusService,
+            AppDbContext context)
         {
             _repo = repo;
             _matriculaRepo = matriculaRepo;
             _mensalidadeStatusService = mensalidadeStatusService;
+            _context = context;
         }
 
         public List<AlunoResponseDto> List(string role, int? academiaId)
@@ -144,6 +148,89 @@ namespace MA_Sys.API.Services
                     m.Aluno.Email.ToLower() == emailLimpo &&
                     m.AcademiaId == academiaId
                 );
+        }
+
+        public List<object> ListarTurmasPublicasDoAluno(int alunoId, int academiaId)
+        {
+            var hoje = DateTime.UtcNow.Date;
+
+            return _context.TurmasAlunos
+                .AsNoTracking()
+                .Where(ta => ta.AlunoId == alunoId && ta.Turma != null && ta.Turma.AcademiaId == academiaId && ta.Turma.Ativo)
+                .Include(ta => ta.Turma)
+                .ThenInclude(t => t!.Professor)
+                .OrderBy(ta => ta.Turma!.Nome)
+                .Select(ta => new
+                {
+                    turmaId = ta.TurmaId,
+                    nome = ta.Turma!.Nome,
+                    descricao = ta.Turma.Descricao,
+                    professor = ta.Turma.Professor != null ? ta.Turma.Professor.Nome : null,
+                    diasSemana = ta.Turma.DiasSemana,
+                    checkInHoje = _context.CheckInsAulas.Any(c =>
+                        c.AlunoId == alunoId &&
+                        c.TurmaId == ta.TurmaId &&
+                        c.DataCheckIn.Date == hoje)
+                })
+                .Cast<object>()
+                .ToList();
+        }
+
+        public object RealizarCheckInPublico(string cpf, string email, int turmaId, int academiaId)
+        {
+            var aluno = BuscarPorCpfEmail(cpf, email, academiaId);
+
+            if (aluno == null)
+                throw new InvalidOperationException("Aluno nao encontrado para esta academia.");
+
+            var turmaAluno = _context.TurmasAlunos
+                .Include(ta => ta.Turma)
+                .ThenInclude(t => t!.Professor)
+                .FirstOrDefault(ta =>
+                    ta.AlunoId == aluno.Id &&
+                    ta.TurmaId == turmaId &&
+                    ta.Turma != null &&
+                    ta.Turma.AcademiaId == academiaId &&
+                    ta.Turma.Ativo);
+
+            if (turmaAluno?.Turma == null)
+                throw new InvalidOperationException("Aluno nao esta vinculado a esta turma.");
+
+            var hoje = DateTime.UtcNow.Date;
+            var checkInExistente = _context.CheckInsAulas
+                .FirstOrDefault(c => c.AlunoId == aluno.Id && c.TurmaId == turmaId && c.DataCheckIn.Date == hoje);
+
+            if (checkInExistente != null)
+            {
+                return new
+                {
+                    jaRegistrado = true,
+                    checkInId = checkInExistente.Id,
+                    dataCheckIn = checkInExistente.DataCheckIn,
+                    turma = turmaAluno.Turma.Nome,
+                    professor = turmaAluno.Turma.Professor?.Nome
+                };
+            }
+
+            var checkIn = new CheckInAula
+            {
+                AcademiaId = academiaId,
+                AlunoId = aluno.Id,
+                TurmaId = turmaId,
+                DataCheckIn = DateTime.UtcNow
+            };
+
+            _context.CheckInsAulas.Add(checkIn);
+            _context.SaveChanges();
+
+            return new
+            {
+                jaRegistrado = false,
+                checkInId = checkIn.Id,
+                dataCheckIn = checkIn.DataCheckIn,
+                turma = turmaAluno.Turma.Nome,
+                professor = turmaAluno.Turma.Professor?.Nome
+            };
         }
 
         public List<AlunoResponseDto> GetByCpfEmail(string cpf, string email, int academiaId)

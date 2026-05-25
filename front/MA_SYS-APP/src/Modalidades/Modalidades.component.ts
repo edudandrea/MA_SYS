@@ -32,6 +32,7 @@ export class ModalidadesComponent implements OnInit {
   modalRef?: BsModalRef;
 
   editarId: number | null = null;
+  modalidadeSelecionada: Modalidades | null = null;
 
   novaModalidade = {
     nomeModalidade: '',
@@ -139,14 +140,22 @@ export class ModalidadesComponent implements OnInit {
     });
   }
 
-  editarModalidade(modalidade: Modalidades) {
+  editarModalidade(template: TemplateRef<any>, modalidade: Modalidades) {
+    this.modalidadeSelecionada = modalidade;
     this.editarId = modalidade.id;
     this.nomeModalidade = modalidade.nomeModalidade;
     modalidade.menuAberto = false;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-md modal-dialog-centered',
+    });
   }
 
   cancelarEdicao() {
     this.editarId = null;
+    this.modalidadeSelecionada = null;
+    this.nomeModalidade = '';
+    this.novaModalidade.nomeModalidade = '';
+    this.modalRef?.hide();
     this.modalidades.forEach(m => m.menuAberto = false);
   }
 
@@ -162,6 +171,9 @@ export class ModalidadesComponent implements OnInit {
         modalidade.nomeModalidade = this.nomeModalidade;
 
         this.editarId = null;
+        this.modalidadeSelecionada = null;
+        this.nomeModalidade = '';
+        this.modalRef?.hide();
 
         this.carregarModalidades();
 
@@ -226,9 +238,19 @@ export class ModalidadesComponent implements OnInit {
   }
 
   openModalNovaModalidade(template: TemplateRef<any>) {
+    this.cancelarEdicao();
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
     });
+  }
+
+  salvarModal() {
+    if (this.editarId && this.modalidadeSelecionada) {
+      this.salvarEdicao(this.modalidadeSelecionada);
+      return;
+    }
+
+    this.cadastrarNovaModalidade();
   }
 
   carregarAcademias(callback?: () => void) {

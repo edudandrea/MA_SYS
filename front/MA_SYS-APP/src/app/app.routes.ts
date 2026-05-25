@@ -23,6 +23,7 @@ import { FiliadosComponent } from '../Filiados/Filiados.component';
 import { RelatoriosComponent } from '../Relatorios/Relatorios.component';
 import { FederacoesComponent } from '../Federacoes/Federacoes.component';
 import { PagamentoFiliadosComponent } from '../PagamentoFiliados/PagamentoFiliados.component';
+import { ProfessorPortalComponent } from '../ProfessorPortal/ProfessorPortal.component';
 
 
 export const routes: Routes = [
@@ -48,6 +49,7 @@ export const routes: Routes = [
             { path: 'alunos', component: AlunosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'modalidades', component: ModalidadesComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'professores', component: ProfessoresComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
+            { path: 'portal-professor', component: ProfessorPortalComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'planos', component: PlanosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin', 'Federacao'] } },
             { path: 'pagamentos', component: PagamentosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin', 'Federacao'] } },
             { path: 'mensalidades-sistema', component: MensalidadesSistemaComponent, canActivate: [RoleGuard], data: { roles: ['Admin', 'SuperAdmin'] } },

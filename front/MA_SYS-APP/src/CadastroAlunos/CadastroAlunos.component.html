@@ -224,6 +224,59 @@
         </section>
       </form>
 
+      <section class="checkin-panel">
+        <div class="section-heading">
+          <span class="eyebrow">Presenca</span>
+          <h4>Check-in nas aulas</h4>
+          <p>Confirme sua presenca nas turmas em que voce esta cadastrado.</p>
+        </div>
+
+        <div class="class-grid" *ngIf="aulasDisponiveis.length; else semAulas">
+          <article class="class-card" *ngFor="let aula of aulasDisponiveis">
+            <div class="class-card-main">
+              <div>
+                <span class="class-kicker">Aula cadastrada</span>
+                <strong>{{ aula.nome }}</strong>
+                <p>{{ aula.descricao || 'Turma ativa para check-in.' }}</p>
+              </div>
+
+              <span class="checkin-badge" [class.done]="aula.checkInHoje">
+                <i class="fa-solid" [class.fa-circle-check]="aula.checkInHoje" [class.fa-clock]="!aula.checkInHoje"></i>
+                {{ aula.checkInHoje ? 'Check-in feito hoje' : 'Aberto hoje' }}
+              </span>
+            </div>
+
+            <div class="class-meta">
+              <span>
+                <i class="fa-solid fa-chalkboard-user"></i>
+                {{ aula.professor || 'Professor nao vinculado' }}
+              </span>
+              <span>
+                <i class="fa-solid fa-calendar-week"></i>
+                {{ aula.diasSemanaLista?.length ? aula.diasSemanaLista.join(', ') : 'Agenda nao informada' }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="btn-checkin"
+              [disabled]="aula.checkInHoje || checkInEmAndamentoId === aula.turmaId"
+              (click)="realizarCheckIn(aula)"
+            >
+              <i class="fa-solid fa-circle-check"></i>
+              {{ aula.checkInHoje ? 'Presenca confirmada' : (checkInEmAndamentoId === aula.turmaId ? 'Confirmando...' : 'Fazer check-in') }}
+            </button>
+          </article>
+        </div>
+
+        <ng-template #semAulas>
+          <div class="empty-checkin">
+            <i class="fa-solid fa-calendar-xmark"></i>
+            <span>Nenhuma turma vinculada ao seu cadastro ainda.</span>
+          </div>
+        </ng-template>
+      </section>
+
       <section class="payment-panel">
         <div class="payment-summary">
           <div class="summary-box">

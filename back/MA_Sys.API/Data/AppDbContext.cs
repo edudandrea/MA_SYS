@@ -30,6 +30,7 @@ namespace MA_SYS.Api.Data
         public DbSet<MensalidadeSistema> MensalidadesSistema { get; set; }
         public DbSet<Turma> Turmas { get; set; }
         public DbSet<TurmaAluno> TurmasAlunos { get; set; }
+        public DbSet<CheckInAula> CheckInsAulas { get; set; }
         public DbSet<Exercicio> Exercicios { get; set; }
         public DbSet<Treino> Treinos { get; set; }
         public DbSet<TreinoExercicio> TreinosExercicios { get; set; }
@@ -129,6 +130,18 @@ namespace MA_SYS.Api.Data
                 .HasOne(ta => ta.Aluno)
                 .WithMany()
                 .HasForeignKey(ta => ta.AlunoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CheckInAula>()
+                .HasOne(c => c.Aluno)
+                .WithMany()
+                .HasForeignKey(c => c.AlunoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CheckInAula>()
+                .HasOne(c => c.Turma)
+                .WithMany()
+                .HasForeignKey(c => c.TurmaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<TreinoExercicio>()

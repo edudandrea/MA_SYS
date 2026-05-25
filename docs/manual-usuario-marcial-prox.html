@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manual do Usuario - Marcial ProX</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #243140;
+      background: #f5f7fb;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.48;
+    }
+
+    .page {
+      min-height: 267mm;
+      padding: 18mm 16mm;
+      background: #fff;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(135deg, rgba(30, 58, 138, 0.93), rgba(15, 118, 110, 0.86)),
+        url("../front/MA_SYS-APP/src/assets/logo-marcial-prox.png") center 35% / 360px auto no-repeat;
+      color: #fff;
+    }
+
+    .cover-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo-box {
+      display: grid;
+      place-items: center;
+      width: 92px;
+      height: 92px;
+      border-radius: 16px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .logo-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .cover h1 {
+      max-width: 680px;
+      margin: 120px 0 16px;
+      font-size: 48px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .cover p {
+      max-width: 620px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 18px;
+    }
+
+    .cover-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .cover-card {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      color: #172033;
+      font-size: 26px;
+    }
+
+    h3 {
+      margin: 22px 0 8px;
+      color: #243140;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0 0 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    .intro {
+      margin-bottom: 18px;
+      color: #526071;
+      font-size: 14px;
+    }
+
+    .toc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .toc-item {
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+
+    .toc-item strong {
+      display: block;
+      color: #0f766e;
+      font-size: 16px;
+    }
+
+    .callout {
+      margin: 14px 0;
+      border-left: 4px solid #0f766e;
+      border-radius: 6px;
+      padding: 12px 14px;
+      background: #eefdfa;
+    }
+
+    .warning {
+      border-color: #d97706;
+      background: #fff7ed;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .step span {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: #fff;
+      background: #0f766e;
+      font-weight: 700;
+    }
+
+    .figure {
+      margin: 18px 0;
+      border: 1px solid #d7e0ea;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      page-break-inside: avoid;
+    }
+
+    .figure-caption {
+      padding: 9px 12px;
+      color: #526071;
+      background: #f8fafc;
+      border-top: 1px solid #d7e0ea;
+      font-size: 12px;
+    }
+
+    .mock {
+      min-height: 265px;
+      background: #edf2f7;
+      display: grid;
+      grid-template-columns: 142px 1fr;
+    }
+
+    .mock.login {
+      grid-template-columns: 1fr 340px;
+      min-height: 310px;
+      background: linear-gradient(135deg, #163b68, #0f766e);
+    }
+
+    .login-copy {
+      padding: 36px;
+      color: #fff;
+    }
+
+    .login-copy h4 {
+      margin: 46px 0 10px;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .login-card {
+      margin: 30px;
+      border-radius: 10px;
+      padding: 24px;
+      background: #fff;
+    }
+
+    .field {
+      height: 38px;
+      margin: 12px 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #f8fafc;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 122px;
+      height: 38px;
+      border-radius: 7px;
+      color: #fff;
+      background: #0f766e;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .side {
+      padding: 14px 12px;
+      color: #eaf2ff;
+      background: #162033;
+    }
+
+    .brand {
+      margin-bottom: 18px;
+      font-weight: 700;
+      font-size: 17px;
+    }
+
+    .nav-line {
+      height: 26px;
+      margin: 8px 0;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.13);
+    }
+
+    .nav-line.active {
+      background: #0f766e;
+    }
+
+    .workspace {
+      padding: 16px;
+    }
+
+    .topbar {
+      height: 50px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px #dbe3ef;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .panel-title strong {
+      font-size: 20px;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #0f766e;
+      background: #ccfbf1;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .card {
+      min-height: 70px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+      color: #172033;
+    }
+
+    .chart {
+      height: 130px;
+      margin-top: 12px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, transparent 75%, rgba(15, 118, 110, 0.22) 75%),
+        repeating-linear-gradient(90deg, #e2e8f0 0 1px, transparent 1px 42px),
+        #fff;
+      border: 1px solid #dbe3ef;
+      position: relative;
+    }
+
+    .chart:before {
+      content: "";
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 28px;
+      height: 68px;
+      border-radius: 70% 70% 0 0;
+      border-top: 8px solid #0f766e;
+      border-right: 8px solid transparent;
+      transform: skewX(-12deg);
+    }
+
+    .table {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.4fr .8fr .8fr;
+      gap: 8px;
+      align-items: center;
+      min-height: 38px;
+      border: 1px solid #dbe3ef;
+      border-radius: 7px;
+      padding: 8px 10px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .input-visual {
+      height: 36px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mini-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .status-ok {
+      color: #0f766e;
+      font-weight: 700;
+    }
+
+    .status-warn {
+      color: #b45309;
+      font-weight: 700;
+    }
+
+    .status-danger {
+      color: #b91c1c;
+      font-weight: 700;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .section-card {
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      padding: 14px;
+      background: #f8fafc;
+      page-break-inside: avoid;
+    }
+
+    .section-card h3 {
+      margin-top: 0;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .page {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-top">
+      <div class="logo-box">
+        <img src="../front/MA_SYS-APP/src/assets/logo-marcial-prox.png" alt="Logo Marcial ProX" />
+      </div>
+      <div>
+        <strong>Marcial ProX</strong>
+        <p>Sistema de gestão para academias, federações e operações de artes marciais.</p>
+      </div>
+    </div>
+
+    <div>
+      <h1>Manual do Usuário Final</h1>
+      <p>Guia prático para acessar o sistema, navegar pelos menus, realizar cadastros, acompanhar pagamentos, controlar fluxo de caixa e consultar relatórios.</p>
+    </div>
+
+    <div class="cover-footer">
+      <div class="cover-card">
+        <strong>Público-alvo</strong>
+        <p>Administradores, academias, federações e usuários responsáveis pela rotina operacional.</p>
+      </div>
+      <div class="cover-card">
+        <strong>Objetivo</strong>
+        <p>Apresentar o uso do sistema sem detalhes técnicos, códigos ou linguagem de desenvolvimento.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>Sumário</h2>
+    <p class="intro">Este manual está organizado pelos menus e tarefas que o usuário encontra no sistema.</p>
+    <div class="toc">
+      <div class="toc-item"><strong>1. Acesso</strong><span>Login, primeiro acesso, perfil e saída segura.</span></div>
+      <div class="toc-item"><strong>2. Navegação</strong><span>Menu lateral, painel superior, tema e escopo de acesso.</span></div>
+      <div class="toc-item"><strong>3. Dashboard</strong><span>Indicadores, alertas, cobranças e visão rápida da operação.</span></div>
+      <div class="toc-item"><strong>4. Cadastros</strong><span>Academias, federações, filiados, alunos, matrículas, professores, modalidades, turmas e treinos.</span></div>
+      <div class="toc-item"><strong>5. Financeiro</strong><span>Planos, formas de pagamento, mensalidades, PIX, cartão e fluxo de caixa.</span></div>
+      <div class="toc-item"><strong>6. Relatórios</strong><span>Filtros por período e leitura dos totais consolidados.</span></div>
+    </div>
+
+    <div class="callout">
+      <strong>Observação sobre permissões:</strong> cada usuário visualiza somente os menus liberados para o seu perfil. Por isso, algumas opções podem aparecer para administradores e não aparecer para academias ou federações.
+    </div>
+
+    <h3>Perfis de acesso</h3>
+    <ul>
+      <li><strong>Super Admin e Admin:</strong> acompanham a visão global, cadastros administrativos, usuários e cobranças do sistema.</li>
+      <li><strong>Academia:</strong> gerencia alunos, matrículas, planos, turmas, treinos, pagamentos, fluxo de caixa e relatórios da própria academia.</li>
+      <li><strong>Federação:</strong> gerencia filiados, planos, pagamentos, fluxo financeiro e painel da federação.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>1. Acesso ao Sistema</h2>
+    <p class="intro">A tela de acesso é o ponto de entrada para todos os usuários. O sistema também pode exibir uma etapa de primeiro acesso quando ainda não existe usuário administrador cadastrado.</p>
+
+    <div class="figure">
+      <div class="mock login">
+        <div class="login-copy">
+          <span>Sistema de gestão</span>
+          <h4>Controle sua academia com clareza e presença profissional.</h4>
+          <p>Cadastros, matrículas, pagamentos e operação administrativa em um único ambiente.</p>
+        </div>
+        <div class="login-card">
+          <strong>Entrar no Marcial ProX</strong>
+          <div class="field"></div>
+          <div class="field"></div>
+          <div class="btn">Entrar no sistema</div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 1 - Tela de login do Marcial ProX.</div>
+    </div>
+
+    <div class="steps">
+      <div class="step"><span>1</span><div><strong>Informe usuário e senha.</strong><br />Use os dados fornecidos pelo responsável do sistema.</div></div>
+      <div class="step"><span>2</span><div><strong>Clique em Entrar no sistema.</strong><br />Após a validação, o sistema abre o painel principal.</div></div>
+      <div class="step"><span>3</span><div><strong>Primeiro acesso, quando solicitado.</strong><br />Preencha nome, login, e-mail e senha para criar o primeiro usuário Super Admin.</div></div>
+    </div>
+
+    <div class="callout warning">
+      <strong>Segurança:</strong> não compartilhe sua senha. Se precisar alterar dados do perfil ou trocar a senha, use o menu do usuário no canto superior direito.
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>2. Navegação Principal</h2>
+    <p class="intro">Depois do login, a navegação acontece pelo menu lateral e pela barra superior.</p>
+
+    <div class="figure">
+      <div class="mock">
+        <div class="side">
+          <div class="brand">Marcial ProX</div>
+          <div class="nav-line active"></div>
+          <div class="nav-line"></div>
+          <div class="nav-line"></div>
+          <div class="nav-line"></div>
+          <div class="nav-line"></div>
+        </div>
+        <div class="workspace">
+          <div class="topbar"></div>
+          <div class="panel-title">
+            <strong>Painel operacional</strong>
+            <span class="chip">Academia ativa</span>
+          </div>
+          <div class="cards">
+            <div class="card"><span>Cadastros</span><strong>Menu</strong></div>
+            <div class="card"><span>Financeiro</span><strong>Menu</strong></div>
+            <div class="card"><span>Relatórios</span><strong>Menu</strong></div>
+          </div>
+          <div class="chart"></div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 2 - Estrutura do painel com menu lateral, barra superior e área de conteúdo.</div>
+    </div>
+
+    <h3>Menu lateral</h3>
+    <ul>
+      <li><strong>Dashboard:</strong> abre a visão de indicadores e alertas.</li>
+      <li><strong>Cadastros:</strong> reúne registros como academias, alunos, matrículas, professores, modalidades, turmas, treinos, federações e filiados.</li>
+      <li><strong>Financeiro:</strong> reúne planos, formas de pagamento, mensalidades do sistema e fluxo de caixa.</li>
+      <li><strong>Relatórios:</strong> apresenta resumos por período.</li>
+      <li><strong>Usuários:</strong> permite gerenciar acessos, quando o perfil tiver permissão.</li>
+    </ul>
+
+    <h3>Barra superior</h3>
+    <ul>
+      <li>Mostra a academia ou organização ativa.</li>
+      <li>Permite alterar o tema visual.</li>
+      <li>Abre opções de perfil: editar perfil, trocar senha e sair.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>3. Dashboard</h2>
+    <p class="intro">O dashboard resume a operação. Ele mostra indicadores, alertas e informações financeiras conforme o perfil do usuário.</p>
+
+    <div class="figure">
+      <div class="mock">
+        <div class="side">
+          <div class="brand">MA</div>
+          <div class="nav-line active"></div>
+          <div class="nav-line"></div>
+          <div class="nav-line"></div>
+        </div>
+        <div class="workspace">
+          <div class="panel-title">
+            <strong>Dashboard Marcial ProX</strong>
+            <span class="chip">Este mês</span>
+          </div>
+          <div class="cards">
+            <div class="card"><span>Alunos ativos</span><strong>128</strong></div>
+            <div class="card"><span>Professores</span><strong>12</strong></div>
+            <div class="card"><span>Mensalidades vencidas</span><strong>7</strong></div>
+          </div>
+          <div class="chart"></div>
+          <div class="mini-list">
+            <div class="mini-item"><span>Mensalidades em alerta</span><strong class="status-warn">10 dias</strong></div>
+            <div class="mini-item"><span>Cobranças do sistema</span><strong class="status-danger">Pendentes</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 3 - Exemplo visual do dashboard com indicadores, gráficos e alertas.</div>
+    </div>
+
+    <h3>Como usar</h3>
+    <ul>
+      <li>Use o filtro de período para alternar entre visão mensal e anual.</li>
+      <li>Observe os cards de indicadores para identificar rapidamente pendências ou crescimento.</li>
+      <li>Na visão da academia, acompanhe alunos ativos, professores, alunos inativos, mensalidades vencendo e vencidas.</li>
+      <li>Na visão administrativa, acompanhe academias, usuários, receitas, pagamentos pendentes e cobranças recentes.</li>
+      <li>Quando houver cobrança pendente, use a ação de pagamento disponível para pagar por PIX ou cartão, se habilitado.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>4. Cadastros</h2>
+    <p class="intro">Os cadastros mantêm os dados usados pela operação diária. Sempre revise as informações antes de salvar.</p>
+
+    <div class="figure">
+      <div class="mock">
+        <div class="side">
+          <div class="brand">Cadastros</div>
+          <div class="nav-line active"></div>
+          <div class="nav-line active"></div>
+          <div class="nav-line"></div>
+          <div class="nav-line"></div>
+        </div>
+        <div class="workspace">
+          <div class="panel-title">
+            <strong>Cadastro de Alunos</strong>
+            <span class="chip">Novo Aluno</span>
+          </div>
+          <div class="form-grid">
+            <div class="input-visual wide"></div>
+            <div class="input-visual"></div>
+            <div class="input-visual"></div>
+            <div class="input-visual"></div>
+            <div class="input-visual"></div>
+          </div>
+          <div class="table">
+            <div class="row"><strong>Aluno</strong><span>Status</span><span>Mensalidade</span></div>
+            <div class="row"><span>Ana Silva</span><span class="status-ok">Ativo</span><span>Em dia</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 4 - Exemplo de tela de cadastro com pesquisa, formulário e informações do aluno.</div>
+    </div>
+
+    <div class="two-col">
+      <div class="section-card">
+        <h3>Alunos</h3>
+        <ul>
+          <li>Pesquise por código, nome ou CPF.</li>
+          <li>Use Novo Aluno para cadastrar nome, CPF, e-mail, telefone, modalidade, graduação e rede social.</li>
+          <li>Abra o cadastro para editar endereço, contato, graduação, nascimento e observações.</li>
+          <li>Acompanhe status do aluno e status da mensalidade.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Matrículas</h3>
+        <ul>
+          <li>Crie uma nova matrícula vinculando aluno, plano, forma de pagamento e data de início.</li>
+          <li>Use pagamento manual quando a mensalidade já foi recebida fora do sistema.</li>
+          <li>Para PIX, gere o QR Code e copie o código quando necessário.</li>
+          <li>Para cartão, informe os dados solicitados e confirme o pagamento.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Academias</h3>
+        <ul>
+          <li>Cadastre nome, responsável, telefone, e-mail, cidade e rede social.</li>
+          <li>Envie a logo para exibição no card e no topo do sistema.</li>
+          <li>Copie o link público de cadastro de alunos quando disponível.</li>
+          <li>Ative ou inative academias conforme a necessidade.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Federações e Filiados</h3>
+        <ul>
+          <li>Cadastre federações com dados de identificação, contato, logo e integrações financeiras.</li>
+          <li>Cadastre filiados, edite informações e controle status ativo ou inativo.</li>
+          <li>Use Cobranças para criar cobranças, gerar PIX e registrar baixa quando aplicável.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>5. Cadastros Operacionais</h2>
+    <p class="intro">Além dos dados principais, a academia pode organizar professores, modalidades, turmas e treinos.</p>
+
+    <div class="two-col">
+      <div class="section-card">
+        <h3>Professores</h3>
+        <ul>
+          <li>Cadastre professores responsáveis pelas aulas.</li>
+          <li>Mantenha dados de contato atualizados.</li>
+          <li>Edite informações quando houver mudança na equipe.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Modalidades</h3>
+        <ul>
+          <li>Cadastre as modalidades oferecidas pela academia.</li>
+          <li>Use os nomes de forma padronizada para facilitar matrículas e relatórios.</li>
+          <li>Atualize ou remova modalidades que não são mais usadas, conforme a política da operação.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Turmas</h3>
+        <ul>
+          <li>Organize grupos por modalidade, professor, horário ou nível.</li>
+          <li>Revise as turmas antes de vincular alunos e treinos.</li>
+          <li>Mantenha a estrutura atualizada para facilitar a rotina da secretaria.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Treinos</h3>
+        <ul>
+          <li>Registre treinos e informações da rotina de aula.</li>
+          <li>Use o cadastro para acompanhar a organização das atividades.</li>
+          <li>Edite informações sempre que houver alteração de planejamento.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Boa prática:</strong> cadastre primeiro modalidades, professores e planos. Depois disso, a criação de matrículas e turmas fica mais rápida e consistente.
+    </div>
+  </section>
+
+  <section class="page">
+    <h2>6. Financeiro</h2>
+    <p class="intro">O módulo financeiro reúne planos, formas de pagamento, mensalidades, cobranças e fluxo de caixa.</p>
+
+    <div class="figure">
+      <div class="mock">
+        <div class="side">
+          <div class="brand">Financeiro</div>
+          <div class="nav-line active"></div>
+          <div class="nav-line active"></div>
+          <div class="nav-line"></div>
+        </div>
+        <div class="workspace">
+          <div class="panel-title">
+            <strong>Fluxo de Caixa</strong>
+            <span class="chip">Novo lançamento</span>
+          </div>
+          <div class="cards">
+            <div class="card"><span>Entradas</span><strong>R$ 8.450</strong></div>
+            <div class="card"><span>Saídas</span><strong>R$ 2.110</strong></div>
+            <div class="card"><span>Saldo</span><strong>R$ 6.340</strong></div>
+          </div>
+          <div class="mini-list">
+            <div class="mini-item"><span>Mensalidade aluno</span><strong class="status-ok">Entrada</strong></div>
+            <div class="mini-item"><span>Despesa operacional</span><strong class="status-danger">Saída</strong></div>
+            <div class="mini-item"><span>Cobrança do sistema</span><strong class="status-warn">Pendente</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 5 - Exemplo visual do financeiro com resumo de entradas, saídas e saldo.</div>
+    </div>
+
+    <h3>Planos</h3>
+    <ul>
+      <li>Cadastre o nome do plano, valor e duração em meses.</li>
+      <li>Use o status ativo/inativo para controlar planos disponíveis.</li>
+      <li>Confira quantos alunos estão vinculados a cada plano, quando essa informação estiver disponível.</li>
+    </ul>
+
+    <h3>Formas de pagamento</h3>
+    <ul>
+      <li>Cadastre o nome da forma de pagamento, quantidade de parcelas, taxa e dias para vencimento.</li>
+      <li>Essas informações são usadas nas matrículas e cobranças.</li>
+    </ul>
+
+    <h3>Mensalidades, PIX e cartão</h3>
+    <ul>
+      <li>Ao criar ou editar matrícula, selecione a forma de pagamento correta.</li>
+      <li>Para PIX, gere o QR Code, copie o código se necessário e use a verificação de pagamento quando disponível.</li>
+      <li>Para cartão, preencha número, nome no cartão, CPF, validade e CVV.</li>
+      <li>Quando um pagamento for realizado fora do sistema, use as opções de baixa ou pagamento manual, quando disponíveis para o perfil.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>7. Fluxo de Caixa e Relatórios</h2>
+    <p class="intro">Essas telas ajudam a acompanhar a saúde financeira e a situação operacional por período.</p>
+
+    <div class="figure">
+      <div class="mock">
+        <div class="side">
+          <div class="brand">Relatórios</div>
+          <div class="nav-line"></div>
+          <div class="nav-line active"></div>
+          <div class="nav-line"></div>
+        </div>
+        <div class="workspace">
+          <div class="panel-title">
+            <strong>Relatórios</strong>
+            <span class="chip">Aplicar período</span>
+          </div>
+          <div class="cards">
+            <div class="card"><span>Cadastrados</span><strong>156</strong></div>
+            <div class="card"><span>Ativos</span><strong>141</strong></div>
+            <div class="card"><span>Pendentes</span><strong>9</strong></div>
+          </div>
+          <div class="table">
+            <div class="row"><strong>Indicador</strong><span>Período</span><span>Status</span></div>
+            <div class="row"><span>Mensalidades</span><span>Mês atual</span><span class="status-warn">Atenção</span></div>
+            <div class="row"><span>Recebimentos</span><span>Mês atual</span><span class="status-ok">OK</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="figure-caption">Imagem 6 - Exemplo de relatório com indicadores filtrados por período.</div>
+    </div>
+
+    <h3>Fluxo de Caixa</h3>
+    <ul>
+      <li>Veja o total de entradas, saídas, saldo e quantidade de movimentos.</li>
+      <li>Use o filtro de academia quando o seu perfil puder visualizar mais de uma unidade.</li>
+      <li>Inclua um novo lançamento manual informando tipo, valor, data, categoria e descrição.</li>
+      <li>Revise os movimentos para identificar origem, forma de pagamento, status e data.</li>
+    </ul>
+
+    <h3>Relatórios</h3>
+    <ul>
+      <li>Informe data de início e data de fim.</li>
+      <li>Clique em Aplicar para atualizar os indicadores.</li>
+      <li>Acompanhe totais cadastrados, ativos, inativos, em dia, pendentes e em atraso.</li>
+      <li>Administradores também podem visualizar resumo de mensalidades do sistema, valores pagos e valores a receber.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>8. Usuários, Perfil e Boas Práticas</h2>
+
+    <div class="two-col">
+      <div class="section-card">
+        <h3>Usuários</h3>
+        <ul>
+          <li>Disponível para perfis administrativos.</li>
+          <li>Use para criar e manter acessos ao sistema.</li>
+          <li>Escolha o perfil correto para limitar os menus de cada usuário.</li>
+        </ul>
+      </div>
+      <div class="section-card">
+        <h3>Perfil</h3>
+        <ul>
+          <li>No canto superior direito, abra o menu do usuário.</li>
+          <li>Use Editar perfil para atualizar nome e e-mail.</li>
+          <li>Use Trocar senha para definir uma nova senha.</li>
+          <li>Clique em Sair ao finalizar o uso em computadores compartilhados.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Boas práticas de uso</h3>
+    <ul>
+      <li>Cadastre informações completas para melhorar pesquisas, relatórios e cobranças.</li>
+      <li>Revise CPF, e-mail, telefone e plano antes de salvar aluno ou matrícula.</li>
+      <li>Não reutilize logins entre pessoas diferentes.</li>
+      <li>Confira os alertas do dashboard diariamente.</li>
+      <li>Registre baixas e lançamentos financeiros no momento em que ocorrerem.</li>
+      <li>Mantenha logos e dados de contato atualizados para uma apresentação profissional.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Encerramento:</strong> este manual apresenta o uso do sistema pela perspectiva do usuário final. Para dúvidas sobre regras internas, permissões ou procedimentos da organização, consulte o responsável administrativo do Marcial ProX.
+    </div>
+
+    <p class="footer-note">Manual gerado para apresentação aos usuários finais do sistema Marcial ProX.</p>
+  </section>
+</body>
+</html>

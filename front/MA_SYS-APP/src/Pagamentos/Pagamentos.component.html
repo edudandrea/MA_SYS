@@ -6,63 +6,42 @@
 </div>
 
 <div class="pagamentos-page">
-  <div class="pagamento-grid">
+  <div class="cadastro-list">
+    <div class="list-head pagamentos-row">
+      <span>Forma</span>
+      <span>Academia</span>
+      <span>Parcelas</span>
+      <span>Taxa</span>
+      <span>Dias</span>
+      <span>Status</span>
+    </div>
+
     <div class="empty-state" *ngIf="!pagamentos || pagamentos.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhuma forma de pagamento cadastrada</p>
     </div>
 
-    <article class="pagamento-card" *ngFor="let pagamento of pagamentos">
-      <div class="card-topline">
-        <span class="entity-badge">Pagamento</span>
-      </div>
+    <button type="button" class="list-row pagamentos-row" *ngFor="let pagamento of pagamentos" (click)="editarFormaPagamento(templateNovaFormaPgto, pagamento)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ getInicial(pagamento.nome) }}</span>
+        <strong>{{ pagamento.nome }}</strong>
+      </span>
 
-      <div class="card-header-kpi">
-        <div class="avatar">
-          {{ getInicial(pagamento.nome) }}
-        </div>
-
-        <div class="title-block">
-          <div class="pagamento-title">
-            <span *ngIf="editarId !== pagamento.id">{{ pagamento.nome }}</span>
-            <input *ngIf="editarId === pagamento.id" [(ngModel)]="nome" class="edit-input" />
-          </div>
-
-          <span class="subtitle">{{ pagamento.academiaNome || (isFederacao ? 'Forma de pagamento da federação' : 'Configuração operacional da cobrança') }}</span>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-box">
-          <span class="kpi-label">Parcelas</span>
-          <strong class="kpi-value" *ngIf="editarId !== pagamento.id">{{ pagamento.parcelas }}</strong>
-          <input *ngIf="editarId === pagamento.id" [(ngModel)]="parcelas" class="edit-input" />
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-label">Taxa</span>
-          <strong class="kpi-value" *ngIf="editarId !== pagamento.id">{{ pagamento.taxa }}%</strong>
-          <input *ngIf="editarId === pagamento.id" [(ngModel)]="taxa" class="edit-input" />
-        </div>
-      </div>
-
-      <div class="detail-list">
-        <div class="detail-item">
-          <i class="fa-solid fa-calendar"></i>
-          <div>
-            <span class="detail-label">Dias para vencimento</span>
-            <strong *ngIf="editarId !== pagamento.id">{{ pagamento.dias }}</strong>
-            <input *ngIf="editarId === pagamento.id" [(ngModel)]="dias" class="edit-input" />
-          </div>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save" *ngIf="editarId !== pagamento.id" (click)="editarFormaPagamento(pagamento)">Editar</button>
-        <button class="btn-save" *ngIf="editarId === pagamento.id" (click)="salvarEdicao(pagamento)">Salvar</button>
-        <button class="btn-cancel" *ngIf="editarId === pagamento.id" (click)="cancelarEdicao()">Cancelar</button>
-      </div>
-    </article>
+      <span>{{ pagamento.academiaNome || (isFederacao ? 'Federação' : 'Configuração operacional') }}</span>
+      <span>{{ pagamento.parcelas }}</span>
+      <span>{{ pagamento.taxa }}%</span>
+      <span>{{ pagamento.dias }}</span>
+      <span>
+        <span
+          class="status clickable"
+          [class.ativo]="pagamento.ativo"
+          [class.inativo]="!pagamento.ativo"
+          (click)="$event.stopPropagation(); toggleStatus(pagamento)"
+        >
+          {{ pagamento.ativo ? 'Ativo' : 'Inativo' }}
+        </span>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -74,8 +53,8 @@
 <ng-template #templateNovaFormaPgto>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Nova forma de pagamento</h4>
-      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      <h4>{{ editarId ? 'Editar forma de pagamento' : 'Nova forma de pagamento' }}</h4>
+      <button type="button" class="btn-close" (click)="cancelarEdicao()"></button>
     </div>
 
     <div class="modal-body">
@@ -87,17 +66,25 @@
 
         <div class="form-group">
           <label>Qtd. de parcelas</label>
-          <input [(ngModel)]="parcelas" name="graduacao" />
+          <input type="number" [(ngModel)]="parcelas" name="parcelas" />
         </div>
 
         <div class="form-group">
           <label>Taxa %</label>
-          <input [(ngModel)]="taxa" name="taxa" />
+          <input type="number" [(ngModel)]="taxa" name="taxa" />
         </div>
 
         <div class="form-group">
           <label>Qtd. de dias</label>
-          <input [(ngModel)]="dias" name="dias" />
+          <input type="number" [(ngModel)]="dias" name="dias" />
+        </div>
+
+        <div class="form-group" *ngIf="editarId">
+          <label>Status</label>
+          <select [(ngModel)]="ativo" name="ativo">
+            <option [ngValue]="true">Ativo</option>
+            <option [ngValue]="false">Inativo</option>
+          </select>
         </div>
 
         <div class="form-group full" *ngIf="!isAcademia && !isFederacao">
@@ -112,8 +99,10 @@
     </div>
 
     <div class="modal-footer form-actions">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-      <button class="btn-save" (click)="cadastrarNovaFormaPgto()">Salvar forma de pagamento</button>
+      <button class="btn-cancel" (click)="cancelarEdicao()">Cancelar</button>
+      <button class="btn-save" (click)="salvarModal()">
+        {{ editarId ? 'Salvar alterações' : 'Salvar forma de pagamento' }}
+      </button>
     </div>
   </div>
 </ng-template>

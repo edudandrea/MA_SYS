@@ -1,0 +1,94 @@
+<div class="professor-page">
+  <section class="professor-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Portal do professor</span>
+      <h1>Turmas, alunos e rotina de aula em uma visao limpa.</h1>
+      <p>Selecione um professor para acompanhar as turmas cadastradas e os alunos vinculados.</p>
+    </div>
+
+    <div class="professor-picker">
+      <label>Professor</label>
+      <select [(ngModel)]="professorId">
+        <option *ngFor="let professor of professores" [ngValue]="professor.id">
+          {{ professor.nome }}
+        </option>
+      </select>
+    </div>
+  </section>
+
+  <section class="metric-grid" *ngIf="professorSelecionado">
+    <article class="metric-card">
+      <span>Professor</span>
+      <strong>{{ professorSelecionado.nome }}</strong>
+      <small>{{ professorSelecionado.graduacao || 'Graduacao nao informada' }}</small>
+    </article>
+
+    <article class="metric-card">
+      <span>Turmas ativas</span>
+      <strong>{{ totalTurmasAtivas }}</strong>
+      <small>{{ turmasDoProfessor.length }} turma(s) vinculada(s)</small>
+    </article>
+
+    <article class="metric-card">
+      <span>Alunos unicos</span>
+      <strong>{{ totalAlunos }}</strong>
+      <small>Considerando as turmas selecionadas</small>
+    </article>
+  </section>
+
+  <section class="professor-workspace">
+    <div class="workspace-toolbar">
+      <div>
+        <span class="eyebrow">Alunos e turmas</span>
+        <h2>Agenda do professor</h2>
+      </div>
+
+      <div class="input-modern search-input">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input [(ngModel)]="buscaAluno" placeholder="Buscar aluno nas turmas" />
+      </div>
+    </div>
+
+    <div class="turma-list" *ngIf="turmasDoProfessor.length; else professorSemTurmas">
+      <article class="turma-panel" *ngFor="let turma of turmasDoProfessor">
+        <div class="turma-header">
+          <div>
+            <span class="status-pill" [class.inactive]="!turma.ativo">
+              {{ turma.ativo ? 'Ativa' : 'Inativa' }}
+            </span>
+            <h3>{{ turma.nome }}</h3>
+            <p>{{ turma.descricao || 'Sem descricao informada.' }}</p>
+          </div>
+
+          <div class="turma-count">
+            <strong>{{ turma.alunos.length }}</strong>
+            <span>aluno(s)</span>
+          </div>
+        </div>
+
+        <div class="turma-schedule">
+          <i class="fa-solid fa-calendar-week"></i>
+          <span>{{ nomesDias(turma) }}</span>
+        </div>
+
+        <div class="student-table" *ngIf="turma.alunos.length; else turmaSemAlunos">
+          <div class="student-row" *ngFor="let aluno of turma.alunos">
+            <div class="student-avatar">{{ aluno.nome.charAt(0) }}</div>
+            <span>{{ aluno.nome }}</span>
+          </div>
+        </div>
+
+        <ng-template #turmaSemAlunos>
+          <div class="empty-line">Nenhum aluno encontrado nesta turma.</div>
+        </ng-template>
+      </article>
+    </div>
+
+    <ng-template #professorSemTurmas>
+      <div class="empty-state">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <p>Nenhuma turma vinculada a este professor</p>
+      </div>
+    </ng-template>
+  </section>
+</div>

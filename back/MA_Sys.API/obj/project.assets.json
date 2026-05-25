@@ -3922,9 +3922,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Dev\\MA_SYS\\back\\ma_sys.api\\MA_Sys.API.csproj",
-      "projectName": "MA_Sys.API",
-      "projectPath": "D:\\Dev\\MA_SYS\\back\\ma_sys.api\\MA_Sys.API.csproj",
+      "projectUniqueName": "D:\\Dev\\MA_SYS\\back\\ma_sys.api\\ma_sys.api.csproj",
+      "projectName": "ma_sys.api",
+      "projectPath": "D:\\Dev\\MA_SYS\\back\\ma_sys.api\\ma_sys.api.csproj",
       "packagesPath": "C:\\Users\\Eduardo\\.nuget\\packages\\",
       "outputPath": "D:\\Dev\\MA_SYS\\back\\ma_sys.api\\obj\\",
       "projectStyle": "PackageReference",
@@ -3953,7 +3953,7 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net10.0": {
@@ -4009,7 +4009,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

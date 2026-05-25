@@ -99,6 +99,11 @@
           <span>Professores</span>
         </a>
 
+        <a *ngIf="canViewCadastrosAcademia()" routerLink="/portal-professor" routerLinkActive="active">
+          <i class="fa-solid fa-clipboard-user"></i>
+          <span>Portal do Professor</span>
+        </a>
+
         <a *ngIf="canViewCadastrosAcademia()" routerLink="/modalidades" routerLinkActive="active">
           <i class="fa-solid fa-dumbbell"></i>
           <span>Modalidades</span>

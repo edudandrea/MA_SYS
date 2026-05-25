@@ -30,6 +30,7 @@ export class MensalidadesSistemaComponent implements OnInit {
   aceitaCartao = true;
   mercadoPagoPublicKey = '';
   mercadoPagoAccessToken = '';
+  mensalidadeSelecionada: MensalidadeSistema | null = null;
 
   constructor(
     private mensalidadesService: MensalidadesSistemaService,
@@ -133,7 +134,8 @@ export class MensalidadesSistemaComponent implements OnInit {
     });
   }
 
-  editarMensalidade(mensalidade: MensalidadeSistema) {
+  editarMensalidade(template: TemplateRef<any>, mensalidade: MensalidadeSistema) {
+    this.mensalidadeSelecionada = mensalidade;
     this.editarId = mensalidade.id;
     this.valor = mensalidade.valor;
     this.prazoPagamentoDias = mensalidade.prazoPagamentoDias;
@@ -144,6 +146,9 @@ export class MensalidadesSistemaComponent implements OnInit {
     this.aceitaCartao = mensalidade.aceitaCartao;
     this.mercadoPagoPublicKey = mensalidade.mercadoPagoPublicKey || '';
     this.mercadoPagoAccessToken = '';
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-md modal-dialog-centered',
+    });
   }
 
   salvarEdicao(mensalidade: MensalidadeSistema) {
@@ -173,6 +178,9 @@ export class MensalidadesSistemaComponent implements OnInit {
         mensalidade.aceitaCartao = this.aceitaCartao;
         mensalidade.mercadoPagoPublicKey = this.mercadoPagoPublicKey;
         this.editarId = null;
+        this.mensalidadeSelecionada = null;
+        this.modalRef?.hide();
+        this.resetForm();
         this.toastr.success('Mensalidade atualizada com sucesso.');
         this.carregarMensalidades();
       },
@@ -184,7 +192,18 @@ export class MensalidadesSistemaComponent implements OnInit {
 
   cancelarEdicao() {
     this.editarId = null;
+    this.mensalidadeSelecionada = null;
+    this.modalRef?.hide();
     this.resetForm();
+  }
+
+  salvarModal() {
+    if (this.editarId && this.mensalidadeSelecionada) {
+      this.salvarEdicao(this.mensalidadeSelecionada);
+      return;
+    }
+
+    this.criarMensalidade();
   }
 
   formatarValor(valor: number): string {
@@ -242,5 +261,6 @@ export class MensalidadesSistemaComponent implements OnInit {
     this.aceitaCartao = true;
     this.mercadoPagoPublicKey = '';
     this.mercadoPagoAccessToken = '';
+    this.mensalidadeSelecionada = null;
   }
 }

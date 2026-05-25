@@ -90,8 +90,24 @@ namespace MA_Sys.API.Controllers
                 mensalidadeStatus,
                 dataVencimentoMensalidade = dataReferencia.ToString("yyyy-MM-dd"),
                 diasParaVencimento,
-                alertaVencimento
+                alertaVencimento,
+                aulas = _service.ListarTurmasPublicasDoAluno(matricula.Aluno.Id, academiaId)
             });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("public/{slug}/check-in")]
+        public IActionResult RealizarCheckInPublico(string slug, [FromBody] AlunoCheckInPublicoDto dto)
+        {
+            try
+            {
+                var academiaId = ObterAcademiaIdPeloSlug(slug);
+                return Ok(_service.RealizarCheckInPublico(dto.Cpf, dto.Email, dto.TurmaId, academiaId));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPost]

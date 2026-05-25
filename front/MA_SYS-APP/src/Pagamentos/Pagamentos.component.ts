@@ -28,6 +28,7 @@ export class PagamentosComponent implements OnInit {
   academias: Academias[] = [];
   academiaId = 0;
   role = '';
+  pagamentoSelecionado: Pagamentos | null = null;
 
   novoFormaPgto = {
     nome: '',
@@ -157,6 +158,7 @@ export class PagamentosComponent implements OnInit {
   // ---------- MODAL NOVA FORMA DE PAGAMENTO ----------
 
   openModalNovoPgto(template: TemplateRef<any>) {
+    this.resetForm();
     this.modalRef = this.modalService.show(template, {
       class: 'modal-md modal-dialog-centered',
     });
@@ -224,7 +226,7 @@ export class PagamentosComponent implements OnInit {
         this.spinner.hide();
         this.toastr.success('Forma de pagamento cadastrada!', 'Sucesso');
 
-        this.novoFormaPgto.nome = '';
+        this.resetForm();
 
         this.modalRef?.hide();
         this.carregarFormaPgtos();
@@ -239,17 +241,26 @@ export class PagamentosComponent implements OnInit {
 
   // ---------- PUT ----------
 
-  editarFormaPagamento(pg: Pagamentos) {
+  editarFormaPagamento(template: TemplateRef<any>, pg: Pagamentos) {
+    this.pagamentoSelecionado = pg;
     this.editarId = pg.id;
     this.nome = pg.nome;
     this.taxa = pg.taxa;
     this.parcelas = pg.parcelas;
     this.dias = pg.dias;
+    this.ativo = pg.ativo;
+    this.academiaId = pg.academiaId || this.academiaId;
     pg.menuAberto = false;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-md modal-dialog-centered',
+    });
   }
 
   cancelarEdicao() {
     this.editarId = null;
+    this.pagamentoSelecionado = null;
+    this.resetForm();
+    this.modalRef?.hide();
     this.pagamentos.forEach(p => p.menuAberto = false);
   }
 
@@ -260,18 +271,54 @@ export class PagamentosComponent implements OnInit {
      taxa: this.taxa,
      parcelas: this.parcelas,
      dias: this.dias,
+     ativo: this.ativo,
     };
 
     this.pgService.atualizarFormaPagamento(payload).subscribe({
       next: () => {
         pg.nome = this.nome;
+        pg.taxa = this.taxa;
+        pg.parcelas = this.parcelas;
+        pg.dias = this.dias;
+        pg.ativo = this.ativo;
 
         this.editarId = null;
+        this.pagamentoSelecionado = null;
+        this.modalRef?.hide();
+        this.resetForm();
 
         this.carregarFormaPgtos();
 
         this.toastr.success('Forma de pagamento atualizada');
       },
     });
+  }
+
+  salvarModal() {
+    if (this.editarId && this.pagamentoSelecionado) {
+      this.salvarEdicao(this.pagamentoSelecionado);
+      return;
+    }
+
+    this.cadastrarNovaFormaPgto();
+  }
+
+  private resetForm() {
+    this.nome = '';
+    this.ativo = true;
+    this.taxa = 0;
+    this.parcelas = 0;
+    this.dias = 0;
+    this.pixPayload = '';
+    this.valor = 0;
+    this.editarId = null;
+    this.pagamentoSelecionado = null;
+    this.novoFormaPgto = {
+      nome: '',
+      ativo: true,
+      taxa: 0,
+      parcelas: 0,
+      dias: 0,
+    };
   }
 }

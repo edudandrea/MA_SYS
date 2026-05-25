@@ -46,23 +46,137 @@
 }
 
 .page-tabs {
-  background: color-mix(in srgb, var(--bg-panel-strong) 92%, transparent);
-  border-color: var(--border-color);
+  position: relative;
+  gap: 2px;
+  padding: 0 10px;
+  margin-bottom: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .page-tab {
+  position: relative;
+  min-height: 48px;
+  padding: 11px 18px;
+  border: 1px solid var(--border-color);
+  border-bottom-color: transparent;
+  border-radius: 12px 12px 0 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-panel-strong) 92%, transparent), color-mix(in srgb, var(--bg-panel) 96%, transparent));
   color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0;
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .page-tab.active {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
-  color: #ffffff;
-  box-shadow: 0 10px 20px var(--accent-shadow);
+  color: var(--text-primary);
+  background: var(--bg-panel);
+  border-color: var(--accent-border-soft);
+  border-bottom-color: var(--bg-panel);
+  z-index: 2;
+  box-shadow:
+    inset 0 3px 0 var(--accent-primary),
+    0 -8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.page-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 3px;
+  background: var(--bg-panel);
 }
 
 .page-tab:hover:not(.active) {
-  background: var(--accent-surface);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-surface) 45%, var(--bg-panel-strong)), var(--bg-panel));
+  border-color: var(--accent-border-soft);
   color: var(--text-primary);
+}
+
+.page-tab i {
+  color: var(--accent-text);
+}
+
+.page-tab.active i {
+  color: var(--accent-primary);
+}
+
+.aluno-card {
+  border-top-left-radius: 0;
+  margin-top: -1px;
+}
+
+.aluno-search-header {
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.aluno-search-header h2 {
+  margin: 4px 0 6px;
+}
+
+.aluno-search-header p {
+  margin: 0;
+  max-width: 720px;
+  color: var(--text-secondary);
+}
+
+.search-eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: var(--accent-surface);
+  border: 1px solid var(--accent-border-soft);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.aluno-search-panel {
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.aluno-search-panel .input-group label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.aluno-search-panel .input-modern input {
+  min-height: 50px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.aluno-search-panel .actions-row {
+  margin-top: 6px;
+  justify-content: flex-end;
+}
+
+.aluno-search-panel .btn-cancel,
+.aluno-search-panel .btn-save {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
 }
 
 .aluno-card label {
@@ -134,9 +248,123 @@
   grid-template-columns: 1fr;
 }
 
+.alunos-list {
+  margin-top: 22px;
+}
+
+.cadastro-list {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-panel-strong) 96%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.list-head,
+.list-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.35fr) 150px minmax(190px, 1fr) minmax(160px, 0.9fr) 110px;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.list-head {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.list-row {
+  width: 100%;
+  min-height: 76px;
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.list-row:last-child {
+  border-bottom: 0;
+}
+
+.list-row:hover {
+  transform: none;
+  background: var(--accent-surface);
+}
+
+.entity-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.entity-cell strong,
+.line-value {
+  color: var(--text-primary);
+}
+
+.entity-cell small,
+.list-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+}
+
+.avatar.small {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-strong));
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 800;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.status {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status.ativo {
+  background: rgba(22, 163, 74, 0.14);
+  color: #22c55e;
+}
+
+.status.inativo {
+  background: rgba(220, 38, 38, 0.14);
+  color: #ef4444;
+}
+
 @media (max-width: 640px) {
   .aluno-modal-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .list-head {
+    display: none;
+  }
+
+  .list-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 16px;
   }
 }
 .mensalidade-paga {

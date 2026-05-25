@@ -89,6 +89,8 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
   dataVencimentoMensalidade: string = '';
   diasParaVencimento: number = 0;
   alertaVencimento: boolean = false;
+  aulasDisponiveis: any[] = [];
+  checkInEmAndamentoId: number | null = null;
 
   constructor(
     private modalService: BsModalService,
@@ -184,6 +186,10 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
         this.dataVencimentoMensalidade = res.dataVencimentoMensalidade || '';
         this.diasParaVencimento = Number(res.diasParaVencimento ?? 0);
         this.alertaVencimento = !!res.alertaVencimento;
+        this.aulasDisponiveis = (res.aulas || []).map((aula: any) => ({
+          ...aula,
+          diasSemanaLista: this.normalizarDiasSemana(aula.diasSemana),
+        }));
         this.alunoEncontrado = true;
         this.formaPagamentoId = 0;
         this.formaPagamentoSelecionada = null;
@@ -199,6 +205,29 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
         } else {
           this.toastr.error('Erro ao buscar aluno.');
         }
+      },
+    });
+  }
+
+  realizarCheckIn(aula: any) {
+    if (!aula?.turmaId || aula.checkInHoje) {
+      return;
+    }
+
+    this.checkInEmAndamentoId = aula.turmaId;
+    this.cadastroAlunosService.realizarCheckIn(this.cpfBusca || this.cpf, this.emailBusca || this.email, aula.turmaId).subscribe({
+      next: (res: any) => {
+        aula.checkInHoje = true;
+        aula.checkInId = res?.checkInId;
+        aula.dataCheckIn = res?.dataCheckIn;
+        this.checkInEmAndamentoId = null;
+        this.toastr.success(res?.jaRegistrado ? 'Check-in ja registrado para hoje.' : 'Check-in realizado com sucesso.');
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        this.checkInEmAndamentoId = null;
+        this.toastr.error(err?.error?.message || 'Nao foi possivel realizar o check-in.');
+        this.cd.detectChanges();
       },
     });
   }
@@ -590,5 +619,16 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
+  }
+
+  private normalizarDiasSemana(valor: any): string[] {
+    if (Array.isArray(valor)) {
+      return valor;
+    }
+
+    return String(valor || '')
+      .split(',')
+      .map((dia) => dia.trim())
+      .filter(Boolean);
   }
 }

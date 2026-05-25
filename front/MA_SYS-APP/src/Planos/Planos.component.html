@@ -1,75 +1,45 @@
 <div class="page-header">
   <div class="page-title-group">
     <h1>Planos</h1>
-    <p>Compare valor, duração e adesão dos planos com leitura rápida de negócio.</p>
+    <p>Compare valor, duração e adesão dos planos em uma lista objetiva.</p>
   </div>
 </div>
 
 <div class="planos-page">
-  <div class="plano-grid">
+  <div class="cadastro-list">
+    <div class="list-head planos-row">
+      <span>Plano</span>
+      <span>Academia</span>
+      <span>Valor</span>
+      <span>Duração</span>
+      <span>Status</span>
+    </div>
+
     <div class="empty-state" *ngIf="!planos || planos.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhum plano cadastrado</p>
     </div>
 
-    <article class="plano-card" *ngFor="let plano of planos">
-      <div class="card-topline">
-        <span class="entity-badge">Plano</span>
+    <button type="button" class="list-row planos-row" *ngFor="let plano of planos" (click)="editarPlano(templateNovoPlano, plano)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ getInicial(plano.nome) }}</span>
+        <strong>{{ plano.nome }}</strong>
+      </span>
+
+      <span>{{ plano.academiaNome || (isFederacao ? 'Plano da federação' : 'Academia não informada') }}</span>
+      <span class="money">{{ plano.valor | currency:'BRL' }}</span>
+      <span>{{ plano.duracaoMeses }} meses</span>
+      <span>
         <span
           class="status clickable"
           [class.ativo]="plano.ativo"
           [class.inativo]="!plano.ativo"
-          (click)="toggleStatus(plano)"
+          (click)="$event.stopPropagation(); toggleStatus(plano)"
         >
           {{ plano.ativo ? 'Ativo' : 'Inativo' }}
         </span>
-      </div>
-
-      <div class="card-header-kpi">
-        <div class="avatar">
-          {{ getInicial(plano.nome) }}
-        </div>
-
-        <div class="title-block">
-          <div class="plano-title">
-            <span *ngIf="editarId !== plano.id">{{ plano.nome }}</span>
-            <input *ngIf="editarId === plano.id" [(ngModel)]="nome" class="edit-input" />
-          </div>
-
-          <span class="subtitle">{{ plano.academiaNome || (isFederacao ? 'Plano da federação' : 'Academia não informada') }}</span>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-box price-box">
-          <span class="kpi-label">Valor</span>
-          <strong class="kpi-value" *ngIf="editarId !== plano.id">{{ plano.valor }}</strong>
-          <input *ngIf="editarId === plano.id" [(ngModel)]="valor" class="edit-input" />
-        </div>
-
-        <div class="kpi-box">
-          <span class="kpi-label">Duração</span>
-          <strong class="kpi-value" *ngIf="editarId !== plano.id">{{ plano.duracaoMeses }} meses</strong>
-          <input *ngIf="editarId === plano.id" [(ngModel)]="duracaoMeses" class="edit-input" />
-        </div>
-      </div>
-
-      <div class="detail-list" *ngIf="!isFederacao">
-        <div class="detail-item">
-          <i class="fa-solid fa-users"></i>
-          <div>
-            <span class="detail-label">Alunos vinculados</span>
-            <strong>{{ plano.totalAlunos || 0 }}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save" *ngIf="editarId !== plano.id" (click)="editarPlano(plano)">Editar</button>
-        <button class="btn-save" *ngIf="editarId === plano.id" (click)="salvarEdicao(plano)">Salvar</button>
-        <button class="btn-cancel" *ngIf="editarId === plano.id" (click)="cancelarEdicao()">Cancelar</button>
-      </div>
-    </article>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -81,8 +51,8 @@
 <ng-template #templateNovoPlano>
   <div class="modal-content">
     <div class="modal-header">
-      <h4>Novo Plano</h4>
-      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+      <h4>{{ editarId ? 'Editar Plano' : 'Novo Plano' }}</h4>
+      <button type="button" class="btn-close" (click)="cancelarEdicao()"></button>
     </div>
 
     <div class="modal-body">
@@ -94,12 +64,12 @@
 
         <div class="form-group">
           <label>Valor</label>
-          <input [(ngModel)]="valor" name="valor" />
+          <input type="number" [(ngModel)]="valor" name="valor" />
         </div>
 
         <div class="form-group">
           <label>Duração (meses)</label>
-          <input [(ngModel)]="duracaoMeses" name="duracaoMeses" />
+          <input type="number" [(ngModel)]="duracaoMeses" name="duracaoMeses" />
         </div>
 
         <div class="form-group full" *ngIf="!isAcademia && !isFederacao">
@@ -114,8 +84,10 @@
     </div>
 
     <div class="modal-footer form-actions">
-      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-      <button class="btn-save" (click)="novoPlano()">Salvar Plano</button>
+      <button class="btn-cancel" (click)="cancelarEdicao()">Cancelar</button>
+      <button class="btn-save" (click)="salvarModal()">
+        {{ editarId ? 'Salvar alterações' : 'Salvar Plano' }}
+      </button>
     </div>
   </div>
 </ng-template>

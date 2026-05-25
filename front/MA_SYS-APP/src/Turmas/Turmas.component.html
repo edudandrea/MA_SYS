@@ -5,46 +5,48 @@
   </div>
 </div>
 
-<div class="surface-card">
-  <div class="surface-header">
-    <h2>Turmas cadastradas</h2>
-  </div>
+<div class="turmas-page">
+  <div class="cadastro-list">
+    <div class="list-head turmas-row">
+      <span>Turma</span>
+      <span>Professor</span>
+      <span>Dias</span>
+      <span>Alunos</span>
+      <span>Status</span>
+      <span></span>
+    </div>
 
-  <div class="turma-grid" *ngIf="turmas.length; else emptyState">
-    <article class="turma-card" *ngFor="let turma of turmas">
-      <div class="card-top">
-        <strong>{{ turma.nome }}</strong>
-        <span class="status" [class.inativo]="!turma.ativo">{{ turma.ativo ? 'Ativa' : 'Inativa' }}</span>
-      </div>
-
-      <p>{{ turma.descricao || 'Sem descricao informada.' }}</p>
-
-      <div class="teacher-row">
-        <i class="fa-solid fa-chalkboard-user"></i>
-        <span>{{ turma.professorNome || 'Professor nao vinculado' }}</span>
-      </div>
-
-      <div class="chip-row">
-        <span class="chip" *ngFor="let dia of turma.diasSemana">{{ dia }}</span>
-      </div>
-
-      <div class="alunos-row">
-        {{ nomesAlunos(turma) }}
-      </div>
-
-      <div class="card-actions">
-        <button class="btn-save small" (click)="abrirModal(templateTurma, turma)">Editar</button>
-        <button class="btn-cancel btn-danger small" (click)="abrirModalExclusao(templateExcluirTurma, turma)">Excluir</button>
-      </div>
-    </article>
-  </div>
-
-  <ng-template #emptyState>
-    <div class="empty-state">
+    <div class="empty-state" *ngIf="!turmas.length">
       <i class="fa-solid fa-calendar-week"></i>
       <p>Nenhuma turma cadastrada</p>
     </div>
-  </ng-template>
+
+    <button type="button" class="list-row turmas-row" *ngFor="let turma of turmas" (click)="abrirModal(templateTurma, turma)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ turma.nome.charAt(0) }}</span>
+        <span>
+          <strong>{{ turma.nome }}</strong>
+          <small>{{ turma.descricao || 'Sem descrição informada' }}</small>
+        </span>
+      </span>
+
+      <span>{{ turma.professorNome || 'Professor não vinculado' }}</span>
+      <span class="chip-row">
+        <span class="chip" *ngFor="let dia of turma.diasSemana">{{ dia }}</span>
+      </span>
+      <span>{{ turma.alunos.length }}</span>
+      <span>
+        <span class="status" [class.inativo]="!turma.ativo">
+          {{ turma.ativo ? 'Ativa' : 'Inativa' }}
+        </span>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="icon-action danger" title="Excluir" (click)="$event.stopPropagation(); abrirModalExclusao(templateExcluirTurma, turma)">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </span>
+    </button>
+  </div>
 </div>
 
 <button class="floating-add" (click)="abrirModal(templateTurma)">
@@ -66,7 +68,7 @@
       </div>
 
       <div class="form-group full">
-        <label>Descricao</label>
+        <label>Descrição</label>
         <textarea rows="3" [(ngModel)]="form.descricao"></textarea>
       </div>
 
@@ -127,14 +129,14 @@
       <div class="modal-warning-box">
         <strong>{{ turmaParaExcluir?.nome || 'Turma selecionada' }}</strong>
         <p>
-          Esta acao removera a turma e os vinculos com os alunos cadastrados nela. Deseja continuar?
+          Esta ação removerá a turma e os vínculos com os alunos cadastrados nela. Deseja continuar?
         </p>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
-      <button class="btn-save btn-danger" (click)="excluirTurma()">Confirmar exclusao</button>
+      <button class="btn-save btn-danger" (click)="excluirTurma()">Confirmar exclusão</button>
     </div>
   </div>
 </ng-template>
