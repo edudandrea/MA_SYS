@@ -565,3 +565,11 @@ D:\Dev\MA_SYS\artifacts\api-build-verify-federacao-fluxo-manual\MA_Sys.API.deps.
 D:\Dev\MA_SYS\artifacts\api-build-verify-federacao-fluxo-manual\MA_Sys.API.runtimeconfig.json
 D:\Dev\MA_SYS\artifacts\api-build-verify-federacao-fluxo-manual\MA_Sys.API.dll
 D:\Dev\MA_SYS\artifacts\api-build-verify-federacao-fluxo-manual\MA_Sys.API.pdb
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\appsettings.Development.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\appsettings.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.staticwebassets.runtime.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.staticwebassets.endpoints.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.deps.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.runtimeconfig.json
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.dll
+D:\Dev\MA_SYS\artifacts\api-build-verify-fluxo-filtros\MA_Sys.API.pdb

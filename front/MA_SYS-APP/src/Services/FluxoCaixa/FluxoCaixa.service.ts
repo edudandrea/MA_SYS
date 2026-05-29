@@ -16,6 +16,7 @@ export interface FluxoCaixaMovimento {
   categoria: string;
   descricao: string;
   academiaNome: string;
+  alunoNome?: string;
   valor: number;
   data: string;
   status: string;
@@ -27,6 +28,15 @@ export interface FluxoCaixaResponse {
   movimentos: FluxoCaixaMovimento[];
 }
 
+export interface FluxoCaixaFiltro {
+  academiaId?: number | null;
+  dataInicio?: string;
+  dataFim?: string;
+  status?: string;
+  formaPagamento?: string;
+  descricao?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -35,10 +45,25 @@ export class FluxoCaixaService {
 
   constructor(private http: HttpClient) {}
 
-  listar(academiaId?: number): Observable<FluxoCaixaResponse> {
+  listar(filtro?: FluxoCaixaFiltro): Observable<FluxoCaixaResponse> {
     let params = new HttpParams();
-    if (academiaId) {
-      params = params.set('academiaId', academiaId);
+    if (filtro?.academiaId) {
+      params = params.set('academiaId', filtro.academiaId);
+    }
+    if (filtro?.dataInicio) {
+      params = params.set('dataInicio', filtro.dataInicio);
+    }
+    if (filtro?.dataFim) {
+      params = params.set('dataFim', filtro.dataFim);
+    }
+    if (filtro?.status) {
+      params = params.set('status', filtro.status);
+    }
+    if (filtro?.formaPagamento) {
+      params = params.set('formaPagamento', filtro.formaPagamento);
+    }
+    if (filtro?.descricao) {
+      params = params.set('descricao', filtro.descricao);
     }
 
     return this.http.get<FluxoCaixaResponse>(this.apiUrl, { params });

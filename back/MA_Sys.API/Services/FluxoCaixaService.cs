@@ -70,7 +70,7 @@ namespace MA_Sys.API.Services
                     })
                 .ToList());
 
-            movimentos.AddRange(_pagamentoRepo.Query()
+            var pagamentosAlunos = _pagamentoRepo.Query()
                 .Where(p => academiaIds.Contains(p.AcademiaId) &&
                             p.Status == "Pago" &&
                             p.DataPagamento >= dataInicio &&
@@ -80,16 +80,42 @@ namespace MA_Sys.API.Services
                     academias,
                     p => p.AcademiaId,
                     a => a.Id,
-                    (p, a) => new FluxoCaixaMovimentoDto
+                    (p, a) => new { Pagamento = p, AcademiaNome = a.Nome })
+                .ToList();
+
+            var alunoIds = pagamentosAlunos
+                .Select(x => x.Pagamento.AlunoId)
+                .Distinct()
+                .ToList();
+
+            var alunosPorId = _context.Alunos
+                .Where(a => alunoIds.Contains(a.Id))
+                .Select(a => new { a.Id, a.Nome })
+                .ToDictionary(a => a.Id, a => a.Nome);
+
+            var formaPagamentoIds = pagamentosAlunos
+                .Select(x => x.Pagamento.FormaPagamentoId)
+                .Distinct()
+                .ToList();
+
+            var formasPagamentoPorId = _context.FormaPagamentos
+                .Where(f => formaPagamentoIds.Contains(f.Id))
+                .Select(f => new { f.Id, f.Nome })
+                .ToDictionary(f => f.Id, f => f.Nome);
+
+            movimentos.AddRange(pagamentosAlunos
+                .Select(x => new FluxoCaixaMovimentoDto
                     {
                         Tipo = "Entrada",
                         Origem = "Mensalidade",
                         Categoria = "Aluno",
-                        Descricao = $"Pagamento de aluno #{p.AlunoId}",
-                        AcademiaNome = a.Nome,
-                        Valor = p.Valor,
-                        Data = p.DataPagamento,
-                        Status = p.Status
+                        Descricao = $"Pagamento de aluno #{x.Pagamento.AlunoId}",
+                        AcademiaNome = x.AcademiaNome,
+                        AlunoNome = alunosPorId.GetValueOrDefault(x.Pagamento.AlunoId),
+                        Valor = x.Pagamento.Valor,
+                        Data = x.Pagamento.DataPagamento,
+                        Status = x.Pagamento.Status,
+                        FormaPagamentoNome = formasPagamentoPorId.GetValueOrDefault(x.Pagamento.FormaPagamentoId)
                     })
                 .ToList());
 
@@ -120,7 +146,7 @@ namespace MA_Sys.API.Services
                 FormaPagamentoNome = ExtrairFormaPagamentoNome(x.Pagamento.Descricao),
             }));
 
-            movimentos = movimentos
+            movimentos = AplicarFiltrosComplementares(movimentos, filtro)
                 .OrderByDescending(m => m.Data)
                 .ToList();
 
@@ -266,7 +292,7 @@ namespace MA_Sys.API.Services
                 })
                 .ToList());
 
-            movimentos = movimentos
+            movimentos = AplicarFiltrosComplementares(movimentos, filtro)
                 .OrderByDescending(m => m.Data)
                 .ToList();
 
@@ -351,6 +377,39 @@ namespace MA_Sys.API.Services
                 return null;
 
             return descricao[inicio..fim].Trim();
+        }
+
+        private static IEnumerable<FluxoCaixaMovimentoDto> AplicarFiltrosComplementares(
+            IEnumerable<FluxoCaixaMovimentoDto> movimentos,
+            FluxoCaixaFiltroDto filtro)
+        {
+            if (!string.IsNullOrWhiteSpace(filtro.Status))
+            {
+                var status = filtro.Status.Trim();
+                movimentos = movimentos.Where(m =>
+                    string.Equals(m.Status, status, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filtro.FormaPagamento))
+            {
+                var formaPagamento = filtro.FormaPagamento.Trim();
+                movimentos = movimentos.Where(m =>
+                    (m.FormaPagamentoNome ?? string.Empty)
+                        .Contains(formaPagamento, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filtro.Descricao))
+            {
+                var descricao = filtro.Descricao.Trim();
+                movimentos = movimentos.Where(m =>
+                    m.Descricao.Contains(descricao, StringComparison.OrdinalIgnoreCase) ||
+                    (m.AlunoNome ?? string.Empty).Contains(descricao, StringComparison.OrdinalIgnoreCase) ||
+                    (m.AcademiaNome ?? string.Empty).Contains(descricao, StringComparison.OrdinalIgnoreCase) ||
+                    (m.Categoria ?? string.Empty).Contains(descricao, StringComparison.OrdinalIgnoreCase) ||
+                    (m.Origem ?? string.Empty).Contains(descricao, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return movimentos;
         }
     }
 }

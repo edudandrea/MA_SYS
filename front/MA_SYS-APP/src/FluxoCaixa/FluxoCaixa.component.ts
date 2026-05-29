@@ -10,6 +10,7 @@ import {
   FluxoCaixaResponse,
   FluxoCaixaService,
 } from '../Services/FluxoCaixa/FluxoCaixa.service';
+import { Pagamentos, PagamentosService } from '../Services/PagamentosService/Pagamentos.service';
 
 @Component({
   selector: 'app-FluxoCaixa',
@@ -29,6 +30,15 @@ export class FluxoCaixaComponent implements OnInit {
     totalMovimentos: 0,
   };
   movimentos: FluxoCaixaMovimento[] = [];
+  formasPagamento: Pagamentos[] = [];
+
+  filtros = {
+    dataInicio: '',
+    dataFim: '',
+    status: '',
+    formaPagamento: '',
+    descricao: '',
+  };
 
   novoLancamento = {
     academiaId: null as number | null,
@@ -46,6 +56,7 @@ export class FluxoCaixaComponent implements OnInit {
     private toastr: ToastrService,
     private cd: ChangeDetectorRef,
     private modalService: BsModalService,
+    private pagamentosService: PagamentosService,
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +70,7 @@ export class FluxoCaixaComponent implements OnInit {
     }
 
     this.carregarFluxo();
+    this.carregarFormasPagamento();
   }
 
   get isAcademia(): boolean {
@@ -93,7 +105,14 @@ export class FluxoCaixaComponent implements OnInit {
 
   carregarFluxo() {
     this.spinner.show();
-    this.fluxoCaixaService.listar(this.academiaIdSelecionada ?? undefined).subscribe({
+    this.fluxoCaixaService.listar({
+      academiaId: this.academiaIdSelecionada,
+      dataInicio: this.filtros.dataInicio,
+      dataFim: this.filtros.dataFim,
+      status: this.filtros.status,
+      formaPagamento: this.filtros.formaPagamento,
+      descricao: this.filtros.descricao,
+    }).subscribe({
       next: (res) => {
         this.resumo = res.resumo;
         this.movimentos = res.movimentos;
@@ -105,6 +124,29 @@ export class FluxoCaixaComponent implements OnInit {
         this.toastr.error('Erro ao carregar o fluxo de caixa.');
       },
     });
+  }
+
+  carregarFormasPagamento() {
+    this.pagamentosService.getFormaPagamentos().subscribe({
+      next: (res) => {
+        this.formasPagamento = res ?? [];
+        this.cd.markForCheck();
+      },
+      error: () => {
+        this.formasPagamento = [];
+      },
+    });
+  }
+
+  limparFiltros() {
+    this.filtros = {
+      dataInicio: '',
+      dataFim: '',
+      status: '',
+      formaPagamento: '',
+      descricao: '',
+    };
+    this.carregarFluxo();
   }
 
   salvarLancamento() {

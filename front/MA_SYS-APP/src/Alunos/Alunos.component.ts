@@ -9,6 +9,8 @@ import { ElementRef, ViewChild } from '@angular/core';
 import { Modalidades, ModalidadesService } from '../Services/ModalidadeService/Modalidades.service';
 import { Academias, AcademiasService } from '../Services/AcademiaService/Academias.service';
 import { Planos, PlanosService } from '../Services/Planos/Planos.service';
+import { MatriculasService } from '../Services/MatriculasService/Matriculas.service';
+import { Pagamentos, PagamentosService } from '../Services/PagamentosService/Pagamentos.service';
 
 export enum TabsCadastroAluno {
   Pesquisa = 'PESQUISA',
@@ -25,6 +27,8 @@ export enum TabsCadastroAluno {
 export class AlunosComponent implements OnInit {
   modalRef?: BsModalRef;
   @ViewChild('inputNomeModal') inputNomeModal!: ElementRef;
+  @ViewChild('templateConfirmarMatricula') templateConfirmarMatricula!: TemplateRef<any>;
+  @ViewChild('templateNovaMatriculaAluno') templateNovaMatriculaAluno!: TemplateRef<any>;
 
   activeTab: TabsCadastroAluno = TabsCadastroAluno.Pesquisa;
   idAluno: number = 0;
@@ -45,6 +49,7 @@ export class AlunosComponent implements OnInit {
   dataCadastro: string = '';
   modalidades: Modalidades[] = [];
   planos: Planos[] = [];
+  formasPagamento: Pagamentos[] = [];
   redeSocial: string = '';
   ativo: boolean = true;
   obs: string = '';
@@ -58,6 +63,7 @@ export class AlunosComponent implements OnInit {
 
   filtroAlunos = { }as any;
   novoAlunoForm = this.createNovoAlunoForm();
+  novaMatriculaForm = this.createNovaMatriculaForm();
 
   tabs = [
     {
@@ -78,6 +84,7 @@ export class AlunosComponent implements OnInit {
   alunosResultado: (Alunos & { academiaNome?: string })[] = [];
 
   selectedAluno?: Alunos & { academiaNome?: string };
+  alunoParaNovaMatricula?: Alunos;
 
   animacaoStatus: 'pulse' | 'shake' | null = null;
 
@@ -96,6 +103,8 @@ export class AlunosComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private acad: AcademiasService,
     private planosService: PlanosService,
+    private matriculasService: MatriculasService,
+    private pagamentosService: PagamentosService,
   ) {}
 
   ngOnInit() {
@@ -346,6 +355,7 @@ export class AlunosComponent implements OnInit {
         this.resetFiltro();
         this.resetNovoAlunoForm();
         this.fecharModal();
+        this.abrirConfirmacaoMatricula(res);
         
       },
       error: (err) => {
@@ -386,6 +396,36 @@ export class AlunosComponent implements OnInit {
   // Métodos para cadastro/edição de alunos - MODAL
   fecharModal() {
     this.modalRef?.hide();
+  }
+
+  abrirConfirmacaoMatricula(aluno: Alunos) {
+    this.alunoParaNovaMatricula = aluno;
+
+    setTimeout(() => {
+      this.modalRef = this.modalService.show(this.templateConfirmarMatricula, {
+        class: 'modal-sm modal-dialog-centered',
+      });
+    }, 200);
+  }
+
+  abrirModalMatriculaNovoAluno() {
+    if (!this.alunoParaNovaMatricula) return;
+
+    this.modalRef?.hide();
+    this.novaMatriculaForm = this.createNovaMatriculaForm();
+    this.carregarPlanos();
+    this.carregarFormasPagamento();
+
+    setTimeout(() => {
+      this.modalRef = this.modalService.show(this.templateNovaMatriculaAluno, {
+        class: 'modal-lg modal-dialog-centered',
+      });
+    }, 200);
+  }
+
+  recusarNovaMatricula() {
+    this.modalRef?.hide();
+    this.alunoParaNovaMatricula = undefined;
   }
 
   openModalNovoAluno(template: TemplateRef<any>) {
@@ -494,6 +534,76 @@ export class AlunosComponent implements OnInit {
 
   private resetNovoAlunoForm() {
     this.novoAlunoForm = this.createNovoAlunoForm();
+  }
+
+  private createNovaMatriculaForm() {
+    return {
+      planoId: 0,
+      formaPagamentoId: 0,
+      dataInicio: new Date().toISOString().split('T')[0],
+    };
+  }
+
+  carregarPlanos() {
+    this.planosService.getPlanos().subscribe({
+      next: (res) => {
+        this.planos = (res ?? []).filter((plano) => plano.ativo !== false);
+      },
+      error: () => {
+        this.planos = [];
+        this.toastr.error('Erro ao carregar planos');
+      },
+    });
+  }
+
+  carregarFormasPagamento() {
+    this.pagamentosService.getFormaPagamentos().subscribe({
+      next: (res) => {
+        this.formasPagamento = (res ?? []).filter((forma) => forma.ativo !== false);
+      },
+      error: () => {
+        this.formasPagamento = [];
+        this.toastr.error('Erro ao carregar formas de pagamento');
+      },
+    });
+  }
+
+  cadastrarMatriculaNovoAluno() {
+    if (!this.alunoParaNovaMatricula?.id) {
+      this.toastr.warning('Aluno nao selecionado');
+      return;
+    }
+
+    if (!this.novaMatriculaForm.planoId) {
+      this.toastr.warning('Selecione um plano');
+      return;
+    }
+
+    if (!this.novaMatriculaForm.formaPagamentoId) {
+      this.toastr.warning('Selecione a forma de pagamento');
+      return;
+    }
+
+    this.spinner.show();
+    this.matriculasService.novaMatricula({
+      alunoId: this.alunoParaNovaMatricula.id,
+      planoId: this.novaMatriculaForm.planoId,
+      formaPgtoId: this.novaMatriculaForm.formaPagamentoId,
+      dataInicio: this.novaMatriculaForm.dataInicio,
+    } as any).subscribe({
+      next: () => {
+        this.spinner.hide();
+        this.toastr.success('Matricula cadastrada!', 'Sucesso');
+        this.modalRef?.hide();
+        this.alunoParaNovaMatricula = undefined;
+        this.novaMatriculaForm = this.createNovaMatriculaForm();
+      },
+      error: (err) => {
+        this.spinner.hide();
+        const message = err?.error?.message || 'Erro ao salvar matricula';
+        this.toastr.error(message, 'Erro');
+      },
+    });
   }
 
   get mensalidadeStatusClasse(): string {

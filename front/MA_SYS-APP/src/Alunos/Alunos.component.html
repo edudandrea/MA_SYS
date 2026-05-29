@@ -499,6 +499,107 @@
   </div>
 </ng-template>
 
+<ng-template #templateConfirmarMatricula>
+  <div class="modal-content modal-surface">
+    <div class="modal-header">
+      <h5 class="modal-title">Nova matricula</h5>
+
+      <button type="button" class="btn-close" (click)="recusarNovaMatricula()"></button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-text">Aluno cadastrado com sucesso.</p>
+
+      <small class="modal-subtext">
+        Deseja incluir uma nova matricula para {{ alunoParaNovaMatricula?.nome }}?
+      </small>
+    </div>
+
+    <div class="modal-footer modal-actions">
+      <button type="button" class="btn-cancel" (click)="recusarNovaMatricula()">
+        Nao
+      </button>
+
+      <button type="button" class="btn-save" (click)="abrirModalMatriculaNovoAluno()">
+        Sim
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateNovaMatriculaAluno>
+  <div class="modal-content modal-surface aluno-modal">
+    <div class="modal-header">
+      <div>
+        <h4>Nova matricula</h4>
+        <p class="modal-subtext">Complete os dados da matricula do aluno cadastrado.</p>
+      </div>
+
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+
+    <div class="modal-body aluno-modal-body">
+      <div class="form-row aluno-modal-grid aluno-modal-grid--single">
+        <div class="input-group">
+          <label>Aluno</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-user"></i>
+            <input [value]="alunoParaNovaMatricula?.nome || ''" readonly />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row aluno-modal-grid">
+        <div class="input-group">
+          <label>Plano</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-layer-group"></i>
+            <select [(ngModel)]="novaMatriculaForm.planoId">
+              <option [ngValue]="0">Selecione</option>
+              <option *ngFor="let plano of planos" [ngValue]="plano.id">
+                {{ plano.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Forma de pagamento</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-credit-card"></i>
+            <select [(ngModel)]="novaMatriculaForm.formaPagamentoId">
+              <option [ngValue]="0">Selecione</option>
+              <option *ngFor="let forma of formasPagamento" [ngValue]="forma.id">
+                {{ forma.nome }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row aluno-modal-grid aluno-modal-grid--single">
+        <div class="input-group">
+          <label>Data de inicio</label>
+
+          <div class="input-modern">
+            <i class="fa-solid fa-calendar"></i>
+            <input type="date" [(ngModel)]="novaMatriculaForm.dataInicio" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer modal-actions">
+      <button class="btn-cancel" (click)="modalRef?.hide()">Cancelar</button>
+
+      <button class="btn-save" (click)="cadastrarMatriculaNovoAluno()">Salvar matricula</button>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #templateCancelarEdicao>
   <div class="modal-content modal-surface">
     <div class="modal-header">
