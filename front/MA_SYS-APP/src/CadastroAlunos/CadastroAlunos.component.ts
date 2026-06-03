@@ -91,6 +91,7 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
   alertaVencimento: boolean = false;
   aniversarioHoje = false;
   aulasDisponiveis: any[] = [];
+  historicoFrequencia: any[] = [];
   checkInEmAndamentoId: number | null = null;
 
   constructor(
@@ -193,6 +194,7 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
           diasSemanaLista: this.normalizarDiasSemana(aula.diasSemana),
           dataAulaSelecionada: this.obterDataAulaInicial(aula),
         }));
+        this.historicoFrequencia = res.historicoFrequencia || [];
         this.alunoEncontrado = true;
         this.formaPagamentoId = 0;
         this.formaPagamentoSelecionada = null;
@@ -685,6 +687,26 @@ export class CadastroAlunosComponent implements OnInit, OnDestroy {
 
     const partes = data.split('-');
     return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+  }
+
+  get totalFrequencias(): number {
+    return this.historicoFrequencia.length;
+  }
+
+  get graduacaoAtual(): string {
+    return this.graduacao || 'Nao informada';
+  }
+
+  get trilhaGraduacao(): string[] {
+    const faixas = ['Branca', 'Cinza', 'Amarela', 'Laranja', 'Verde', 'Azul', 'Roxa', 'Marrom', 'Preta'];
+    const atualNormalizada = this.normalizarTexto(this.graduacaoAtual);
+    const indiceAtual = faixas.findIndex((faixa) => atualNormalizada.includes(this.normalizarTexto(faixa)));
+
+    if (indiceAtual < 0) {
+      return [this.graduacaoAtual, 'Proxima graduacao', 'Meta de evolucao'];
+    }
+
+    return faixas.slice(indiceAtual, Math.min(indiceAtual + 3, faixas.length));
   }
 
   private obterOpcaoCheckInSelecionada(aula: any): any {

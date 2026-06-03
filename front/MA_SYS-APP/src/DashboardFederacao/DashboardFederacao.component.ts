@@ -170,6 +170,6 @@ export class DashboardFederacaoComponent implements OnInit, OnDestroy {
     }
 
     const theme = document.body.getAttribute('data-theme') || 'system';
-    return ['system', 'green-gold', 'red-black'].includes(theme);
+    return ['system', 'purple-white', 'green-gold', 'red-black', 'navy-mint'].includes(theme);
   }
 }

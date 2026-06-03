@@ -179,6 +179,28 @@ namespace MA_Sys.API.Services
                 .ToList();
         }
 
+        public List<object> ListarHistoricoFrequenciaPublico(int alunoId, int academiaId)
+        {
+            return _context.CheckInsAulas
+                .AsNoTracking()
+                .Where(c => c.AlunoId == alunoId && c.AcademiaId == academiaId)
+                .Include(c => c.Turma)
+                .ThenInclude(t => t!.Professor)
+                .OrderByDescending(c => c.DataCheckIn)
+                .Take(24)
+                .ToList()
+                .Select(c => new
+                {
+                    checkInId = c.Id,
+                    dataCheckIn = c.DataCheckIn.ToString("yyyy-MM-dd"),
+                    turma = c.Turma != null ? c.Turma.Nome : null,
+                    professor = c.Turma != null && c.Turma.Professor != null ? c.Turma.Professor.Nome : null,
+                    origem = c.Origem
+                })
+                .Cast<object>()
+                .ToList();
+        }
+
         public object RealizarCheckInPublico(string cpf, string email, int turmaId, DateTime? dataAula, int academiaId)
         {
             var aluno = BuscarPorCpfEmail(cpf, email, academiaId);

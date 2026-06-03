@@ -467,7 +467,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const theme = this.getCurrentTheme();
-    return ['system', 'green-gold', 'red-black'].includes(theme);
+    return ['system', 'purple-white', 'green-gold', 'red-black', 'navy-mint'].includes(theme);
   }
 
   private getCurrentTheme() {

@@ -1,27 +1,27 @@
 <div class="cadastro-shell">
   <section class="cadastro-hero">
     <div class="hero-brand">
-      <img src="assets/logo-marcial-prox.png" alt="Logo Marcial ProX" class="hero-logo" />
-      <span class="hero-badge">Pre-cadastro de aluno</span>
+      <img src="assets/logo-uniflow-dojo.png" alt="Logo UNiFlow Dojo" class="hero-logo" />
+      <span class="hero-badge">Portal do aluno</span>
     </div>
 
     <div class="hero-copy">
-      <h1>Confirme seus dados e conclua sua entrada no Marcial ProX.</h1>
+      <h1>Seu espaco UNiFlow Dojo para acompanhar presenca, pagamentos e graduacao.</h1>
       <p>
-        Uma experiencia mais clara para matricula, revisao cadastral e escolha da forma de
-        pagamento.
+        Acesse seus dados com CPF e email, confirme aula, consulte sua mensalidade e acompanhe
+        sua evolucao.
       </p>
     </div>
 
     <div class="hero-points">
       <div class="hero-point">
-        <strong>Cadastro guiado</strong>
-        <span>Informacoes organizadas em blocos simples e objetivos.</span>
+        <strong>Dados do aluno</strong>
+        <span>Informacoes cadastrais, plano e status financeiro em um painel limpo.</span>
       </div>
 
       <div class="hero-point">
-        <strong>Pagamento integrado</strong>
-        <span>PIX e cartao no mesmo fluxo, respeitando o tema ativo do sistema.</span>
+        <strong>Presenca e graduacao</strong>
+        <span>Check-in publico, frequencia recente e trilha de evolucao visiveis.</span>
       </div>
     </div>
   </section>
@@ -30,7 +30,7 @@
     <div class="panel-heading">
       <span class="eyebrow">Identificacao</span>
       <h2>Vamos localizar seu cadastro</h2>
-      <p>Informe CPF e email para carregar seus dados e continuar.</p>
+      <p>Informe CPF e email para carregar seu portal com seguranca.</p>
     </div>
 
     <div *ngIf="!alunoEncontrado" class="search-card">
@@ -65,12 +65,12 @@
         <div class="student-chips">
           <span class="info-chip">
             <i class="fa-solid fa-building"></i>
-            Marcial ProX
+            UNiFlow Dojo
           </span>
 
           <span class="info-chip emphasis">
             <i class="fa-solid fa-file-signature"></i>
-            Revisao cadastral pronta para envio
+            Portal ativo
           </span>
         </div>
       </div>
@@ -78,8 +78,8 @@
       <div class="birthday-alert" *ngIf="aniversarioHoje">
         <i class="fa-solid fa-cake-candles"></i>
         <div>
-          <strong>Feliz aniversário, {{ nome }}! 🎉🎂</strong>
-          <p>Que seu novo ciclo seja cheio de energia, conquistas e muitos treinos incríveis! 🥳</p>
+          <strong>Feliz aniversario, {{ nome }}!</strong>
+          <p>Que seu novo ciclo tenha energia, conquistas e treinos incriveis.</p>
         </div>
       </div>
 
@@ -232,6 +232,33 @@
         </section>
       </form>
 
+      <section class="student-overview">
+        <article class="overview-card">
+          <span class="overview-kicker">Graduacao atual</span>
+          <strong>{{ graduacaoAtual }}</strong>
+          <div class="grade-track">
+            <span
+              *ngFor="let faixa of trilhaGraduacao; let i = index"
+              [class.current]="i === 0"
+            >
+              {{ faixa }}
+            </span>
+          </div>
+        </article>
+
+        <article class="overview-card">
+          <span class="overview-kicker">Frequencia registrada</span>
+          <strong>{{ totalFrequencias }}</strong>
+          <small>presencas recentes no historico</small>
+        </article>
+
+        <article class="overview-card">
+          <span class="overview-kicker">Status financeiro</span>
+          <strong>{{ mensalidadeStatus || 'Sem status' }}</strong>
+          <small>Vencimento: {{ dataVencimentoMensalidade || '--/--/----' }}</small>
+        </article>
+      </section>
+
       <section class="checkin-panel">
         <div class="section-heading">
           <span class="eyebrow">Presenca</span>
@@ -309,6 +336,31 @@
         </ng-template>
       </section>
 
+      <section class="history-panel">
+        <div class="section-heading">
+          <span class="eyebrow">Historico</span>
+          <h4>Frequencia recente</h4>
+          <p>Acompanhe as presencas registradas nas suas aulas.</p>
+        </div>
+
+        <div class="history-list" *ngIf="historicoFrequencia.length; else semHistorico">
+          <article class="history-row" *ngFor="let item of historicoFrequencia">
+            <div>
+              <strong>{{ item.turma || 'Aula' }}</strong>
+              <span>{{ item.professor || 'Professor nao vinculado' }}</span>
+            </div>
+            <time>{{ formatarDataAula(item.dataCheckIn) }}</time>
+          </article>
+        </div>
+
+        <ng-template #semHistorico>
+          <div class="empty-checkin">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Nenhuma presenca registrada no historico recente.</span>
+          </div>
+        </ng-template>
+      </section>
+
       <section class="payment-panel">
         <div class="payment-summary">
           <div class="summary-box">
@@ -332,7 +384,7 @@
             <span>{{ mensalidadeStatus || 'Sem status' }}</span>
           </div>
           <div class="status-line">
-            <small>Validade até {{ dataVencimentoMensalidade || '--/--/----' }}</small>
+            <small>Validade ate {{ dataVencimentoMensalidade || '--/--/----' }}</small>
             <small>{{ diasParaVencimento }} dia(s)</small>
           </div>
           <p *ngIf="diasParaVencimento >= 0 && diasParaVencimento <= 5">

@@ -230,7 +230,7 @@ export class LayoutComponent implements OnInit {
     this.currentUserId = usuario.id || 0;
     this.userName = usuario.userName || 'Usuario';
     this.userEmail = usuario.email || '';
-    this.academiaNome = usuario.academiaNome || 'Marcial ProX';
+    this.academiaNome = usuario.academiaNome || 'UNiFlow Dojo';
     this.academiaLogoUrl = this.resolveLogoUrl(usuario.academiaLogoUrl);
     if (usuario.role === 'Federacao') {
       this.academiaNome = usuario.federacaoNome || this.academiaNome;

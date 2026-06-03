@@ -30,6 +30,7 @@ export const routes: Routes = [
 
     
     { path: 'login', component: LoginComponent}, 
+    { path: ':academia/portal-aluno', component: CadastroAlunosComponent},
     { path: ':academia/cadastro', component: CadastroAlunosComponent},    
     { path: 'federacao/:federacaoId/pagamento', component: PagamentoFiliadosComponent },
     

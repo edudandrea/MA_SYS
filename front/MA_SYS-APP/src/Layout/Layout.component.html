@@ -11,13 +11,15 @@
         (click)="toggleSidebar()"
         [attr.aria-label]="sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'"
       >
-        <span class="brand-mark-text">MA</span>
+        <span class="brand-mark-emblem" aria-hidden="true">
+          <span>UF</span>
+        </span>
         <i class="fa-solid fa-bars-staggered brand-mark-icon"></i>
       </button>
 
       <div class="brand-copy" *ngIf="!sidebarCollapsed">
-        <strong>Marcial ProX</strong>
-        <span>Gestao para artes marciais</span>
+        <strong>UniFlow Dojo</strong>
+        <span>Gestao, disciplina e evolucao</span>
       </div>
     </div>
 

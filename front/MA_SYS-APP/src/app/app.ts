@@ -22,6 +22,6 @@ export class App implements OnInit {
     this.auth.initializeIdleTimeout();
   }
 
-  protected readonly title = signal('Marcial ProX'); 
+  protected readonly title = signal('UNiFlow Dojo'); 
  
 }

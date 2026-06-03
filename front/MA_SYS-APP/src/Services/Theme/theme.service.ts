@@ -13,13 +13,16 @@ export class ThemeService {
   private readonly defaultTheme = 'system';
 
   readonly themes: ThemeOption[] = [
-    { value: 'system', label: 'Sistema' },
-    { value: 'blue-light', label: 'Branco + Azul Escuro' },
-    { value: 'yellow-white', label: 'Amarelo + Branco' },
-    { value: 'purple-white', label: 'Roxo + Branco' },
-    { value: 'green-gold', label: 'Verde + Dourado' },
-    { value: 'red-black', label: 'Vermelho + Preto' },
-    { value: 'windows', label: 'Padrao Windows' },
+    { value: 'system', label: 'UNiFlow Dark' },
+    { value: 'blue-light', label: 'Dojo Claro' },
+    { value: 'yellow-white', label: 'Lima + Branco' },
+    { value: 'purple-white', label: 'Grafite + Verde' },
+    { value: 'green-gold', label: 'Verde Profundo' },
+    { value: 'red-black', label: 'Preto Tecnico' },
+    { value: 'windows', label: 'Operacional Claro' },
+    { value: 'sage-sand', label: 'Sage Executivo' },
+    { value: 'navy-mint', label: 'Marinho + Menta' },
+    { value: 'platinum-teal', label: 'Platina + Teal' },
   ];
 
   initializeTheme() {

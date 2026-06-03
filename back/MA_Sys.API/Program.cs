@@ -130,7 +130,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "MA_Sys API",
+        Title = "UNiFlow Dojo API",
         Version = "v1"
     });
 

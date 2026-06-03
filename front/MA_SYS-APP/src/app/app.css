@@ -81,7 +81,8 @@
 
 body[data-theme='blue-light'] .app-spinner-shell,
 body[data-theme='yellow-white'] .app-spinner-shell,
-body[data-theme='purple-white'] .app-spinner-shell,
+body[data-theme='sage-sand'] .app-spinner-shell,
+body[data-theme='platinum-teal'] .app-spinner-shell,
 body[data-theme='windows'] .app-spinner-shell {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.94));
   border-color: rgba(37, 99, 235, 0.16);
@@ -89,14 +90,16 @@ body[data-theme='windows'] .app-spinner-shell {
 
 body[data-theme='blue-light'] .app-spinner-shell strong,
 body[data-theme='yellow-white'] .app-spinner-shell strong,
-body[data-theme='purple-white'] .app-spinner-shell strong,
+body[data-theme='sage-sand'] .app-spinner-shell strong,
+body[data-theme='platinum-teal'] .app-spinner-shell strong,
 body[data-theme='windows'] .app-spinner-shell strong {
   color: #0f172a;
 }
 
 body[data-theme='blue-light'] .app-spinner-shell p,
 body[data-theme='yellow-white'] .app-spinner-shell p,
-body[data-theme='purple-white'] .app-spinner-shell p,
+body[data-theme='sage-sand'] .app-spinner-shell p,
+body[data-theme='platinum-teal'] .app-spinner-shell p,
 body[data-theme='windows'] .app-spinner-shell p {
   color: rgba(15, 23, 42, 0.66);
 }

@@ -6,8 +6,8 @@
   padding: 18px;
   color: var(--text-primary);
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent-primary) 18%, transparent) 0, transparent 36%),
-    radial-gradient(circle at 82% 6%, color-mix(in srgb, var(--accent-secondary) 12%, transparent) 0, transparent 32%),
+    linear-gradient(118deg, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent 38%),
+    repeating-linear-gradient(150deg, color-mix(in srgb, var(--accent-primary) 10%, transparent) 0 1px, transparent 1px 44px),
     linear-gradient(180deg, color-mix(in srgb, var(--bg-app) 92%, #020617 8%), var(--bg-app));
 }
 
@@ -266,10 +266,120 @@
   gap: 20px;
 }
 
+.student-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.overview-card,
+.history-panel {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-surface) 64%, transparent), transparent 48%),
+    color-mix(in srgb, var(--bg-panel-strong) 94%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.overview-card {
+  min-height: 150px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.overview-kicker {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.overview-card strong {
+  color: var(--text-primary);
+  font-size: clamp(1.3rem, 2vw, 2rem);
+  line-height: 1.05;
+}
+
+.overview-card small {
+  color: var(--text-secondary);
+}
+
+.grade-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grade-track span {
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--bg-panel) 82%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.grade-track span.current {
+  color: #0b1209;
+  border-color: color-mix(in srgb, var(--accent-primary) 72%, #ffffff 28%);
+  background: linear-gradient(135deg, #b7ff35, var(--accent-primary));
+}
+
 .checkin-panel {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.history-panel {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-row {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 78%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-panel) 90%, transparent);
+}
+
+.history-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.history-row strong {
+  color: var(--text-primary);
+}
+
+.history-row span,
+.history-row time {
+  color: var(--text-secondary);
+}
+
+.history-row time {
+  flex-shrink: 0;
+  font-weight: 800;
 }
 
 .class-grid {
@@ -735,6 +845,7 @@ textarea {
     padding: 18px;
   }
 
+  .student-overview,
   .cols-2,
   .cols-3,
   .search-grid,
@@ -787,6 +898,7 @@ textarea {
   }
 
   .class-card-main,
+  .history-row,
   .status-line,
   .birthday-alert {
     align-items: flex-start;

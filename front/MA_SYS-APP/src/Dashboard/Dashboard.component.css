@@ -525,13 +525,19 @@
 }
 
 body[data-theme='system'] .card-heading span,
+body[data-theme='purple-white'] .card-heading span,
 body[data-theme='green-gold'] .card-heading span,
+body[data-theme='navy-mint'] .card-heading span,
 body[data-theme='red-black'] .card-heading span,
 body[data-theme='system'] .table-header,
+body[data-theme='purple-white'] .table-header,
 body[data-theme='green-gold'] .table-header,
+body[data-theme='navy-mint'] .table-header,
 body[data-theme='red-black'] .table-header,
 body[data-theme='system'] .empty-note,
+body[data-theme='purple-white'] .empty-note,
 body[data-theme='green-gold'] .empty-note,
+body[data-theme='navy-mint'] .empty-note,
 body[data-theme='red-black'] .empty-note {
   color: var(--text-secondary);
 }

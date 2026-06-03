@@ -5,11 +5,10 @@
 .page-tabs {
   position: relative;
   gap: 2px;
-  padding: 0 10px;
+  padding: 0;
   margin-bottom: 0;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--border-color);
   border-radius: 0;
   box-shadow: none;
 }

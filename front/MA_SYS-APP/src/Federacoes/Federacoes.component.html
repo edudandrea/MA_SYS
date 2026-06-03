@@ -5,13 +5,59 @@
   </div>
 </div>
 
-<div class="federacoes-grid">
+<div class="federacoes-page">
+  <div class="cadastro-list">
+    <div class="list-head federacoes-row">
+      <span>Federacao</span>
+      <span>Responsavel</span>
+      <span>Contato</span>
+      <span>Cidade/UF</span>
+      <span>Rede social</span>
+      <span>Status</span>
+      <span>Acoes</span>
+    </div>
   <div class="empty-state" *ngIf="!federacoes.length">
     <i class="fa-solid fa-building-columns"></i>
     <p>Nenhuma federação cadastrada</p>
   </div>
 
-  <article class="federacao-card" *ngFor="let federacao of federacoes">
+  <div class="list-row federacoes-row" *ngFor="let federacao of federacoes" (click)="editar(templateFederacao, federacao)">
+    <span class="entity-cell">
+      <span class="avatar avatar-logo small" *ngIf="federacao.logoUrl; else semLogoLinha">
+        <img [src]="federacao.logoUrl" [alt]="federacao.nome" />
+      </span>
+      <ng-template #semLogoLinha>
+        <span class="avatar small">{{ getInicial(federacao.nome) }}</span>
+      </ng-template>
+
+      <span>
+        <strong>{{ federacao.nome }}</strong>
+        <small>Federacao</small>
+      </span>
+    </span>
+
+    <span>{{ federacao.responsavel || 'Nao informado' }}</span>
+    <span>
+      <strong class="line-value">{{ federacao.telefone || 'Sem telefone' }}</strong>
+      <small>{{ federacao.email || 'Sem email' }}</small>
+    </span>
+    <span>{{ federacao.cidade || 'Nao informada' }}{{ federacao.estado ? ' / ' + federacao.estado : '' }}</span>
+    <span>{{ federacao.redeSocial || 'Nao informada' }}</span>
+    <span>
+      <span
+        class="status clickable"
+        [class.ativo]="federacao.ativo"
+        [class.inativo]="!federacao.ativo"
+        (click)="$event.stopPropagation(); toggleStatus(federacao)"
+      >
+        {{ federacao.ativo ? 'Ativa' : 'Inativa' }}
+      </span>
+    </span>
+    <span class="row-actions">
+      <button type="button" class="icon-action" title="Editar" (click)="$event.stopPropagation(); editar(templateFederacao, federacao)">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+    </span>
     <div class="card-header">
       <div class="header-top">
         <div class="avatar-section">
@@ -86,7 +132,8 @@
         Editar Federação
       </button>
     </div>
-  </article>
+  </div>
+  </div>
 </div>
 
 <button class="floating-add" (click)="abrirModal(templateFederacao)">

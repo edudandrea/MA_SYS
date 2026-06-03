@@ -91,7 +91,8 @@ namespace MA_Sys.API.Controllers
                 dataVencimentoMensalidade = dataReferencia.ToString("yyyy-MM-dd"),
                 diasParaVencimento,
                 alertaVencimento,
-                aulas = _service.ListarTurmasPublicasDoAluno(matricula.Aluno.Id, academiaId)
+                aulas = _service.ListarTurmasPublicasDoAluno(matricula.Aluno.Id, academiaId),
+                historicoFrequencia = _service.ListarHistoricoFrequenciaPublico(matricula.Aluno.Id, academiaId)
             });
         }
 

@@ -11,13 +11,49 @@
     </button>
   </div>
 
-  <div class="usuario-grid">
+  <div class="cadastro-list">
+    <div class="list-head usuarios-row">
+      <span>Usuario</span>
+      <span>Login</span>
+      <span>Email</span>
+      <span>Perfil</span>
+      <span>Vinculo</span>
+      <span>Acoes</span>
+    </div>
     <div class="empty-state" *ngIf="!usuarios || usuarios.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhum usuário cadastrado</p>
     </div>
 
-    <article class="usuario-card" *ngFor="let user of usuarios">
+    <div class="list-row usuarios-row" *ngFor="let user of usuarios" (click)="editar(user)">
+      <span class="entity-cell">
+        <span class="avatar small">{{ getInicial(user.userName) }}</span>
+
+        <span>
+          <strong title="{{ user.userName }}">{{ user.userName }}</strong>
+          <small>Usuario</small>
+        </span>
+      </span>
+
+      <span>{{ user.login || 'Sem login' }}</span>
+      <span>{{ user.email || 'Sem email' }}</span>
+      <span>
+        <span class="badge-role" [class.admin]="user.role === 'Admin'">
+          <i class="fa-solid fa-shield-halved"></i>
+          {{ user.role }}
+        </span>
+      </span>
+      <span>{{ getVinculo(user) }}</span>
+      <span class="row-actions">
+        <button type="button" class="icon-action" title="Editar" (click)="$event.stopPropagation(); editar(user)">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button type="button" class="icon-action danger" title="Excluir" (click)="$event.stopPropagation(); deleteUsuario(user.userId ?? user.id)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </span>
+
+      <div class="legacy-card-content">
       <div class="card-topline">
         <span class="entity-badge">Usuário</span>
         <div class="menu">
@@ -63,7 +99,8 @@
           {{ user.role }}
         </div>
       </div>
-    </article>
+      </div>
+    </div>
   </div>
 
   <ng-template #modalUsuario>

@@ -448,7 +448,7 @@ export class TreinosComponent implements OnInit {
 
             <footer class="footer">
               <span>Impresso em ${new Date().toLocaleDateString('pt-BR')}</span>
-              <span>Martial Arts System</span>
+              <span>UNiFlow Dojo</span>
             </footer>
           </div>
         </body>

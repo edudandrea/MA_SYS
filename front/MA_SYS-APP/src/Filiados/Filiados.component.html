@@ -9,13 +9,65 @@
 </div>
 
 <div class="filiados-page">
-  <div class="filiado-grid">
+  <div class="cadastro-list">
+    <div class="list-head filiados-row">
+      <span>Filiado</span>
+      <span>Responsavel</span>
+      <span>Contato</span>
+      <span>Cidade/UF</span>
+      <span>Rede social</span>
+      <span>Status</span>
+      <span>Acoes</span>
+    </div>
     <div class="empty-state" *ngIf="!filiados || filiados.length === 0">
       <i class="fa-solid fa-user-slash"></i>
       <p>Nenhum filiado cadastrado</p>
     </div>
 
-    <article class="filiado-card" *ngFor="let filiado of filiados">
+    <div class="list-row filiados-row" *ngFor="let filiado of filiados" (click)="editarFiliado(templateFiliado, filiado)">
+      <span class="entity-cell">
+        <span class="avatar avatar-logo small" *ngIf="filiado.logoUrl; else semLogoLinha">
+          <img [src]="filiado.logoUrl" [alt]="filiado.nome" />
+        </span>
+        <ng-template #semLogoLinha>
+          <span class="avatar small">{{ getInicial(filiado.nome) }}</span>
+        </ng-template>
+
+        <span>
+          <strong>{{ filiado.nome }}</strong>
+          <small>Filiado</small>
+        </span>
+      </span>
+
+      <span>{{ filiado.responsavel || 'Nao informado' }}</span>
+      <span>
+        <strong class="line-value">{{ filiado.telefone || 'Sem telefone' }}</strong>
+        <small>{{ filiado.email || 'Sem email' }}</small>
+      </span>
+      <span>{{ filiado.cidade || 'Nao informada' }}{{ filiado.estado ? ' / ' + filiado.estado : '' }}</span>
+      <span>{{ filiado.redeSocial || 'Nao informada' }}</span>
+      <span>
+        <span
+          class="status clickable"
+          [class.ativo]="filiado.ativo"
+          [class.inativo]="!filiado.ativo"
+          (click)="$event.stopPropagation(); toggleStatus(filiado)"
+        >
+          {{ filiado.ativo ? 'Ativo' : 'Inativo' }}
+        </span>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="icon-action" title="Editar" (click)="$event.stopPropagation(); editarFiliado(templateFiliado, filiado)">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button type="button" class="icon-action" title="Cobrancas" (click)="$event.stopPropagation(); openModalCobrancas(templateCobrancas, filiado)">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </button>
+        <button type="button" class="icon-action danger" title="Excluir" (click)="$event.stopPropagation(); excluir(filiado)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </span>
+      <span class="legacy-card-content">
       <div class="card-topline">
         <span class="entity-badge">Filiado</span>
         <span class="status clickable" [class.ativo]="filiado.ativo" [class.inativo]="!filiado.ativo" (click)="toggleStatus(filiado)">
@@ -77,7 +129,8 @@
         <button class="btn-cancel" (click)="openModalCobrancas(templateCobrancas, filiado)">Cobranças</button>
         <button class="btn-cancel danger" (click)="excluir(filiado)">Excluir</button>
       </div>
-    </article>
+      </span>
+    </div>
   </div>
 </div>
 
