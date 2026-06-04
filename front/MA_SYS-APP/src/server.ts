@@ -24,7 +24,13 @@ app.use('/api', async (req, res, next) => {
     const headers = new Headers();
 
     Object.entries(req.headers).forEach(([key, value]) => {
-      if (key.toLowerCase() === 'host' || typeof value === 'undefined') {
+      const headerName = key.toLowerCase();
+
+      if (
+        headerName === 'host' ||
+        headerName === 'accept-encoding' ||
+        typeof value === 'undefined'
+      ) {
         return;
       }
 
@@ -51,7 +57,13 @@ app.use('/api', async (req, res, next) => {
 
     res.status(response.status);
     response.headers.forEach((value, key) => {
-      if (key.toLowerCase() === 'transfer-encoding') {
+      const headerName = key.toLowerCase();
+
+      if (
+        headerName === 'transfer-encoding' ||
+        headerName === 'content-encoding' ||
+        headerName === 'content-length'
+      ) {
         return;
       }
 
