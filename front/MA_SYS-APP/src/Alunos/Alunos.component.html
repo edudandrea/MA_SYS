@@ -387,6 +387,100 @@
   </form>
 </div>
 
+<!-- ================= TAB AULA EXPERIMENTAL ================= -->
+
+<div class="surface-card aluno-card" *ngIf="activeTab === TabsCadastroAluno.AulaExperimental">
+  <div class="surface-header aluno-search-header">
+    <div>
+      <span class="search-eyebrow">Primeiro contato</span>
+      <h2>Aula experimental</h2>
+      <p>Cadastre rapidamente um interessado para acompanhamento e conversão em aluno.</p>
+    </div>
+  </div>
+
+  <form class="form aluno-search-panel">
+    <div class="form-row aluno-modal-grid aluno-modal-grid--single">
+      <div class="input-group">
+        <label>Nome</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-user"></i>
+          <input [(ngModel)]="aulaExperimentalForm.nome" name="aulaExperimentalNome" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row aluno-modal-grid">
+      <div class="input-group">
+        <label>Telefone</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-phone"></i>
+          <input [(ngModel)]="aulaExperimentalForm.telefone" name="aulaExperimentalTelefone" />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-envelope"></i>
+          <input [(ngModel)]="aulaExperimentalForm.email" name="aulaExperimentalEmail" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row aluno-modal-grid">
+      <div class="input-group">
+        <label>Modalidade</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-hand-fist"></i>
+
+          <select [(ngModel)]="aulaExperimentalForm.modalidadeId" name="aulaExperimentalModalidade">
+            <option [ngValue]="0">Selecione</option>
+
+            <option *ngFor="let modalidade of modalidades" [ngValue]="modalidade.id">
+              {{ modalidade.nomeModalidade }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Data da aula</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-calendar-day"></i>
+          <input type="date" [(ngModel)]="aulaExperimentalForm.dataAula" name="aulaExperimentalData" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row aluno-modal-grid aluno-modal-grid--single">
+      <div class="input-group">
+        <label>Observações</label>
+
+        <div class="input-modern">
+          <i class="fa-solid fa-note-sticky"></i>
+          <input [(ngModel)]="aulaExperimentalForm.observacoes" name="aulaExperimentalObservacoes" />
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn-cancel" type="button" (click)="resetAulaExperimentalForm()">
+        <i class="fa-solid fa-eraser"></i>
+        Limpar
+      </button>
+      <button class="btn-save" type="button" (click)="cadastrarAulaExperimental()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Salvar aula experimental
+      </button>
+    </div>
+  </form>
+</div>
+
 <button
   class="floating-add"
   *ngIf="activeTab === TabsCadastroAluno.Pesquisa && !modoEdicao"

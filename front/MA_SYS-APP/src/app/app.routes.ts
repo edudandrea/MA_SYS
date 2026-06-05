@@ -53,7 +53,7 @@ export const routes: Routes = [
             { path: 'portal-professor', component: ProfessorPortalComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'planos', component: PlanosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin', 'Federacao'] } },
             { path: 'pagamentos', component: PagamentosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin', 'Federacao'] } },
-            { path: 'mensalidades-sistema', component: MensalidadesSistemaComponent, canActivate: [RoleGuard], data: { roles: ['Admin', 'SuperAdmin'] } },
+            { path: 'mensalidades-sistema', component: MensalidadesSistemaComponent, canActivate: [RoleGuard], data: { roles: ['Admin', 'SuperAdmin', 'Academia'] } },
             { path: 'turmas', component: TurmasComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'treinos', component: TreinosComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin'] } },
             { path: 'fluxo-caixa', component: FluxoCaixaComponent, canActivate: [RoleGuard], data: { roles: ['Academia', 'SuperAdmin', 'Federacao'] } },

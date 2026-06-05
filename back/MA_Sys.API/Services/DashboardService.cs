@@ -176,12 +176,77 @@ namespace MA_Sys.API.Services
                 .Where(p => p.Status == "Pago" && p.DataPagamento.HasValue && p.DataPagamento.Value >= inicioMes)
                 .Sum(p => (decimal?)p.Valor) ?? 0m;
 
+            var totalAlunos = alunoQuery.Count();
+            var alunosInativos = alunoQuery.Count(a => !a.Ativo);
+            var novosAlunosMes = alunoQuery.Count(a => a.DataCadastro >= inicioMes);
+            var taxaEvasao = totalAlunos > 0
+                ? Math.Round((decimal)alunosInativos / totalAlunos * 100, 2)
+                : 0m;
+
+            var modalidadeMaisForte = alunoQuery
+                .GroupBy(a => a.ModalidadeId)
+                .Select(g => new
+                {
+                    ModalidadeId = g.Key,
+                    TotalAlunos = g.Count()
+                })
+                .OrderByDescending(g => g.TotalAlunos)
+                .FirstOrDefault();
+
+            ModalidadeForteDashboardDto? modalidadeForteDto = null;
+            if (modalidadeMaisForte != null)
+            {
+                var nomeModalidade = _context.Modalidades
+                    .Where(m => m.Id == modalidadeMaisForte.ModalidadeId)
+                    .Select(m => m.NomeModalidade)
+                    .FirstOrDefault();
+
+                modalidadeForteDto = new ModalidadeForteDashboardDto
+                {
+                    ModalidadeId = modalidadeMaisForte.ModalidadeId,
+                    Nome = nomeModalidade ?? $"Modalidade {modalidadeMaisForte.ModalidadeId}",
+                    TotalAlunos = modalidadeMaisForte.TotalAlunos
+                };
+            }
+
+            var professoresBase = professoresQuery.ToList();
+            var professorIds = professoresBase.Select(p => p.Id).ToList();
+            var alunosPorProfessor = _context.TurmasAlunos
+                .AsNoTracking()
+                .Where(ta =>
+                    ta.Turma != null &&
+                    ta.Turma.ProfessorId.HasValue &&
+                    professorIds.Contains(ta.Turma.ProfessorId.Value))
+                .GroupBy(ta => ta.Turma!.ProfessorId!.Value)
+                .Select(g => new
+                {
+                    ProfessorId = g.Key,
+                    TotalAlunos = g.Select(ta => ta.AlunoId).Distinct().Count()
+                })
+                .ToList();
+
+            var professoresComMaisAlunos = professoresBase
+                .Select(p =>
+                {
+                    var totalTurmas = alunosPorProfessor.FirstOrDefault(item => item.ProfessorId == p.Id)?.TotalAlunos;
+                    return new ProfessorAlunosDashboardDto
+                    {
+                        ProfessorId = p.Id,
+                        Nome = p.Nome ?? $"Professor {p.Id}",
+                        TotalAlunos = totalTurmas ?? p.TotalAlunos
+                    };
+                })
+                .OrderByDescending(p => p.TotalAlunos)
+                .ThenBy(p => p.Nome)
+                .Take(5)
+                .ToList();
+
             return new DashboardDto
             {
                 TotalAcademias = academiaQuery.Count(),
                 TotalAcademiasAtivas = academiaQuery.Count(a => a.Ativo),
                 TotalAcademiasInativas = academiaQuery.Count(a => !a.Ativo),
-                TotalAlunos = alunoQuery.Count(),
+                TotalAlunos = totalAlunos,
                 TotalProfessores = professoresQuery.Count(),
                 TotalUsuarios = usuariosQuery.Count(),
                 TotalPlanos = planosQuery.Count(),
@@ -197,6 +262,11 @@ namespace MA_Sys.API.Services
                 Meses = alunosPorMes.Select(x => new DateTime(1, x.Mes, 1).ToString("MMM")).ToList(),
                 AlunosPorMes = alunosPorMes.Select(x => x.Total).ToList(),
                 Planos = planos,
+                NovosAlunosMes = isAdmin || isSuperAdmin || isFederacao ? 0 : novosAlunosMes,
+                AlunosInativos = isAdmin || isSuperAdmin || isFederacao ? 0 : alunosInativos,
+                TaxaEvasao = isAdmin || isSuperAdmin || isFederacao ? 0 : taxaEvasao,
+                ModalidadeMaisForte = isAdmin || isSuperAdmin || isFederacao ? null : modalidadeForteDto,
+                ProfessoresComMaisAlunos = isAdmin || isSuperAdmin || isFederacao ? null : professoresComMaisAlunos,
                 TotalMensalidadesVencendo10Dias = isAdmin || isSuperAdmin || isFederacao ? 0 : totalMensalidadesVencendo10Dias,
                 TotalMensalidadesVencidas = isAdmin || isSuperAdmin || isFederacao ? 0 : totalMensalidadesVencidas,
                 MensalidadesAlerta = isAdmin || isSuperAdmin || isFederacao ? null : alertasMensalidade,

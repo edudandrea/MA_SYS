@@ -9,12 +9,18 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { Authinterceptor } from '../Services/Auth/auth.interceptor';
+import { LoadingInterceptor } from '../Services/Loading/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
 
     
     provideHttpClient(withInterceptorsFromDi(), withFetch()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: Authinterceptor,

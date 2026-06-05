@@ -4,12 +4,29 @@
   [fullScreen]="true"
 >
   <div class="app-spinner-shell" role="status" aria-live="polite">
-    <div class="app-spinner-dumbbell" aria-hidden="true">
-      <span class="plate plate-left outer"></span>
-      <span class="plate plate-left inner"></span>
-      <span class="grip"></span>
-      <span class="plate plate-right inner"></span>
-      <span class="plate plate-right outer"></span>
+    <div class="app-martial-loader" [ngClass]="currentMartialSpinner" aria-hidden="true">
+      @switch (currentMartialSpinner) {
+        @case ('boxing-glove') {
+          <span class="glove-cuff"></span>
+          <span class="glove-palm"></span>
+          <span class="glove-thumb"></span>
+          <span class="glove-shine"></span>
+        }
+        @case ('muay-thai-prajied') {
+          <span class="prajied-band"></span>
+          <span class="prajied-knot"></span>
+          <span class="prajied-tail tail-left"></span>
+          <span class="prajied-tail tail-right"></span>
+        }
+        @case ('jiu-jitsu-belt') {
+          <span class="belt-wrap wrap-back"></span>
+          <span class="belt-wrap wrap-front"></span>
+          <span class="belt-knot"></span>
+          <span class="belt-tip tip-left"></span>
+          <span class="belt-tip tip-right"></span>
+          <span class="belt-stripe"></span>
+        }
+      }
     </div>
     <strong>Carregando</strong>
     <p>Preparando os dados do sistema.</p>

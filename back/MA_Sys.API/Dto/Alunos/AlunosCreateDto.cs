@@ -9,6 +9,8 @@ namespace MA_Sys.API.Dto.Alunos
         public int ModalidadeId { get; set; }
         public int PlanoId { get; set; }
         public string? Graduacao { get; set; }
+        public string? RedeSocial { get; set; }
+        public string? Obs { get; set; }
         public DateTime DataNascimento { get; set; }
     }
 }

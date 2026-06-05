@@ -15,6 +15,7 @@ import { Pagamentos, PagamentosService } from '../Services/PagamentosService/Pag
 export enum TabsCadastroAluno {
   Pesquisa = 'PESQUISA',
   Cadastro = 'CADASTRO',
+  AulaExperimental = 'AULA_EXPERIMENTAL',
 }
 
 @Component({
@@ -63,6 +64,7 @@ export class AlunosComponent implements OnInit {
 
   filtroAlunos = { }as any;
   novoAlunoForm = this.createNovoAlunoForm();
+  aulaExperimentalForm = this.createAulaExperimentalForm();
   novaMatriculaForm = this.createNovaMatriculaForm();
 
   tabs = [
@@ -75,6 +77,11 @@ export class AlunosComponent implements OnInit {
       id: TabsCadastroAluno.Cadastro,
       label: 'Cadastro de Alunos',
       icon: 'bi bi-person-vcard',
+    },
+    {
+      id: TabsCadastroAluno.AulaExperimental,
+      label: 'Aula experimental',
+      icon: 'bi bi-calendar-plus',
     },
   ];
 
@@ -116,6 +123,10 @@ export class AlunosComponent implements OnInit {
     this.activeTab = tab;
     if (tab === TabsCadastroAluno.Pesquisa) {
       this.resetFiltro();
+    }
+    if (tab === TabsCadastroAluno.AulaExperimental) {
+      this.resetAulaExperimentalForm();
+      this.carregarModalidades();
     }
   }
 
@@ -398,6 +409,51 @@ export class AlunosComponent implements OnInit {
     this.modalRef?.hide();
   }
 
+  cadastrarAulaExperimental() {
+    if (!this.aulaExperimentalForm.nome?.trim()) {
+      this.toastr.warning('Informe o nome do aluno');
+      return;
+    }
+
+    if (this.aulaExperimentalForm.modalidadeId <= 0) {
+      this.toastr.warning('Selecione uma modalidade');
+      return;
+    }
+
+    this.spinner.show();
+
+    const modalidade = this.modalidades.find((item) => item.id === this.aulaExperimentalForm.modalidadeId);
+    const observacao = [
+      'Aula experimental',
+      this.aulaExperimentalForm.dataAula ? `Data: ${this.aulaExperimentalForm.dataAula}` : '',
+      modalidade?.nomeModalidade ? `Modalidade: ${modalidade.nomeModalidade}` : '',
+      this.aulaExperimentalForm.observacoes?.trim() || '',
+    ].filter(Boolean).join(' | ');
+
+    this.alunoService.novoAluno({
+      nome: this.aulaExperimentalForm.nome.trim(),
+      telefone: this.aulaExperimentalForm.telefone,
+      email: this.aulaExperimentalForm.email,
+      modalidadeId: this.aulaExperimentalForm.modalidadeId,
+      graduacao: 'Aula experimental',
+      obs: observacao,
+      dataCadastro: new Date().toISOString(),
+    } as any).subscribe({
+      next: (res) => {
+        this.spinner.hide();
+        this.toastr.success('Aula experimental cadastrada!', 'Sucesso');
+        this.setAlunoAtual(res);
+        this.activeTab = TabsCadastroAluno.Cadastro;
+        this.resetAulaExperimentalForm();
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error(err);
+        this.toastr.error('Erro ao cadastrar aula experimental', 'Erro');
+      },
+    });
+  }
+
   abrirConfirmacaoMatricula(aluno: Alunos) {
     this.alunoParaNovaMatricula = aluno;
 
@@ -534,6 +590,21 @@ export class AlunosComponent implements OnInit {
 
   private resetNovoAlunoForm() {
     this.novoAlunoForm = this.createNovoAlunoForm();
+  }
+
+  private createAulaExperimentalForm() {
+    return {
+      nome: '',
+      telefone: '',
+      email: '',
+      modalidadeId: 0,
+      dataAula: new Date().toISOString().split('T')[0],
+      observacoes: '',
+    };
+  }
+
+  resetAulaExperimentalForm() {
+    this.aulaExperimentalForm = this.createAulaExperimentalForm();
   }
 
   private createNovaMatriculaForm() {

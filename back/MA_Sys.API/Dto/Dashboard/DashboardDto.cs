@@ -27,9 +27,28 @@ namespace MA_Sys.API.Dto.DashboardDto
         public List<PlanoChartsDto>? Planos { get; set; }
         public int TotalMensalidadesVencendo10Dias { get; set; }
         public int TotalMensalidadesVencidas { get; set; }
+        public int NovosAlunosMes { get; set; }
+        public int AlunosInativos { get; set; }
+        public decimal TaxaEvasao { get; set; }
+        public ModalidadeForteDashboardDto? ModalidadeMaisForte { get; set; }
+        public List<ProfessorAlunosDashboardDto>? ProfessoresComMaisAlunos { get; set; }
         public List<MensalidadeAlertaDto>? MensalidadesAlerta { get; set; }
         public int TotalAcademiasComPendencia { get; set; }
         public int TotalAcademiasEmDiaPagamento { get; set; }
         public List<AcademiaPagamentoAlertaDto>? AcademiasPagamentoAlerta { get; set; }
+    }
+
+    public class ModalidadeForteDashboardDto
+    {
+        public int ModalidadeId { get; set; }
+        public string Nome { get; set; } = string.Empty;
+        public int TotalAlunos { get; set; }
+    }
+
+    public class ProfessorAlunosDashboardDto
+    {
+        public int ProfessorId { get; set; }
+        public string Nome { get; set; } = string.Empty;
+        public int TotalAlunos { get; set; }
     }
 }

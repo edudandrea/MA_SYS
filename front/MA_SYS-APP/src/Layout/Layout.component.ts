@@ -137,7 +137,7 @@ export class LayoutComponent implements OnInit {
   }
 
   canViewFinanceiroSistema(): boolean {
-    return this.isAdmin() || this.isSuperAdmin();
+    return this.isAdmin() || this.isSuperAdmin() || this.isAcademia();
   }
 
   canViewFinanceiroAcademia(): boolean {

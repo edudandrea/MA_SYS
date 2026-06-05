@@ -25,58 +25,163 @@
   font-size: 0.92rem;
 }
 
-.app-spinner-dumbbell {
+.app-martial-loader {
   position: relative;
-  width: 148px;
-  height: 64px;
+  width: 150px;
+  height: 82px;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: dumbbellLift 1.2s ease-in-out infinite;
+  animation: martialFloat 1.15s ease-in-out infinite;
 }
 
-.app-spinner-dumbbell .grip {
-  width: 62px;
-  height: 12px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #93c5fd, #2563eb 45%, #60a5fa);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
-}
-
-.app-spinner-dumbbell .plate {
+.app-martial-loader span {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border-radius: 10px;
-  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.34);
+  display: block;
 }
 
-.app-spinner-dumbbell .outer {
-  width: 16px;
-  height: 40px;
-}
-
-.app-spinner-dumbbell .inner {
-  width: 12px;
-  height: 30px;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
-}
-
-.app-spinner-dumbbell .plate-left.outer {
-  left: 14px;
-}
-
-.app-spinner-dumbbell .plate-left.inner {
+.boxing-glove .glove-palm {
+  width: 82px;
+  height: 62px;
+  top: 8px;
   left: 34px;
+  border-radius: 38px 36px 30px 34px;
+  background:
+    radial-gradient(circle at 68% 28%, rgba(255, 255, 255, 0.48), transparent 18%),
+    linear-gradient(145deg, #ef4444, #991b1b 72%);
+  box-shadow: 0 16px 28px rgba(239, 68, 68, 0.36);
+  transform: rotate(-10deg);
 }
 
-.app-spinner-dumbbell .plate-right.inner {
-  right: 34px;
+.boxing-glove .glove-thumb {
+  width: 32px;
+  height: 34px;
+  right: 24px;
+  bottom: 17px;
+  border-radius: 24px 20px 24px 12px;
+  background: linear-gradient(145deg, #dc2626, #7f1d1d);
+  transform: rotate(-18deg);
 }
 
-.app-spinner-dumbbell .plate-right.outer {
-  right: 14px;
+.boxing-glove .glove-cuff {
+  width: 38px;
+  height: 34px;
+  left: 20px;
+  bottom: 10px;
+  border-radius: 10px 16px 16px 10px;
+  background: linear-gradient(145deg, #f8fafc, #cbd5e1);
+  box-shadow: inset 0 0 0 4px #0f172a;
+  transform: rotate(-8deg);
+}
+
+.boxing-glove .glove-shine {
+  width: 34px;
+  height: 10px;
+  top: 22px;
+  left: 58px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.34);
+  transform: rotate(-18deg);
+}
+
+.muay-thai-prajied .prajied-band {
+  width: 106px;
+  height: 42px;
+  top: 10px;
+  left: 22px;
+  border: 11px solid #eab308;
+  border-bottom-color: #b45309;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.28),
+    0 15px 26px rgba(234, 179, 8, 0.28);
+}
+
+.muay-thai-prajied .prajied-knot {
+  width: 24px;
+  height: 24px;
+  left: 63px;
+  top: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #facc15, #a16207);
+  box-shadow: 0 8px 16px rgba(234, 179, 8, 0.24);
+}
+
+.muay-thai-prajied .prajied-tail {
+  width: 14px;
+  height: 36px;
+  top: 55px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #facc15, #92400e);
+  transform-origin: top center;
+}
+
+.muay-thai-prajied .tail-left {
+  left: 55px;
+  transform: rotate(22deg);
+}
+
+.muay-thai-prajied .tail-right {
+  right: 55px;
+  transform: rotate(-22deg);
+}
+
+.jiu-jitsu-belt .belt-wrap {
+  width: 118px;
+  height: 26px;
+  left: 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f8fafc, #dbe4ee);
+  box-shadow: 0 14px 24px rgba(148, 163, 184, 0.24);
+}
+
+.jiu-jitsu-belt .wrap-back {
+  top: 25px;
+  transform: rotate(10deg);
+  opacity: 0.9;
+}
+
+.jiu-jitsu-belt .wrap-front {
+  top: 31px;
+  transform: rotate(-8deg);
+}
+
+.jiu-jitsu-belt .belt-knot {
+  width: 38px;
+  height: 32px;
+  top: 25px;
+  left: 56px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffffff, #cbd5e1);
+  box-shadow: inset 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+
+.jiu-jitsu-belt .belt-tip {
+  width: 22px;
+  height: 50px;
+  top: 49px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #f8fafc, #cbd5e1);
+  transform-origin: top center;
+}
+
+.jiu-jitsu-belt .tip-left {
+  left: 54px;
+  transform: rotate(20deg);
+}
+
+.jiu-jitsu-belt .tip-right {
+  right: 54px;
+  transform: rotate(-20deg);
+}
+
+.jiu-jitsu-belt .belt-stripe {
+  width: 20px;
+  height: 30px;
+  top: 27px;
+  left: 65px;
+  border-radius: 7px;
+  background: #111827;
 }
 
 body[data-theme='blue-light'] .app-spinner-shell,
@@ -104,13 +209,13 @@ body[data-theme='windows'] .app-spinner-shell p {
   color: rgba(15, 23, 42, 0.66);
 }
 
-@keyframes dumbbellLift {
+@keyframes martialFloat {
   0%,
   100% {
-    transform: translateY(8px);
+    transform: translateY(7px) rotate(-2deg);
   }
 
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-8px) rotate(2deg);
   }
 }
